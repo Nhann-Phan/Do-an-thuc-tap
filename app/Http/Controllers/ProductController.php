@@ -7,7 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProjectImage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\File; // Sử dụng thư viện File giống Gallery
+use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
@@ -19,7 +19,6 @@ class ProductController extends Controller
     {
         $products = Product::where('is_active', 1)->get();
         $projectImages = ProjectImage::latest()->take(6)->get();
-        $menuCategories = Category::whereNull('parent_id')->with('children')->get();
         return view('clients.store', compact('products', 'projectImages', 'menuCategories'));
     }   
 
@@ -38,11 +37,43 @@ class ProductController extends Controller
         return view('clients.category_products', compact('products', 'menuCategories', 'currentCategory'));
     }
 
+    // --- HÀM SHOW: ĐÃ THÊM LOGIC LẤY SẢN PHẨM TƯƠNG TỰ ---
     public function show($id)
     {
-        $product = Product::findOrFail($id);
+        // Load kèm quan hệ category để check cha/con
+        $product = Product::with('category.parent', 'category.children')->findOrFail($id);
+        
+        $relatedProducts = collect(); // Khởi tạo collection rỗng
+
+        if ($product->category) {
+            $cat = $product->category;
+            $ids = [];
+            
+            // Logic: Lấy hết ID của các danh mục liên quan (Anh em cùng cha hoặc Cha-Con)
+            if ($cat->parent_id) {
+                // Nếu là mục con -> Lấy danh sách ID của các mục con khác cùng cha
+                if ($cat->parent) {
+                     $ids = $cat->parent->children->pluck('id')->toArray();
+                     $ids[] = $cat->parent_id; // Thêm cả cha vào
+                }
+            } else {
+                // Nếu là mục cha -> Lấy danh sách ID của các con
+                $ids = $cat->children->pluck('id')->toArray();
+                $ids[] = $cat->id;
+            }
+            
+            // Query lấy sản phẩm tương tự
+            $relatedProducts = Product::where('is_active', 1)
+                                    ->whereIn('category_id', $ids) // Thuộc nhóm ID đã lọc
+                                    ->where('id', '!=', $id)       // Trừ chính sản phẩm đang xem
+                                    ->inRandomOrder()              // Lấy ngẫu nhiên
+                                    ->take(4)                      // Lấy 4 sản phẩm
+                                    ->get();
+        }
+
         $menuCategories = Category::whereNull('parent_id')->with('children')->get();
-        return view('clients.product_detail', compact('product', 'menuCategories'));
+        
+        return view('clients.product_detail', compact('product', 'menuCategories', 'relatedProducts'));
     }
 
     // ==========================================
@@ -55,13 +86,20 @@ class ProductController extends Controller
         return view('admin.product_list', compact('products'));
     }
 
-    public function create($category_id)
+    // --- HÀM CREATE: TỰ ĐỘNG BẮT ID DANH MỤC TỪ URL ---
+    public function create(Request $request, $id = null)
     {
-        $category = Category::findOrFail($category_id);
-        return view('admin.product_create', compact('category'));
+        $categories = Category::all(); 
+        
+        // Ưu tiên lấy từ tham số hàm, sau đó đến route param, cuối cùng là query string
+        $selectedCategoryId = $id;
+        if (!$selectedCategoryId) $selectedCategoryId = $request->route('category_id');
+        if (!$selectedCategoryId) $selectedCategoryId = $request->get('category_id');
+
+        return view('admin.product_create', compact('categories', 'selectedCategoryId'));
     }
 
-    // --- SỬA LẠI HÀM LƯU (GIỐNG GALLERY) ---
+    // --- HÀM STORE: LƯU XONG QUAY LẠI FORM ĐỂ NHẬP TIẾP ---
     public function store(Request $request)
     {
         $request->validate([
@@ -74,15 +112,10 @@ class ProductController extends Controller
         $data['slug'] = Str::slug($request->name) . '-' . time();
         $data['price'] = $request->input('price', 0); 
 
-        // XỬ LÝ ẢNH MỚI (Lưu trực tiếp vào public/uploads/products)
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            
-            // Di chuyển file vào thư mục public/uploads/products
             $file->move(public_path('uploads/products'), $filename);
-            
-            // Lưu đường dẫn vào DB (Lưu ý: không có chữ public ở đầu)
             $data['image'] = 'uploads/products/' . $filename;
         }
 
@@ -91,7 +124,10 @@ class ProductController extends Controller
 
         Product::create($data);
 
-        return redirect()->route('category.show', $request->category_id)->with('success', 'Đã thêm sản phẩm!');
+        // Quay lại trang create kèm theo ID danh mục để nhập tiếp
+        return redirect()
+                ->route('product.create', ['category_id' => $request->category_id])
+                ->with('success', 'Đã thêm sản phẩm thành công! Mời nhập tiếp sản phẩm tiếp theo.');
     }
 
     public function edit($id)
@@ -101,10 +137,9 @@ class ProductController extends Controller
         return view('admin.product_edit', compact('product', 'categories'));
     }
 
-    // --- SỬA LẠI HÀM CẬP NHẬT (GIỐNG GALLERY) ---
     public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::findOrFail($id); // Sửa lỗi undefined variable $product
 
         $request->validate([
             'name' => 'required|max:255',
@@ -116,12 +151,9 @@ class ProductController extends Controller
         $data['slug'] = Str::slug($request->name) . '-' . $product->id;
 
         if ($request->hasFile('image')) {
-            // Xóa ảnh cũ nếu có
             if ($product->image && File::exists(public_path($product->image))) {
                 File::delete(public_path($product->image));
             }
-
-            // Upload ảnh mới
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/products'), $filename);
@@ -133,40 +165,32 @@ class ProductController extends Controller
 
         $product->update($data);
 
-        return redirect()->route('category.show', $product->category_id)->with('success', 'Cập nhật thành công!');
+        return redirect()->route('admin.category.products', $product->category_id)->with('success', 'Cập nhật thành công!');
     }
 
-    // --- SỬA LẠI HÀM XÓA (GIỐNG GALLERY) ---
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
         
-        // Xóa ảnh trong thư mục public
         if ($product->image && File::exists(public_path($product->image))) {
             File::delete(public_path($product->image));
         }
-
+        
         $product->delete();
 
         return redirect()->back()->with('success', 'Đã xóa sản phẩm!');
     }
 
-    // --- ADMIN: XEM SẢN PHẨM THEO DANH MỤC ---
     public function adminShowByCategory($id)
     {
-        // 1. Lấy thông tin danh mục
         $category = Category::with('children')->findOrFail($id);
-
-        // 2. Lấy ID của danh mục này và các danh mục con (để hiển thị hết)
         $categoryIds = $category->children->pluck('id')->toArray();
         $categoryIds[] = $category->id;
 
-        // 3. Lọc sản phẩm theo danh sách ID trên
         $products = Product::whereIn('category_id', $categoryIds)
                            ->latest()
                            ->paginate(10);
         
-        // 4. Trả về view danh sách (Kèm biến $category để hiển thị tiêu đề)
-        return view('admin.product_list', compact('products', 'category'));
+        return view('admin.category_detail', compact('products', 'category'));
     }
 }

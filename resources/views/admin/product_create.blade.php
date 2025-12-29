@@ -7,18 +7,33 @@
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold text-secondary">Thêm sản phẩm mới</h3>
-    <a href="{{ route('category.show', $category->id) }}" class="btn btn-secondary btn-sm">
-        <i class="fas fa-arrow-left"></i> Quay lại danh mục
+    <h3 class="fw-bold text-secondary">
+        @if($selectedCategoryId)
+            {{-- Hiển thị tên danh mục đang nhập liệu --}}
+            @php $catName = $categories->find($selectedCategoryId)->name ?? 'Mới'; @endphp
+            Nhập liệu liên tục: <span class="text-primary">{{ $catName }}</span>
+        @else
+            Thêm sản phẩm mới
+        @endif
+    </h3>
+    
+    <a href="{{ $selectedCategoryId ? route('admin.category.products', $selectedCategoryId) : route('product.index_admin') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-list me-2"></i> Xem danh sách đã nhập
     </a>
 </div>
 
 <div class="card border-0 shadow-sm">
-    <div class="card-header bg-primary text-white fw-bold">
-        Đang thêm vào danh mục: {{ $category->name }}
-    </div>
-    
     <div class="card-body">
+        
+        @if(session('success'))
+            <div class="alert alert-success d-flex align-items-center mb-4">
+                <i class="fas fa-check-circle me-2 text-xl"></i>
+                <div>
+                    <strong>Thành công!</strong> {{ session('success') }}
+                </div>
+            </div>
+        @endif
+
         @if ($errors->any())
             <div class="alert alert-danger">
                 <ul class="mb-0">
@@ -31,13 +46,12 @@
 
         <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <input type="hidden" name="category_id" value="{{ $category->id }}">
             
             <div class="row">
                 <div class="col-md-8">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Tên sản phẩm <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" required placeholder="Ví dụ: Camera Wifi Ezviz..." value="{{ old('name') }}">
+                        <input type="text" name="name" class="form-control" required placeholder="Nhập tên sản phẩm tiếp theo..." value="{{ old('name') }}" autofocus>
                     </div>
 
                     <div class="mb-3">
@@ -49,6 +63,22 @@
                 <div class="col-md-4">
                     <div class="card bg-light border-0 mb-3">
                         <div class="card-body">
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Danh mục <span class="text-danger">*</span></label>
+                                <select name="category_id" class="form-select" required>
+                                    <option value="">-- Chọn danh mục --</option>
+                                    @foreach($categories as $cat)
+                                        <option value="{{ $cat->id }}" 
+                                            {{-- Logic: ID trên URL khớp ID danh mục -> Selected --}}
+                                            {{ (isset($selectedCategoryId) && $selectedCategoryId == $cat->id) || old('category_id') == $cat->id ? 'selected' : '' }}>
+                                            
+                                            {{ $cat->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Giá bán (VNĐ)</label>
                                 <input type="number" name="price" class="form-control" placeholder="0" value="{{ old('price') }}">
@@ -57,7 +87,6 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Ảnh đại diện</label>
                                 <input type="file" name="image" id="imageInput" class="form-control mb-2" accept="image/*" onchange="previewImage(this)">
-                                
                                 <div class="p-2 border bg-white rounded text-center" style="min-height: 150px; display: flex; align-items: center; justify-content: center;">
                                     <img id="preview" src="#" class="img-fluid rounded" style="max-height: 200px; display: none;">
                                     <span id="placeholder-text" class="text-muted small">Chưa chọn ảnh</span>
@@ -78,8 +107,8 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100 py-2 fw-bold text-uppercase">
-                        <i class="fas fa-save me-1"></i> Lưu sản phẩm
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold text-uppercase shadow">
+                        <i class="fas fa-plus-circle me-1"></i> Lưu & Nhập tiếp
                     </button>
                 </div>
             </div>
@@ -88,13 +117,8 @@
 </div>
 
 <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
-
 <script>
-    CKEDITOR.replace( 'description', {
-        height: 400,
-        language: 'vi'
-    });
-
+    CKEDITOR.replace( 'description', { height: 400, language: 'vi' });
     function previewImage(input) {
         var preview = document.getElementById('preview');
         var placeholder = document.getElementById('placeholder-text');

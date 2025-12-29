@@ -1,182 +1,179 @@
 @extends('layouts.admin_layout')
 
 @section('content')
-<script src="https://cdn.tailwindcss.com"></script>
+
 <style>
-    .tw-reset a { text-decoration: none; }
-    .tw-reset ul { padding-left: 0; margin-bottom: 0; }
-    /* Hiệu ứng Modal */
-    #editModal { transition: opacity 0.3s ease; }
-    #editModal.hidden { opacity: 0; pointer-events: none; }
-    #editModal:not(.hidden) { opacity: 1; pointer-events: auto; }
+    /* ... (Giữ nguyên phần CSS cũ của bạn) ... */
+    .category-card { border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 12px; overflow: hidden; height: 100%; transition: transform 0.2s; background: white; }
+    .category-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .card-header-custom { background-color: #1e293b; color: white; padding: 12px 15px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; }
+    .child-item-wrapper { position: relative; border-bottom: 1px solid #f1f5f9; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center; }
+    .child-item-wrapper:last-child { border-bottom: none; }
+    .child-item-wrapper:hover { background-color: #f0fdf4; }
+    .child-action-area { flex-grow: 1; padding: 12px 15px; cursor: pointer; color: #334155; font-weight: 500; text-decoration: none; display: flex; align-items: center; }
+    .child-action-area:hover { color: #15803d; }
+    .child-action-area i.fa-plus { opacity: 0; margin-left: 10px; transition: opacity 0.2s; color: #15803d; }
+    .child-item-wrapper:hover .child-action-area i.fa-plus { opacity: 1; }
+    .child-icon { color: #cbd5e1; margin-right: 10px; transition: color 0.2s; }
+    .child-item-wrapper:hover .child-icon { color: #15803d; }
+    .action-buttons-mini { padding-right: 10px; display: flex; gap: 5px; }
+    .btn-mini { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; border: none; background: transparent; transition: all 0.2s; color: #94a3b8; }
+    .btn-mini:hover { background-color: #f1f5f9; }
+    .btn-mini.edit:hover { color: #eab308; }
+    .btn-mini.delete:hover { color: #ef4444; }
 </style>
 
-<div class="tw-reset font-sans relative">
-    
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h3 class="text-2xl font-bold text-gray-700">Cấu hình Danh mục</h3>
-            <p class="text-sm text-gray-500">Quản lý Menu hiển thị trên website</p>
-        </div>
+<div class="row g-4">
+    <div class="col-12 mb-2">
+        <h3 class="fw-bold text-dark m-0">Cấu hình Danh mục</h3>
+        <span class="text-muted small">Quản lý Menu hiển thị trên website</span>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <div class="lg:col-span-4">
-            <div class="bg-white rounded-lg shadow-md overflow-hidden border-t-4 border-blue-600">
-                <div class="p-4 bg-gray-50 border-b">
-                    <h4 class="font-bold text-gray-800 flex items-center">
-                        <i class="fas fa-plus-circle mr-2 text-blue-600"></i> Thêm Mục Mới
-                    </h4>
-                </div>
-                <div class="p-5">
-                    <form action="{{ route('categories.store') }}" method="POST">
-                        @csrf
-                        <div class="mb-4">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Tên hiển thị</label>
-                            <input type="text" name="name" required class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="VD: Camera Wifi">
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Thuộc nhóm (Cha)</label>
-                            <select name="parent_id" class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                                <option value="">-- Danh mục gốc --</option>
-                                @foreach($categories as $cat)
-                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Icon (Font Awesome)</label>
-                            <div class="flex">
-                                <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                                    <i class="fas fa-icons"></i>
-                                </span>
-                                <input type="text" name="icon" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-r-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="VD: fas fa-camera">
-                            </div>
-                        </div>
-                        
-                        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow transition">
-                            THÊM VÀO MENU
-                        </button>
-                    </form>
-                </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 90px; z-index: 1;">
+            <div class="card-header bg-white border-bottom p-3">
+                <h5 class="m-0 fw-bold text-primary"><i class="fas fa-plus-circle me-2"></i>Thêm Mục Mới</h5>
             </div>
-        </div>
-
-        <div class="lg:col-span-8">
-            <div class="bg-blue-50 text-blue-800 px-4 py-3 rounded-lg border border-blue-200 mb-4 flex items-center shadow-sm">
-                <i class="fas fa-info-circle mr-2 text-xl"></i> 
-                <span class="font-medium">Danh sách danh mục đang hiển thị trên Website</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach($categories as $parent)
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition">
-                    <div class="bg-gray-800 text-white px-3 py-3 flex justify-between items-center">
-                        <span class="font-bold text-sm uppercase flex items-center truncate max-w-[60%]">
-                            <i class="{{ $parent->icon ?? 'fas fa-folder' }} mr-2 text-yellow-400"></i> {{ $parent->name }}
-                        </span>
-                        <div class="flex items-center space-x-1">
-                            <a href="{{ route('admin.category.products', $parent->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" title="Xem danh sách sản phẩm">
-                                <i class="fas fa-list-ul"></i>
-                            </a>
-                            
-                            <button onclick="openEditModal({{ $parent->id }}, '{{ $parent->name }}', '{{ $parent->icon }}', '')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded text-xs" title="Sửa danh mục">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            
-                            <form action="{{ route('categories.destroy', $parent->id) }}" method="POST" onsubmit="return confirm('Xóa mục này sẽ xóa tất cả danh mục con?')" class="inline">
-                                @csrf @method('DELETE')
-                                <button class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs" title="Xóa"><i class="fas fa-trash"></i></button>
-                            </form>
-                        </div>
-                    </div>
-                    
-                    <ul class="divide-y divide-gray-100">
-                        @forelse($parent->children as $child)
-                            <li class="px-3 py-2 flex justify-between items-center hover:bg-gray-50 text-sm">
-                                <span class="flex items-center truncate max-w-[60%]">
-                                    <i class="fas fa-angle-right text-gray-300 mr-2"></i> {{ $child->name }}
-                                </span>
-                                <div class="flex items-center space-x-1">
-                                    <a href="{{ route('product.create', ['category_id' => $child->id]) }}" class="text-green-600 border border-green-200 px-1 rounded text-xs font-bold hover:bg-green-50" title="Thêm sản phẩm">+SP</a>
-                                    
-                                    <button onclick="openEditModal({{ $child->id }}, '{{ $child->name }}', '{{ $child->icon }}', '{{ $parent->id }}')" class="text-yellow-500 hover:text-yellow-600 px-1" title="Sửa">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-
-                                    <form action="{{ route('categories.destroy', $child->id) }}" method="POST" onsubmit="return confirm('Xóa mục này?')" class="inline">
-                                        @csrf @method('DELETE')
-                                        <button class="text-gray-300 hover:text-red-500 px-1" title="Xóa"><i class="fas fa-times"></i></button>
-                                    </form>
-                                </div>
-                            </li>
-                        @empty
-                            <li class="px-4 py-2 text-center text-gray-400 text-xs italic bg-gray-50">Chưa có mục con</li>
-                        @endforelse
-                    </ul>
-                </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-
-    <div id="editModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 overflow-hidden transform transition-all scale-100">
-            <div class="bg-yellow-500 px-4 py-3 flex justify-between items-center">
-                <h3 class="text-white font-bold text-lg"><i class="fas fa-edit mr-2"></i> Cập nhật Danh mục</h3>
-                <button onclick="closeEditModal()" class="text-white hover:text-gray-200 text-xl">&times;</button>
-            </div>
-            
-            <div class="p-6">
-                <form id="editForm" method="POST">
+            <div class="card-body p-4">
+                <form action="{{ route('categories.store') }}" method="POST">
                     @csrf
-                    @method('PUT')
-                    
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Tên hiển thị</label>
-                        <input type="text" id="editName" name="name" required class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-secondary">Tên hiển thị</label>
+                        <input type="text" name="name" required class="form-control form-control-lg fs-6" placeholder="VD: Camera Wifi">
                     </div>
-
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Nhóm cha (Nếu muốn đổi)</label>
-                        <select name="parent_id" id="editParentId" class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white">
-                            <option value="">-- LÀ DANH MỤC GỐC --</option>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-secondary">Thuộc nhóm (Cha)</label>
+                        <select name="parent_id" class="form-select form-select-lg fs-6">
+                            <option value="">-- Danh mục gốc --</option>
                             @foreach($categories as $cat)
-                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                @if($cat->parent_id == null)
+                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                @endif
                             @endforeach
                         </select>
                     </div>
-
                     <div class="mb-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Icon</label>
-                        <input type="text" id="editIcon" name="icon" class="w-full border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                        <label class="form-label fw-bold small text-secondary">Icon (Font Awesome)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fas fa-icons"></i></span>
+                            <input type="text" name="icon" class="form-control" placeholder="VD: fas fa-camera">
+                        </div>
                     </div>
-
-                    <div class="flex justify-end gap-2">
-                        <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded font-bold">Hủy</button>
-                        <button type="submit" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded font-bold">Lưu thay đổi</button>
-                    </div>
+                    <button class="btn btn-primary w-100 py-2 fw-bold shadow-sm">THÊM VÀO MENU</button>
                 </form>
             </div>
         </div>
     </div>
 
+    <div class="col-lg-8">
+        <div class="alert alert-light border shadow-sm d-flex align-items-center rounded-3 mb-4">
+            <i class="fas fa-info-circle fs-4 text-primary me-3"></i>
+            <div>
+                <strong>Mẹo:</strong> Bấm vào tên danh mục để chuyển sang trang <strong>Thêm sản phẩm mới</strong> (Chế độ nhập liệu nhanh).
+            </div>
+        </div>
+
+        <div class="row g-3 align-items-start">
+            @foreach($categories as $parent)
+            
+            @if($parent->parent_id !== null) @continue @endif
+
+            <div class="col-md-6">
+                <div class="category-card d-flex flex-column">
+                    <div class="card-header-custom">
+                        <div class="d-flex align-items-center text-truncate" style="max-width: 70%;">
+                            <i class="{{ $parent->icon ?? 'fas fa-folder' }} me-2 text-warning"></i>
+                            <span class="text-truncate" title="{{ $parent->name }}">{{ $parent->name }}</span>
+                        </div>
+                        <div class="d-flex gap-1">
+                            <a href="{{ route('admin.category.products', $parent->id) }}" class="btn btn-sm btn-outline-light border-0 py-0" title="Xem danh sách"><i class="fas fa-list-ul"></i></a>
+                            <button onclick="openEditModal({{ $parent->id }}, '{{ $parent->name }}', '{{ $parent->icon }}', '')" class="btn btn-sm btn-outline-light border-0 py-0" title="Sửa"><i class="fas fa-pen"></i></button>
+                            <form action="{{ route('categories.destroy', $parent->id) }}" method="POST" onsubmit="return confirm('Xóa mục này sẽ xóa tất cả danh mục con?')" class="d-inline">
+                                @csrf @method('DELETE')
+                                <button class="btn btn-sm btn-outline-danger border-0 py-0 text-white" title="Xóa"><i class="fas fa-times"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex flex-column">
+                        @forelse($parent->children as $child)
+                            <div class="child-item-wrapper">
+                                
+                                <a href="{{ route('product.create', ['category_id' => $child->id]) }}" 
+                                   class="child-action-area"
+                                   title="Nhập sản phẩm mới vào mục này">
+                                    <i class="fas fa-caret-right child-icon"></i>
+                                    <span>{{ $child->name }}</span>
+                                    <i class="fas fa-plus small"></i> 
+                                </a>
+
+                                <div class="action-buttons-mini">
+                                    <a href="{{ route('admin.category.products', $child->id) }}" class="btn-mini text-primary" title="Xem danh sách"><i class="fas fa-list-ul fa-xs"></i></a>
+                                    <button onclick="openEditModal({{ $child->id }}, '{{ $child->name }}', '{{ $child->icon }}', '{{ $parent->id }}')" class="btn-mini edit" title="Sửa tên"><i class="fas fa-pen fa-xs"></i></button>
+                                    <form action="{{ route('categories.destroy', $child->id) }}" method="POST" onsubmit="return confirm('Bạn chắc chắn muốn xóa mục này?')" class="d-inline">
+                                        @csrf @method('DELETE')
+                                        <button class="btn-mini delete" title="Xóa mục này"><i class="fas fa-trash-alt fa-xs"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="p-4 text-center text-muted small fst-italic bg-light">Chưa có mục con</div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
 </div>
 
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-warning text-dark border-0">
+                <h5 class="modal-title fw-bold"><i class="fas fa-edit me-2"></i>Cập nhật Danh mục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editForm" method="POST">
+                    @csrf @method('PUT')
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small">Tên hiển thị</label>
+                        <input type="text" id="editName" name="name" required class="form-control form-control-lg fs-6">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small">Nhóm cha</label>
+                        <select name="parent_id" id="editParentId" class="form-select form-select-lg fs-6">
+                            <option value="">-- LÀ DANH MỤC GỐC --</option>
+                            @foreach($categories as $cat)
+                                @if($cat->parent_id == null) <option value="{{ $cat->id }}">{{ $cat->name }}</option> @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary small">Icon</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fas fa-icons"></i></span>
+                            <input type="text" id="editIcon" name="icon" class="form-control">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-light fw-bold px-4" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-warning fw-bold px-4">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     function openEditModal(id, name, icon, parentId) {
         document.getElementById('editName').value = name;
         document.getElementById('editIcon').value = icon;
         document.getElementById('editParentId').value = parentId || "";
         document.getElementById('editForm').action = "/admin/categories/" + id;
-        document.getElementById('editModal').classList.remove('hidden');
-    }
-
-    function closeEditModal() {
-        document.getElementById('editModal').classList.add('hidden');
+        var myModal = new bootstrap.Modal(document.getElementById('editModal'));
+        myModal.show();
     }
 </script>
 @endsection

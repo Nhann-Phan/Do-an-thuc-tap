@@ -7,6 +7,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\CheckoutController;
 
 // ====================================================
 // 1. KHU VỰC CÔNG KHAI (Khách hàng)
@@ -73,3 +76,25 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     });
 
 });
+
+// Route Giỏ hàng
+Route::get('gio-hang', [CartController::class, 'index'])->name('cart.index');
+Route::get('add-to-cart/{id}', [CartController::class, 'addToCart'])->name('add_to_cart');
+Route::patch('update-cart', [CartController::class, 'update'])->name('update_cart');
+Route::delete('remove-from-cart', [CartController::class, 'remove'])->name('remove_from_cart');
+
+// --- ROUTE QUẢN LÝ ĐƠN HÀNG ---
+    Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('admin.orders.show');
+    Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.update_status');
+    Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
+
+// --- ROUTE THANH TOÁN (Dán vào cuối file) ---
+Route::get('thanh-toan', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('thanh-toan', [CheckoutController::class, 'placeOrder'])->name('checkout.process');
+
+// --- Route Thêm vào giỏ (Cũ) ---
+Route::get('add-to-cart/{id}', [CartController::class, 'addToCart'])->name('add_to_cart');
+
+// --- THÊM DÒNG NÀY: Route Mua ngay ---
+Route::get('buy-now/{id}', [CartController::class, 'buyNow'])->name('buy_now');
