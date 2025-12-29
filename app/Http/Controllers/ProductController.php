@@ -19,7 +19,7 @@ class ProductController extends Controller
     {
         $products = Product::where('is_active', 1)->get();
         $projectImages = ProjectImage::latest()->take(6)->get();
-        return view('clients.store', compact('products', 'projectImages', 'menuCategories'));
+        return view('clients.store', compact('products', 'projectImages'));
     }   
 
     public function showByCategory($id)

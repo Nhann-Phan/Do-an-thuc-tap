@@ -98,3 +98,4 @@ Route::get('add-to-cart/{id}', [CartController::class, 'addToCart'])->name('add_
 
 // --- THÊM DÒNG NÀY: Route Mua ngay ---
 Route::get('buy-now/{id}', [CartController::class, 'buyNow'])->name('buy_now');
+
