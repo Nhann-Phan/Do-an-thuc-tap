@@ -185,6 +185,50 @@
             },
         });
     });
+
+    function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const content = document.getElementById('chat-content');
+            const userMsg = input.value.trim();
+
+            if(userMsg === '') return;
+
+            // 1. Hiện tin nhắn khách
+            content.innerHTML += `<div class="bg-gray-200 p-2 rounded-lg self-end max-w-[80%] ml-auto mt-2 text-right">${userMsg}</div>`;
+            input.value = '';
+            content.scrollTop = content.scrollHeight;
+
+            // 2. Hiện "Đang nhập..."
+            const loadingId = 'loading-' + Date.now();
+            content.innerHTML += `
+                <div id="${loadingId}" class="bg-blue-50 text-gray-500 p-2 rounded-lg self-start max-w-[80%] mt-2 flex items-center">
+                    <i class="fas fa-robot mr-2 text-blue-600"></i>
+                    <span class="text-xs italic">GPM AI đang trả lời<span class="animate-pulse">...</span></span>
+                </div>`;
+            content.scrollTop = content.scrollHeight;
+
+            // 3. Gọi về Server cũ
+            fetch('{{ route('chatbot.send') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ message: userMsg })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById(loadingId).remove();
+                content.innerHTML += `<div class="bg-blue-100 text-blue-900 p-3 rounded-lg self-start max-w-[85%] mt-2 shadow-sm leading-relaxed">
+                                        <i class="fas fa-robot mr-2 text-lg text-blue-600"></i>
+                                        <span>${data.reply}</span>
+                                      </div>`;
+                content.scrollTop = content.scrollHeight;
+            })
+            .catch(error => {
+                document.getElementById(loadingId).remove();
+            });
+        }
 </script>
 
 <style>

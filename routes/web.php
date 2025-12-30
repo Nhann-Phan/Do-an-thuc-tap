@@ -9,6 +9,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\CheckoutController;
 
 // ====================================================
@@ -96,3 +97,6 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     });
 
 });
+
+// Route Chatbot
+Route::post('/chatbot/send', [ChatbotController::class, 'send'])->name('chatbot.send');
