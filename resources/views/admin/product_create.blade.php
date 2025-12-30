@@ -11,7 +11,7 @@
         @if($selectedCategoryId)
             {{-- Hiển thị tên danh mục đang nhập liệu --}}
             @php $catName = $categories->find($selectedCategoryId)->name ?? 'Mới'; @endphp
-            Nhập liệu liên tục: <span class="text-primary">{{ $catName }}</span>
+            Bảng nhập liệu: <span class="text-primary">{{ $catName }}</span>
         @else
             Thêm sản phẩm mới
         @endif

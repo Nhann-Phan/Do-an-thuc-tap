@@ -25,7 +25,7 @@
 
 <div class="row g-4">
     <div class="col-12 mb-2">
-        <h3 class="fw-bold text-dark m-0">Cấu hình Danh mục</h3>
+        <h3 class="fw-bold text-dark m-0">Danh mục sản phẩm</h3>
         <span class="text-muted small">Quản lý Menu hiển thị trên website</span>
     </div>
 
@@ -66,13 +66,6 @@
     </div>
 
     <div class="col-lg-8">
-        <div class="alert alert-light border shadow-sm d-flex align-items-center rounded-3 mb-4">
-            <i class="fas fa-info-circle fs-4 text-primary me-3"></i>
-            <div>
-                <strong>Mẹo:</strong> Bấm vào tên danh mục để chuyển sang trang <strong>Thêm sản phẩm mới</strong> (Chế độ nhập liệu nhanh).
-            </div>
-        </div>
-
         <div class="row g-3 align-items-start">
             @foreach($categories as $parent)
             
@@ -108,7 +101,8 @@
                                 </a>
 
                                 <div class="action-buttons-mini">
-                                    <a href="{{ route('admin.category.products', $child->id) }}" class="btn-mini text-primary" title="Xem danh sách"><i class="fas fa-list-ul fa-xs"></i></a>
+                                    <a href="{{ route('admin.category.products', $child->id) }}" class="btn-mini text-primary" title="Xem danh sách" 
+                                        style="text-decoration: none;"><i class="fas fa-list-ul fa-xs"></i></a>
                                     <button onclick="openEditModal({{ $child->id }}, '{{ $child->name }}', '{{ $child->icon }}', '{{ $parent->id }}')" class="btn-mini edit" title="Sửa tên"><i class="fas fa-pen fa-xs"></i></button>
                                     <form action="{{ route('categories.destroy', $child->id) }}" method="POST" onsubmit="return confirm('Bạn chắc chắn muốn xóa mục này?')" class="d-inline">
                                         @csrf @method('DELETE')
