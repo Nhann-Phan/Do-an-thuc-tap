@@ -13,11 +13,11 @@ class Product extends Model
     protected $fillable = [
         'name', 
         'slug',
-        'sku',            // Mã sản phẩm
-        'category_id',    // ID danh mục
-        'price',          // Giá bán
-        'sale_price',     // Giá khuyến mãi
-        'quantity',       // Số lượng
+        'sku',              // Mã sản phẩm
+        'category_id',      // ID danh mục
+        'price',            // Giá bán
+        'sale_price',       // Giá khuyến mãi
+        'quantity',         // Số lượng
         'short_description', // Mô tả ngắn
         'description',       // Bài viết chi tiết
         'image',             // Ảnh đại diện
