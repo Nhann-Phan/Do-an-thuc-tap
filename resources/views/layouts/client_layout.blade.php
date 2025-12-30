@@ -112,6 +112,7 @@
                             @endif
                         </div>
                     </a>
+
                     <div class="relative" id="searchContainer">
                         <button type="button" onclick="toggleSearchDropdown()" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-blue-800 hover:bg-gray-100 rounded-full transition focus:outline-none">
                             <i class="fas fa-search text-lg"></i>
@@ -139,19 +140,6 @@
             Copyright © 2025 TechShop An Giang.
         </div>
     </footer>
-
-    <div id="compare-bar" class="fixed bottom-0 left-0 w-full bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] border-t z-50 transform translate-y-full transition-transform duration-300">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-4">
-                <span class="font-bold text-gray-700">So sánh:</span>
-                <div id="compare-list" class="flex space-x-2"></div>
-            </div>
-            <div class="flex space-x-2">
-                <button onclick="clearCompare()" class="text-gray-500 hover:text-red-500 text-sm underline">Xóa hết</button>
-                <button class="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 font-bold text-sm">SO SÁNH NGAY</button>
-            </div>
-        </div>
-    </div>
 
     <div class="fixed bottom-8 right-6 z-40">
         <button id="chat-btn" onclick="toggleChat()" class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-2xl flex items-center justify-center w-14 h-14 transition transform hover:scale-110">
@@ -260,7 +248,7 @@
         // Swal Config
         const ToastMini = Swal.mixin({ width: 380, padding: '1rem', customClass: { popup: 'small-popup-text' } });
 
-        // Validation & Logic scripts (Giữ nguyên như cũ)
+        // --- VALIDATION & BOOKING LOGIC ---
         function showError(fieldId, msgId) {
             document.getElementById(fieldId).classList.add('border-red-500', 'bg-red-50');
             document.getElementById(fieldId).classList.remove('border-gray-300');
@@ -330,7 +318,7 @@
             }
         }
 
-        // Search
+        // --- SEARCH DROPDOWN ---
         function toggleSearchDropdown() {
             var dropdown = document.getElementById('searchDropdown');
             var input = document.getElementById('searchInput');
@@ -342,10 +330,7 @@
             }
         }
 
-        // Compare & Chat (Giữ nguyên logic cũ)
-        let compareList = [];
-        function addToCompare(id, name, img) { /* Logic compare cũ */ }
-        function clearCompare() { compareList = []; document.getElementById('compare-bar').classList.add('translate-y-full'); document.getElementById('compare-list').innerHTML = ''; }
+        // --- CHAT WIDGET ---
         function toggleChat() {
             const chat = document.getElementById('chat-window');
             if (chat.classList.contains('invisible')) {
@@ -367,6 +352,7 @@
         }
         document.getElementById('chat-input').addEventListener('keypress', function (e) { if (e.key === 'Enter') sendMessage(); });
 
+        // --- GLOBAL CLICK LISTENER ---
         document.addEventListener('click', function(event) {
             const bookingModal = document.getElementById('booking-modal');
             if (!bookingModal.classList.contains('invisible') && event.target === bookingModal) toggleBooking();

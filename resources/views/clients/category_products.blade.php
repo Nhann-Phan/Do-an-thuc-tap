@@ -46,7 +46,6 @@
                     @endforeach
                 </div>
             </div>
-            
         </div>
 
         <div class="col-span-1 lg:col-span-3">
@@ -86,14 +85,6 @@
                                 <img src="https://via.placeholder.com/300x300?text=No+Image" class="w-full h-full object-contain opacity-50">
                             @endif
                         </a>
-                        <div class="absolute bottom-0 left-0 w-full flex justify-center pb-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition duration-300">
-                            <a href="{{ route('product.detail', $product->id) }}" class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow hover:bg-blue-700 mx-1 transition" title="Xem chi tiết">
-                                <i class="fas fa-eye text-xs"></i>
-                            </a>
-                            <button class="bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow hover:bg-yellow-600 mx-1 transition" title="Thêm vào giỏ">
-                                <i class="fas fa-shopping-cart text-xs"></i>
-                            </button>
-                        </div>
                     </div>
 
                     <div class="p-4 flex flex-col flex-grow">

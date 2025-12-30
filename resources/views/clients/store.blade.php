@@ -74,7 +74,7 @@
                                      class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700" 
                                      draggable="false" 
                                      onmousedown="return false">
-                                     
+                                
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
                                     <p class="text-white font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition duration-300 line-clamp-2">
                                         {{ $img->caption ?? 'Dự án GPM' }}
@@ -110,20 +110,20 @@
 
             @foreach($products as $product)
             <div class="bg-white border rounded hover:shadow-xl transition duration-300 relative group flex flex-col">
-                <span class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded">-10%</span>
+                @if($product->sale_price)
+                    <span class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded">-HOT</span>
+                @endif
+
                 <div class="h-48 p-4 flex items-center justify-center relative">
-                    @if($product->image)
-                        <img src="{{ asset($product->image) }}" class="max-h-full max-w-full object-contain">
-                    @else
-                        <div class="text-6xl text-gray-300"><i class="fas fa-laptop"></i></div> 
-                    @endif
-                    
-                    <div class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition duration-300">
-                        <button onclick="addToCompare({{ $product->id }}, '{{ $product->name }}', '')" class="bg-gray-800 text-white w-8 h-8 rounded-full hover:bg-gray-900" title="So sánh">
-                            <i class="fas fa-exchange-alt text-xs"></i>
-                        </button>
-                    </div>
+                    <a href="{{ route('product.detail', $product->id) }}" class="block w-full h-full flex items-center justify-center">
+                        @if($product->image)
+                            <img src="{{ asset($product->image) }}" class="max-h-full max-w-full object-contain">
+                        @else
+                            <div class="text-6xl text-gray-300"><i class="fas fa-laptop"></i></div> 
+                        @endif
+                    </a>
                 </div>
+
                 <div class="p-4 flex-grow flex flex-col">
                     <h4 class="text-sm font-bold text-gray-700 mb-1 hover:text-blue-600 cursor-pointer line-clamp-2">
                         <a href="{{ route('product.detail', $product->id) }}">{{ $product->name }}</a>
