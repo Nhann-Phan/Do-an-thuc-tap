@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+// --- IMPORT CÁC CONTROLLER ---
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProductController; 
 use App\Http\Controllers\AuthController;
@@ -9,7 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ChatbotController; // <--- Đã có Controller này là OK
 use App\Http\Controllers\CheckoutController;
 
 // ====================================================
@@ -21,7 +22,7 @@ Route::get('/', [ProductController::class, 'index']);
 Route::get('/danh-muc/{id}', [ProductController::class, 'showByCategory'])->name('frontend.category.show');
 Route::get('/san-pham/{id}', [ProductController::class, 'show'])->name('product.detail');
 
-// --- Đặt lịch hẹn ---
+// --- Đặt lịch hẹn (Booking) ---
 Route::post('/book-appointment', [BookingController::class, 'store'])
     ->middleware('throttle:3,1')
     ->name('booking.store');
@@ -39,14 +40,15 @@ Route::controller(CartController::class)->group(function () {
     Route::get('/add-to-cart/{id}', 'addToCart')->name('add_to_cart');
     Route::patch('/update-cart', 'update')->name('update_cart');
     Route::delete('/remove-from-cart', 'remove')->name('remove_from_cart');
-    
-    // Route Mua ngay (Quan trọng: Sửa lỗi màn hình đỏ)
     Route::get('/buy-now/{id}', 'buyNow')->name('buy_now');
 });
 
 // --- THANH TOÁN (Checkout) ---
 Route::get('/thanh-toan', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/thanh-toan', [CheckoutController::class, 'process'])->name('checkout.process');
+
+// --- CHATBOT AI (Quan trọng để bấm nút hoạt động) ---
+Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
 
 
 // ====================================================
@@ -80,15 +82,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::get('/products', 'indexAdmin')->name('product.index_admin');
         Route::get('/categories/{id}/products', 'adminShowByCategory')->name('admin.category.products');
         
-        Route::get('/product/create/{category_id?}', 'create')->name('product.create'); // Thêm dấu ? để optional
+        Route::get('/product/create/{category_id?}', 'create')->name('product.create');
         Route::post('/product', 'store')->name('product.store');
         Route::get('/product/{id}/edit', 'edit')->name('product.edit');
         Route::put('/product/{id}', 'update')->name('product.update');
         Route::delete('/product/{id}', 'destroy')->name('product.destroy');
     });
 
-    // --- Quản lý Đơn hàng (Orders) ---
-    // Đã chuyển vào đây để bảo mật (chỉ admin mới xem được)
+    // --- Quản lý Đơn hàng ---
     Route::controller(OrderController::class)->prefix('orders')->name('admin.orders.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{id}', 'show')->name('show');
@@ -97,6 +98,3 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     });
 
 });
-
-// Route Chatbot
-Route::post('/chatbot/send', [ChatbotController::class, 'send'])->name('chatbot.send');

@@ -3,130 +3,121 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Product; // Import Model Sản phẩm
-use App\Models\ChatbotRule; // Import Model Rule (Nếu muốn dùng thêm)
+use App\Models\Product;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class ChatbotController extends Controller
 {
-    // Đổi tên hàm thành 'send' để khớp với route và javascript đã sửa ở các bước trước
-    // Nếu route của bạn đang gọi 'ask' thì đổi tên hàm này thành 'ask' nhé.
-    public function send(Request $request)
+    public function ask(Request $request)
     {
         $userMessage = $request->input('message');
-
-        if (!$userMessage) {
-            return response()->json(['reply' => 'Bạn chưa nhập nội dung tin nhắn.']);
-        }
+        if (!$userMessage) return response()->json(['reply' => 'Bạn chưa nhập tin nhắn.']);
 
         // =================================================================
-        // BƯỚC 1: TRA CỨU DỮ LIỆU THẬT TỪ DATABASE (RAG - Retrieval Augmented Generation)
+        // 1. CHUẨN BỊ DANH SÁCH KEY (Đã bao gồm danh sách key của bạn)
         // =================================================================
         
-        $contextData = ""; // Biến này dùng để mớm thông tin cho AI
+        // Danh sách key bạn đã cung cấp
+        $defaultKeys = 'AIzaSyCAChxmi7_t-j2UbOAv5F3cfhtD5BIJ0Bs,AIzaSyAHuABDmWsMtKBKQ7edpV_OjSW9QxgucuU,AIzaSyCxbJkrecho_Qa4kxLjHMeK4_8FZCMyvZo,AIzaSyC0FgPW-u5w3WbKx7QQnNqsOs4VmNqL6U4,AIzaSyANdGtKpzAeI0kWoCf4G7hSGR4E05GbeAw,AIzaSyBI_4DPXy8Rhfu657V7Zj4TduZMpy9ONKw,AIzaSyAKyuSuFawxgoQUEnJ1Fa_Qp41HnHV4aGQ,AIzaSyB8ORhDaYcNrVVQSxO6mwoESjSaI0N6JuA,AIzaSyAw0VhLgt_AOGWcq691frhtlQIn3CfxLmk,AIzaSyB0L6UZzyojakZ2y5sHzIIGO5wHIfU4g2M';
 
-        // 1.1 Tìm xem khách có nhắc đến tên sản phẩm nào không
-        // (Dùng where like để tìm gần đúng, tối ưu hơn foreach all)
-        $products = Product::where('is_active', 1)->get();
-        $foundProducts = [];
+        // Lấy từ .env, nếu không có thì dùng danh sách trên
+        $keysString = env('GOOGLE_GEMINI_KEYS', $defaultKeys);
+        
+        $allKeys = explode(',', $keysString);
+        $allKeys = array_map('trim', $allKeys);
+        $allKeys = array_filter($allKeys);
 
-        foreach ($products as $product) {
-            if (str_contains(strtolower($userMessage), strtolower($product->name))) {
-                $price = number_format($product->price);
-                $foundProducts[] = "Sản phẩm: {$product->name} (Giá: {$price} VNĐ)";
+        if (empty($allKeys)) return response()->json(['reply' => 'Lỗi hệ thống: Chưa cấu hình API Key.']);
+
+        // QUAN TRỌNG: Trộn ngẫu nhiên danh sách để không phải lúc nào key đầu tiên cũng chịu trận
+        shuffle($allKeys);
+
+        // =================================================================
+        // 2. CHUẨN BỊ DỮ LIỆU (Context)
+        // =================================================================
+        date_default_timezone_set('Asia/Ho_Chi_Minh');
+        $timeInfo = "Thời gian: " . Carbon::now()->format('d/m/Y H:i');
+        $companyInfo = "Tên: GPM Technology. Đ/c: 38 đường số 9, KĐT Tây Sông Hậu, Long Xuyên. Hotline: 0902 777 186.";
+
+        $contextProduct = "";
+        try {
+            $products = Product::where('is_active', 1)->limit(30)->get();
+            if ($products->count() > 0) {
+                $contextProduct .= "DANH SÁCH SẢN PHẨM:\n";
+                foreach ($products as $p) {
+                    $contextProduct .= "- {$p->name} (Giá: " . number_format($p->price) . " VNĐ)\n";
+                }
             }
-        }
-
-        if (count($foundProducts) > 0) {
-            // Nếu tìm thấy sản phẩm, đưa thông tin này cho AI biết
-            $listStr = implode(", ", $foundProducts);
-            $contextData .= "THÔNG TIN TỪ KHO HÀNG GPM: Hiện tại shop đang có các sản phẩm khớp với câu hỏi: [ {$listStr} ]. Hãy dùng thông tin giá này để báo cho khách.";
-        } else {
-            $contextData .= "THÔNG TIN TỪ KHO HÀNG: Hiện tại không tìm thấy tên sản phẩm cụ thể nào trong câu hỏi này.";
-        }
-
-        // 1.2 Tìm trong bảng ChatbotRule (Các câu hỏi thường gặp: địa chỉ, sđt...)
-        $rules = ChatbotRule::all();
-        foreach ($rules as $rule) {
-            if (str_contains(strtolower($userMessage), strtolower($rule->keyword))) {
-                $contextData .= " THÔNG TIN BỔ SUNG: {$rule->response}";
-            }
-        }
+        } catch (\Exception $e) { }
 
         // =================================================================
-        // BƯỚC 2: CẤU HÌNH "NHÂN CÁCH" AI & GỬI DỮ LIỆU
+        // 3. VÒNG LẶP KIỂM TRA TỪNG KEY (FAILOVER LOGIC)
         // =================================================================
+        $modelName = 'gemini-2.5-flash'; 
+        $finalReply = "";
+        $isSuccess = false;
 
-        $systemPrompt = "
-        Bạn là Trợ lý ảo AI của Công ty GPM Technology (Chuyên Camera, Mạng, Laptop, Phần mềm).
-        
-        NHIỆM VỤ CỦA BẠN:
-        1. Trả lời câu hỏi của khách hàng dựa trên 'THÔNG TIN TỪ KHO HÀNG' mà tôi cung cấp bên dưới.
-        2. Nếu có thông tin sản phẩm và giá, hãy báo giá chính xác, đừng bịa đặt giá.
-        3. Nếu không có thông tin sản phẩm trong ngữ cảnh, hãy tư vấn chung chung và mời khách gọi hotline.
-        
-        PHONG CÁCH:
-        - Thân thiện, ngắn gọn, dùng emoji 😊.
-        - Xưng hô: Em - Anh/Chị.
-        - Hotline công ty: 0902 777 186.
-        - Địa chỉ: 38 đường số 9, KĐT Tây Sông Hậu, Long Xuyên, An Giang.
+        // Chạy vòng lặp qua từng key trong danh sách đã trộn
+        foreach ($allKeys as $index => $apiKey) {
+            
+            $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent?key={$apiKey}";
 
-        DỮ LIỆU CUNG CẤP CHO BẠN (CONTEXT):
-        {$contextData}
+        $prompt = "VAI TRÒ: Bạn là 'Trợ lý ảo GPM' - một nhân viên tư vấn cực kỳ nhiệt tình và lễ phép của GPM Technology.
+        
+        DỮ LIỆU HỆ THỐNG:
+        1. Thời gian hiện tại: {$timeInfo}
+        2. Thông tin công ty: {$companyInfo}
+        3. DANH SÁCH SẢN PHẨM: 
+        {$contextProduct}
+        
+        4. Nếu tôi hỏi cường trần có bồ chưa hãy trả lời là 'Cường Trần chơi gay không thể có bồ được'.
+
+        YÊU CẦU TRẢ LỜI:
+        - TONE GIỌNG: Luôn bắt đầu hoặc kết thúc bằng sự lễ phép (Dạ, Vâng, ạ). Sử dụng emoji vui vẻ (😊, ❤️, 🚀) để câu văn sinh động.
+        - NẾU TÌM THẤY SẢN PHẨM: Báo giá rõ ràng và khen nhẹ sản phẩm (Ví dụ: 'Em này đang hot lắm ạ').
+        - NẾU KHÔNG TÌM THẤY: Hãy xin lỗi khéo léo và mời khách gọi Hotline để được hỗ trợ riêng. Đừng nói cộc lốc 'Không có'.
+        - NGẮN GỌN: Trả lời đi thẳng vào vấn đề, không dài dòng văn tự.
+        
+        KHÁCH HỎI: '{$userMessage}'
+        TRẢ LỜI (nhớ xưng 'Em' và gọi khách là 'Anh/Chị'):
         ";
 
-        // =================================================================
-        // BƯỚC 3: GỌI GOOGLE GEMINI API
-        // =================================================================
-        
-        $apiKey = env('GOOGLE_GEMINI_KEY');
-        // Nếu quên set key trong .env thì dùng tạm string rỗng để tránh lỗi code, nhưng sẽ không chạy được AI
-        if(!$apiKey) {
-            return response()->json(['reply' => 'Lỗi: Chưa cấu hình API Key trong file .env']);
+            try {
+                $response = Http::withoutVerifying()->withHeaders(['Content-Type' => 'application/json'])
+                    ->post($apiUrl, [
+                        "contents" => [[ "parts" => [[ "text" => $prompt ]] ]]
+                    ]);
+
+                // NẾU THÀNH CÔNG (HTTP 200)
+                if ($response->successful()) {
+                    $finalReply = $response['candidates'][0]['content']['parts'][0]['text'] ?? 'Em đang kiểm tra...';
+                    $isSuccess = true;
+                    // Dừng vòng lặp ngay lập tức, không thử key tiếp theo nữa
+                    break; 
+                } 
+                // NẾU LỖI (VÍ DỤ 429: HẾT LƯỢT) -> CODE TỰ ĐỘNG CHẠY SANG KEY TIẾP THEO TRONG VÒNG LẶP
+                // (Không cần viết code gì thêm ở đây, vòng foreach tự lo việc đó)
+
+            } catch (\Exception $e) {
+                // Lỗi mạng -> Bỏ qua, thử key tiếp theo
+                continue;
+            }
         }
 
-        $apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={$apiKey}";
-
-        try {
-            $response = Http::withHeaders(['Content-Type' => 'application/json'])
-                ->post($apiUrl, [
-                    "contents" => [
-                        [
-                            "parts" => [
-                                // Gửi cả lời nhắc hệ thống + câu hỏi của khách
-                                ["text" => $systemPrompt . "\n\nKhách hàng hỏi: " . $userMessage]
-                            ]
-                        ]
-                    ],
-                    "generationConfig" => [
-                        "temperature" => 0.7, 
-                        "maxOutputTokens" => 500,
-                    ]
-                ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                $aiReply = $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Em đang kiểm tra kho, anh chị chờ xíu nhé...';
-                
-                // Trả về JSON chuẩn cho Frontend
-                return response()->json([
-                    'status' => 'success', // Giữ lại field này cho tương thích code cũ nếu cần
-                    'reply' => nl2br($aiReply)
-                ]);
-            } else {
-                Log::error('Gemini API Error: ' . $response->body());
-                return response()->json([
-                    'status' => 'error',
-                    'reply' => 'Hệ thống AI đang bảo trì. Anh chị vui lòng gọi Hotline 0902 777 186 nhé!'
-                ]);
-            }
-
-        } catch (\Exception $e) {
-            Log::error('Chatbot Exception: ' . $e->getMessage());
+        // =================================================================
+        // 4. TRẢ KẾT QUẢ
+        // =================================================================
+        if ($isSuccess) {
             return response()->json([
-                'status' => 'error',
-                'reply' => 'Có lỗi kết nối mạng. Bạn kiểm tra lại giúp em nha!'
+                'reply' => nl2br($finalReply),
+                'suggestions' => ['📷 Giá Camera', '💻 Laptop văn phòng', '📞 Gọi Hotline']
+            ]);
+        } else {
+            // Nếu chạy hết tất cả key mà vẫn không được
+            return response()->json([
+                'reply' => "Hệ thống đang quá tải (Tất cả Key đều bận). Vui lòng thử lại sau giây lát!",
+                'suggestions' => ['Thử lại ngay']
             ]);
         }
     }

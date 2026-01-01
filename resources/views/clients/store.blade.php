@@ -208,7 +208,7 @@
             content.scrollTop = content.scrollHeight;
 
             // 3. Gọi về Server cũ
-            fetch('{{ route('chatbot.send') }}', {
+            fetch('{{ route('chatbot.ask') }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
