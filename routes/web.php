@@ -98,3 +98,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     });
 
 });
+
+// Giới hạn 10 request trong 1 phút cho route này
+Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])
+    ->middleware('throttle:10,1') 
+    ->name('chatbot.ask');
