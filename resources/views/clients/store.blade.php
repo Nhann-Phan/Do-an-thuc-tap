@@ -43,57 +43,10 @@
                                 <span class="text-6xl font-extrabold text-blue-500 tracking-tighter">GPM</span>
                             </div>
                             <div class="text-xl font-bold text-black tracking-[0.3em] uppercase mt-2">Giải pháp mới</div>
-                            <a href="#" class="inline-block mt-8 px-8 py-3 border border-blue-600 text-blue-600 font-bold rounded-full hover:bg-blue-600 hover:text-white transition duration-300">XEM HỒ SƠ NĂNG LỰC</a>
+                            <a href="#" class="inline-block mt-8 px-8 py-3 border border-blue-600 text-blue-600 font-bold rounded-full hover:bg-blue-600 hover:text-white transition duration-300">Về chúng tôi</a>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-16 bg-white" id="gallery">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-end mb-10">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800 uppercase border-blue-600 pl-3">Hình ảnh thực tế</h2>
-                    {{-- <p class="text-gray-500 mt-2 ml-5">Kéo sang trái/phải để xem thêm các dự án.</p> --}}
-                </div>
-                {{-- <div class="hidden md:flex gap-2">
-                    <div class="swiper-button-prev-project w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-left"></i></div>
-                    <div class="swiper-button-next-project w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-right"></i></div>
-                </div> --}}
-            </div>
-
-            <div class="swiper myProjectSwiper !pb-12 px-2 cursor-grab active:cursor-grabbing"> 
-                <div class="swiper-wrapper">
-                    {{-- NHÂN BẢN DỰ ÁN NẾU ÍT HƠN 4 ĐỂ KÉO MƯỢT --}}
-                    @if(isset($projectImages) && count($projectImages) > 0)
-                        @for($i = 0; $i < (count($projectImages) < 4 ? 4 : 1); $i++)
-                            @foreach($projectImages as $img)
-                            <div class="swiper-slide select-none">
-                                <div class="overflow-hidden rounded-xl shadow-lg relative group h-64">
-                                    <img src="{{ asset($img->image_path) }}" 
-                                         class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700 pointer-events-none" 
-                                         draggable="false">
-                                    
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
-                                        <p class="text-white font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition duration-300 line-clamp-2">
-                                            {{ $img->caption ?? 'Dự án GPM' }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        @endfor
-                    @else
-                        <div class="swiper-slide">
-                            <div class="h-64 flex items-center justify-center bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 text-gray-400">
-                                Chưa có hình ảnh nào.
-                            </div>
-                        </div>
-                    @endif
-                </div>
-                <div class="swiper-pagination-project swiper-pagination"></div>
             </div>
         </div>
     </section>
@@ -167,6 +120,53 @@
 
                 </div>
                 <div class="swiper-pagination-product swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+        <section class="py-16 bg-white" id="gallery">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 uppercase border-blue-600 pl-3">Ảnh công trình thực tế</h2>
+                    {{-- <p class="text-gray-500 mt-2 ml-5">Kéo sang trái/phải để xem thêm các dự án.</p> --}}
+                </div>
+                {{-- <div class="hidden md:flex gap-2">
+                    <div class="swiper-button-prev-project w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-left"></i></div>
+                    <div class="swiper-button-next-project w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-right"></i></div>
+                </div> --}}
+            </div>
+
+            <div class="swiper myProjectSwiper !pb-12 px-2 cursor-grab active:cursor-grabbing"> 
+                <div class="swiper-wrapper">
+                    {{-- NHÂN BẢN DỰ ÁN NẾU ÍT HƠN 4 ĐỂ KÉO MƯỢT --}}
+                    @if(isset($projectImages) && count($projectImages) > 0)
+                        @for($i = 0; $i < (count($projectImages) < 4 ? 4 : 1); $i++)
+                            @foreach($projectImages as $img)
+                            <div class="swiper-slide select-none">
+                                <div class="overflow-hidden rounded-xl shadow-lg relative group h-64">
+                                    <img src="{{ asset($img->image_path) }}" 
+                                         class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700 pointer-events-none" 
+                                         draggable="false">
+                                    
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+                                        <p class="text-white font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition duration-300 line-clamp-2">
+                                            {{ $img->caption ?? 'Dự án GPM' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        @endfor
+                    @else
+                        <div class="swiper-slide">
+                            <div class="h-64 flex items-center justify-center bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 text-gray-400">
+                                Chưa có hình ảnh nào.
+                            </div>
+                        </div>
+                    @endif
+                </div>
+                <div class="swiper-pagination-project swiper-pagination"></div>
             </div>
         </div>
     </section>

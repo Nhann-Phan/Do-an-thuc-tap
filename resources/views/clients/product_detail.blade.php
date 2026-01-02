@@ -59,12 +59,12 @@
                     <h1 class="text-2xl font-bold text-gray-900 leading-snug mb-2">{{ $product->name }}</h1>
                     <div class="w-12 h-1 bg-blue-600 mb-4 rounded-full"></div>
 
-                    <div class="flex items-center text-sm mb-4 text-gray-600">
+                    {{-- <div class="flex items-center text-sm mb-4 text-gray-600">
                         <div class="flex text-yellow-400 text-xs mr-2">
                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                         </div>
                         <span class="border-l border-gray-300 pl-2 ml-2 text-green-600 font-bold"><i class="fas fa-check-circle mr-1"></i>Còn hàng</span>
-                    </div>
+                    </div> --}}
 
                     <div class="mb-5 bg-gray-50 p-3 rounded border border-gray-100">
                         @if($product->sale_price)
@@ -73,15 +73,6 @@
                         @else
                             <span class="text-3xl font-bold text-red-600">{{ number_format($product->price) }} ₫</span>
                         @endif
-                    </div>
-
-                    <div class="text-gray-600 text-sm leading-relaxed mb-6">
-                        <ul class="space-y-1.5 list-disc pl-4 marker:text-blue-500">
-                            <li><strong>Hãng sản xuất:</strong> Microsoft / Partner</li>
-                            <li><strong>Bảo hành:</strong> Trọn đời thiết bị</li>
-                            <li><strong>Hình thức:</strong> Key điện tử (ESD) gửi qua Email</li>
-                            <li><strong>Hỗ trợ:</strong> Cài đặt miễn phí qua Ultraview/Teamviewer</li>
-                        </ul>
                     </div>
 
                     <div class="flex gap-3 mt-auto">

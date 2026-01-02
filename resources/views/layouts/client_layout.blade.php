@@ -104,6 +104,8 @@
                         </div>
 
                         <a href="#gallery" class="hover:text-blue-800 transition">Dự án</a>
+                        <a href="#" class="hover:text-blue-800 transition">Đối tác</a>
+                        <a href="#" class="hover:text-blue-800 transition">Tin tức</a>
                         <a href="#" class="hover:text-blue-800 transition">Liên hệ</a>
                     </nav>
 
