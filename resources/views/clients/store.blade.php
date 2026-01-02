@@ -55,34 +55,36 @@
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-end mb-10">
                 <div>
-                    <h2 class="text-3xl font-bold text-blue-600 uppercase border-l-4 border-blue-600 pl-4">Hình ảnh thực tế</h2>
-                    <p class="text-gray-500 mt-2 ml-5">Kéo sang trái/phải để xem thêm các dự án.</p>
+                    <h2 class="text-2xl font-bold text-gray-800 uppercase border-blue-600 pl-3">Hình ảnh thực tế</h2>
+                    {{-- <p class="text-gray-500 mt-2 ml-5">Kéo sang trái/phải để xem thêm các dự án.</p> --}}
                 </div>
-                <div class="hidden md:flex gap-2">
-                    <div class="swiper-button-prev-custom w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-left"></i></div>
-                    <div class="swiper-button-next-custom w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-right"></i></div>
-                </div>
+                {{-- <div class="hidden md:flex gap-2">
+                    <div class="swiper-button-prev-project w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-left"></i></div>
+                    <div class="swiper-button-next-project w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-right"></i></div>
+                </div> --}}
             </div>
 
-            <div class="swiper myProjectSwiper !pb-12 px-2"> 
+            <div class="swiper myProjectSwiper !pb-12 px-2 cursor-grab active:cursor-grabbing"> 
                 <div class="swiper-wrapper">
+                    {{-- NHÂN BẢN DỰ ÁN NẾU ÍT HƠN 4 ĐỂ KÉO MƯỢT --}}
                     @if(isset($projectImages) && count($projectImages) > 0)
-                        @foreach($projectImages as $img)
-                        <div class="swiper-slide select-none">
-                            <div class="overflow-hidden rounded-xl shadow-lg relative group h-64">
-                                <img src="{{ asset($img->image_path) }}" 
-                                     class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700" 
-                                     draggable="false" 
-                                     onmousedown="return false">
-                                
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
-                                    <p class="text-white font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition duration-300 line-clamp-2">
-                                        {{ $img->caption ?? 'Dự án GPM' }}
-                                    </p>
+                        @for($i = 0; $i < (count($projectImages) < 4 ? 4 : 1); $i++)
+                            @foreach($projectImages as $img)
+                            <div class="swiper-slide select-none">
+                                <div class="overflow-hidden rounded-xl shadow-lg relative group h-64">
+                                    <img src="{{ asset($img->image_path) }}" 
+                                         class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700 pointer-events-none" 
+                                         draggable="false">
+                                    
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+                                        <p class="text-white font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition duration-300 line-clamp-2">
+                                            {{ $img->caption ?? 'Dự án GPM' }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        @endforeach
+                            @endforeach
+                        @endfor
                     @else
                         <div class="swiper-slide">
                             <div class="h-64 flex items-center justify-center bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 text-gray-400">
@@ -91,150 +93,189 @@
                         </div>
                     @endif
                 </div>
-                <div class="swiper-pagination"></div>
+                <div class="swiper-pagination-project swiper-pagination"></div>
             </div>
         </div>
     </section>
 
-    <div id="products" class="container mx-auto px-4 py-12">
-        <div class="flex justify-between items-end mb-6 border-b pb-2">
-            <h3 class="text-2xl font-bold text-gray-800 uppercase border-l-4 border-blue-600 pl-3">Sản phẩm mới nhất</h3>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            @if(isset($currentCategory))
-                <div class="mb-6 border-l-4 border-blue-600 pl-4 col-span-full">
-                    <h2 class="text-2xl font-bold text-gray-800 uppercase">{{ $currentCategory->name }}</h2>
-                    <p class="text-gray-500 text-sm">Hiển thị {{ $products->count() }} sản phẩm</p>
+    <section id="products" class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-end mb-8 pb-2">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800 uppercase border-blue-600 pl-3">Sản phẩm nổi bật</h3>
+                    @if(isset($currentCategory))
+                        <p class="text-gray-500 text-sm mt-1 ml-4">{{ $currentCategory->name }}</p>
+                    @endif
                 </div>
-            @endif
-
-            @foreach($products as $product)
-            <div class="bg-white border rounded hover:shadow-xl transition duration-300 relative group flex flex-col">
-                @if($product->sale_price)
-                    <span class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded">-HOT</span>
-                @endif
-
-                <div class="h-48 p-4 flex items-center justify-center relative">
-                    <a href="{{ route('product.detail', $product->id) }}" class="block w-full h-full flex items-center justify-center">
-                        @if($product->image)
-                            <img src="{{ asset($product->image) }}" class="max-h-full max-w-full object-contain">
-                        @else
-                            <div class="text-6xl text-gray-300"><i class="fas fa-laptop"></i></div> 
-                        @endif
-                    </a>
-                </div>
-
-                <div class="p-4 flex-grow flex flex-col">
-                    <h4 class="text-sm font-bold text-gray-700 mb-1 hover:text-blue-600 cursor-pointer line-clamp-2">
-                        <a href="{{ route('product.detail', $product->id) }}">{{ $product->name }}</a>
-                    </h4>
-                    <div class="mt-auto">
-                        @if($product->sale_price)
-                            <span class="text-red-600 font-bold">{{ number_format($product->sale_price) }} đ</span>
-                            <span class="text-gray-400 text-xs line-through ml-2">{{ number_format($product->price) }} đ</span>
-                        @else
-                            <span class="text-red-600 font-bold">{{ number_format($product->price) }} đ</span>
-                        @endif
-                    </div>
-                </div>
+                {{-- <div class="hidden md:flex gap-2">
+                    <div class="swiper-button-prev-product w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer bg-white"><i class="fas fa-chevron-left"></i></div>
+                    <div class="swiper-button-next-product w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer bg-white"><i class="fas fa-chevron-right"></i></div>
+                </div> --}}
             </div>
-            @endforeach
+
+            <div class="swiper myProductSwiper !pb-12 px-2 cursor-grab active:cursor-grabbing">
+                <div class="swiper-wrapper">
+                    
+                    {{-- 
+                        QUAN TRỌNG: KỸ THUẬT NHÂN BẢN SLIDE (x4 lần) 
+                        Để đảm bảo Loop hoạt động kể cả khi chỉ có 1-2 sản phẩm HOT 
+                    --}}
+                    @for ($i = 0; $i < 4; $i++)
+                        @foreach($products as $product)
+                            {{-- Chỉ hiển thị sản phẩm HOT --}}
+                            @if($product->is_hot || (isset($product->status) && $product->status == 'hot')) 
+                            <div class="swiper-slide select-none h-auto">
+                                <div class="bg-white border rounded hover:shadow-xl transition duration-300 relative group flex flex-col h-full">
+                                    {{-- Badge HOT --}}
+                                    <span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded z-10 animate-pulse">HOT</span>
+                                    @if($product->sale_price)
+                                        <span class="absolute top-2 right-2 bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded z-10">-Sale</span>
+                                    @endif
+
+                                    <div class="h-48 p-4 flex items-center justify-center relative overflow-hidden">
+                                        <a href="{{ route('product.detail', $product->id) }}" class="block w-full h-full flex items-center justify-center pointer-events-none md:pointer-events-auto">
+                                            @if($product->image)
+                                                <img src="{{ asset($product->image) }}" class="max-h-full max-w-full object-contain transform group-hover:scale-105 transition duration-500 pointer-events-none">
+                                            @else
+                                                <div class="text-6xl text-gray-300"><i class="fas fa-laptop"></i></div> 
+                                            @endif
+                                        </a>
+                                    </div>
+
+                                    <div class="p-4 flex-grow flex flex-col border-t border-gray-100">
+                                        <h4 class="text-sm font-bold text-gray-700 mb-2 hover:text-blue-600 cursor-pointer line-clamp-2 min-h-[2.5rem]">
+                                            <a href="{{ route('product.detail', $product->id) }}">{{ $product->name }}</a>
+                                        </h4>
+                                        <div class="mt-auto">
+                                            @if($product->sale_price)
+                                                <span class="text-red-600 font-bold text-lg">{{ number_format($product->sale_price) }} đ</span>
+                                                <span class="text-gray-400 text-xs line-through ml-2">{{ number_format($product->price) }} đ</span>
+                                            @else
+                                                <span class="text-red-600 font-bold text-lg">{{ number_format($product->price) }} đ</span>
+                                            @endif
+                                        </div>
+                                        <a href="{{ route('product.detail', $product->id) }}" class="mt-3 w-full block text-center border border-blue-600 text-blue-600 py-1.5 rounded text-xs font-bold hover:bg-blue-600 hover:text-white transition uppercase">
+                                            Xem chi tiết
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                        @endforeach
+                    @endfor
+                    {{-- KẾT THÚC NHÂN BẢN --}}
+
+                </div>
+                <div class="swiper-pagination-product swiper-pagination"></div>
+            </div>
         </div>
-    </div>
+    </section>
 
 @endsection
 
 @push('scripts')
 <script>
-    // Đợi trang tải xong mới chạy Slide
     document.addEventListener("DOMContentLoaded", function() {
-        var swiper = new Swiper(".myProjectSwiper", {
-            // Cấu hình cơ bản
-            slidesPerView: 1,      
-            spaceBetween: 20,      
-            loop: true,            
+        // HACK: Chờ 300ms để đảm bảo HTML đã render xong
+        setTimeout(() => {
             
-            // --- CẤU HÌNH KÉO THẢ ---
-            grabCursor: true,      // Con trỏ bàn tay
-            simulateTouch: true,   // Giả lập cảm ứng
-            allowTouchMove: true,  // Cho phép vuốt
-            
-            // --- CẤU HÌNH TỰ ĐỘNG CHẠY ---
-            autoplay: {
-                delay: 5000,        // 5 giây
-                disableOnInteraction: false, // Kéo xong vẫn tự chạy tiếp
-                pauseOnMouseEnter: true,     // Di chuột vào thì dừng
-            },
+            // 1. Slider Hình ảnh thực tế (Project)
+            if (document.querySelector(".myProjectSwiper")) {
+                new Swiper(".myProjectSwiper", {
+                    observer: true, 
+                    observeParents: true,
+                    slidesPerView: 1,      
+                    spaceBetween: 20,      
+                    loop: true,            
+                    grabCursor: true,      
+                    simulateTouch: true,   
+                    autoplay: {
+                        delay: 5000,        
+                        disableOnInteraction: false, 
+                        pauseOnMouseEnter: true,     
+                    },
+                    breakpoints: {
+                        640: { slidesPerView: 2, spaceBetween: 20 },
+                        768: { slidesPerView: 3, spaceBetween: 25 },
+                        1024: { slidesPerView: 4, spaceBetween: 30 }, 
+                    },
+                    navigation: {
+                        nextEl: ".swiper-button-next-project",
+                        prevEl: ".swiper-button-prev-project",
+                    },
+                    pagination: {
+                        el: ".swiper-pagination-project",
+                        clickable: true,
+                    },
+                });
+            }
 
-            // --- RESPONSIVE ---
-            breakpoints: {
-                640: { slidesPerView: 2, spaceBetween: 20 },
-                768: { slidesPerView: 3, spaceBetween: 25 },
-                1024: { slidesPerView: 4, spaceBetween: 30 }, // PC hiện 4 ảnh
-            },
+            // 2. Slider Sản phẩm HOT (Product)
+            if (document.querySelector(".myProductSwiper")) {
+                new Swiper(".myProductSwiper", {
+                    observer: true, 
+                    observeParents: true,
+                    slidesPerView: 2,       
+                    spaceBetween: 15,      
+                    loop: true,  // Loop được vì đã nhân bản slide
+                    grabCursor: true,      
+                    simulateTouch: true,   
+                    autoplay: {
+                        delay: 4000,        
+                        disableOnInteraction: false, 
+                        pauseOnMouseEnter: true,     
+                    },
+                    breakpoints: {
+                        640: { slidesPerView: 2, spaceBetween: 20 },
+                        768: { slidesPerView: 3, spaceBetween: 20 },
+                        1024: { slidesPerView: 4, spaceBetween: 25 }, 
+                        1280: { slidesPerView: 5, spaceBetween: 25 }, 
+                    },
+                    navigation: {
+                        nextEl: ".swiper-button-next-product",
+                        prevEl: ".swiper-button-prev-product",
+                    },
+                    pagination: {
+                        el: ".swiper-pagination-product",
+                        clickable: true,
+                    },
+                });
+            }
 
-            navigation: {
-                nextEl: ".swiper-button-next-custom",
-                prevEl: ".swiper-button-prev-custom",
-            },
-
-            pagination: {
-                el: ".swiper-pagination",
-                clickable: true,
-                dynamicBullets: true,
-            },
-        });
+        }, 300); // Delay 0.3s
     });
 
+    // Chatbot (Giữ nguyên)
     function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const content = document.getElementById('chat-content');
-            const userMsg = input.value.trim();
-
-            if(userMsg === '') return;
-
-            // 1. Hiện tin nhắn khách
-            content.innerHTML += `<div class="bg-gray-200 p-2 rounded-lg self-end max-w-[80%] ml-auto mt-2 text-right">${userMsg}</div>`;
-            input.value = '';
+        const input = document.getElementById('chat-input');
+        const content = document.getElementById('chat-content');
+        const userMsg = input.value.trim();
+        if(userMsg === '') return;
+        content.innerHTML += `<div class="bg-gray-200 p-2 rounded-lg self-end max-w-[80%] ml-auto mt-2 text-right">${userMsg}</div>`;
+        input.value = '';
+        content.scrollTop = content.scrollHeight;
+        const loadingId = 'loading-' + Date.now();
+        content.innerHTML += `<div id="${loadingId}" class="bg-blue-50 text-gray-500 p-2 rounded-lg self-start max-w-[80%] mt-2 flex items-center"><i class="fas fa-robot mr-2 text-blue-600"></i><span class="text-xs italic">GPM AI đang trả lời...</span></div>`;
+        content.scrollTop = content.scrollHeight;
+        fetch('{{ route('chatbot.ask') }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+            body: JSON.stringify({ message: userMsg })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById(loadingId).remove();
+            content.innerHTML += `<div class="bg-blue-100 text-blue-900 p-3 rounded-lg self-start max-w-[85%] mt-2 shadow-sm leading-relaxed"><i class="fas fa-robot mr-2 text-lg text-blue-600"></i><span>${data.reply}</span></div>`;
             content.scrollTop = content.scrollHeight;
-
-            // 2. Hiện "Đang nhập..."
-            const loadingId = 'loading-' + Date.now();
-            content.innerHTML += `
-                <div id="${loadingId}" class="bg-blue-50 text-gray-500 p-2 rounded-lg self-start max-w-[80%] mt-2 flex items-center">
-                    <i class="fas fa-robot mr-2 text-blue-600"></i>
-                    <span class="text-xs italic">GPM AI đang trả lời<span class="animate-pulse">...</span></span>
-                </div>`;
-            content.scrollTop = content.scrollHeight;
-
-            // 3. Gọi về Server cũ
-            fetch('{{ route('chatbot.ask') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ message: userMsg })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById(loadingId).remove();
-                content.innerHTML += `<div class="bg-blue-100 text-blue-900 p-3 rounded-lg self-start max-w-[85%] mt-2 shadow-sm leading-relaxed">
-                                        <i class="fas fa-robot mr-2 text-lg text-blue-600"></i>
-                                        <span>${data.reply}</span>
-                                      </div>`;
-                content.scrollTop = content.scrollHeight;
-            })
-            .catch(error => {
-                document.getElementById(loadingId).remove();
-            });
-        }
+        })
+        .catch(error => { document.getElementById(loadingId).remove(); });
+    }
 </script>
 
 <style>
     .swiper-pagination-bullet-active { background-color: #2563eb !important; width: 24px !important; border-radius: 4px !important; }
-    /* Giúp con trỏ chuột hiển thị đúng kiểu khi kéo */
-    .myProjectSwiper { cursor: grab; }
-    .myProjectSwiper:active { cursor: grabbing; }
+    /* Cursor Styles */
+    .myProjectSwiper, .myProductSwiper { cursor: grab; }
+    .myProjectSwiper:active, .myProductSwiper:active { cursor: grabbing; }
 </style>
 @endpush

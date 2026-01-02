@@ -36,6 +36,7 @@
                             <i class="{{ $cat->icon ?? 'fas fa-caret-right' }} mr-2 text-gray-400 text-xs"></i> {{ $cat->name }}
                         </a>
                         
+                        {{-- Hiển thị con nếu đang ở danh mục cha hoặc chính nó --}}
                         @if($currentCategory->id == $cat->id || $currentCategory->parent_id == $cat->id)
                             @foreach($cat->children as $child)
                                 <a href="{{ route('frontend.category.show', $child->id) }}" class="pl-10 pr-4 py-2 border-b border-gray-50 text-sm hover:text-blue-600 flex items-center {{ $currentCategory->id == $child->id ? 'text-blue-600 font-bold' : 'text-gray-500' }}">
@@ -71,16 +72,16 @@
                 <div class="group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-400 transition duration-300 flex flex-col h-full relative overflow-hidden">
                     
                     @if($product->is_hot)
-                        <span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow z-10">HOT</span>
+                        <span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow z-10">-HOT</span>
                     @endif
 
                     <div class="relative overflow-hidden p-4 bg-white h-48 flex items-center justify-center">
                         <a href="{{ route('product.detail', $product->id) }}" class="block w-full h-48 flex items-center justify-center bg-white rounded-t-lg overflow-hidden">
                             @if($product->image)
                                 <img src="{{ asset($product->image) }}" 
-                                    class="w-full h-full object-contain hover:scale-105 transition duration-500" 
-                                    alt="{{ $product->name }}"
-                                    onerror="this.onerror=null;this.src='https://via.placeholder.com/300x300?text=No+Image'">
+                                     class="w-full h-full object-contain hover:scale-105 transition duration-500" 
+                                     alt="{{ $product->name }}"
+                                     onerror="this.onerror=null;this.src='https://via.placeholder.com/300x300?text=No+Image'">
                             @else
                                 <img src="https://via.placeholder.com/300x300?text=No+Image" class="w-full h-full object-contain opacity-50">
                             @endif

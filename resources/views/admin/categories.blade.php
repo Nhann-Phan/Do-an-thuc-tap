@@ -92,17 +92,15 @@
                         @forelse($parent->children as $child)
                             <div class="child-item-wrapper">
                                 
-                                <a href="{{ route('product.create', ['category_id' => $child->id]) }}" 
+                                <a href="{{ route('admin.category.products', $child->id) }}" 
                                    class="child-action-area"
-                                   title="Nhập sản phẩm mới vào mục này">
+                                   title="Xem danh sách sản phẩm trong danh mục {{ $child->name }}">
                                     <i class="fas fa-caret-right child-icon"></i>
                                     <span>{{ $child->name }}</span>
                                     <i class="fas fa-plus small"></i> 
                                 </a>
 
                                 <div class="action-buttons-mini">
-                                    <a href="{{ route('admin.category.products', $child->id) }}" class="btn-mini text-primary" title="Xem danh sách" 
-                                        style="text-decoration: none;"><i class="fas fa-list-ul fa-xs"></i></a>
                                     <button onclick="openEditModal({{ $child->id }}, '{{ $child->name }}', '{{ $child->icon }}', '{{ $parent->id }}')" class="btn-mini edit" title="Sửa tên"><i class="fas fa-pen fa-xs"></i></button>
                                     <form action="{{ route('categories.destroy', $child->id) }}" method="POST" onsubmit="return confirm('Bạn chắc chắn muốn xóa mục này?')" class="d-inline">
                                         @csrf @method('DELETE')

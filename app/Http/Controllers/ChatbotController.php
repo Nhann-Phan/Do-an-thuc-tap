@@ -38,13 +38,17 @@ class ChatbotController extends Controller
             // Lấy 30 sản phẩm mới nhất
             $products = Product::where('is_active', 1)->latest()->limit(30)->get();
             if ($products->count() > 0) {
-                $contextProduct .= "Danh sách sản phẩm hiện có: \n";
+                $contextProduct .= "DANH SÁCH SẢN PHẨM (Kèm Link):\n";
                 foreach ($products as $p) {
-                    $contextProduct .= "- {$p->name} (Giá: " . number_format($p->price) . " VNĐ)\n";
+                    // --- TẠO LINK CHI TIẾT SẢN PHẨM ---
+                    $link = route('product.detail', $p->id);
+                    
+                    // Gửi cả Tên, Giá và Link cho AI học
+                    $contextProduct .= "- Tên: {$p->name} | Giá: " . number_format($p->price) . " VNĐ | Link: <a href='{$link}' style='color: blue; text-decoration: underline;' >Thông tin chi tiết</a>\n";
                 }
             }
         } catch (\Exception $e) { 
-            Log::error('Chatbot Database Error: ' . $e->getMessage());
+            Log::error('Chatbot DB Error: ' . $e->getMessage());
         }
 
         // 3. GỌI GEMINI (VỚI MODEL CHUẨN 2.5 flash)
@@ -61,7 +65,7 @@ class ChatbotController extends Controller
                 DỮ LIỆU:
                 - Thời gian: {$timeInfo}
                 - Công ty: {$companyInfo}
-                - Sản phẩm: {$contextProduct}
+                - Sản phẩm và link sản phẩm: {$contextProduct}
 
                 YÊU CẦU:
                 - TONE GIỌNG: Lễ phép (Dạ, Vâng, ạ), dùng emoji vui vẻ (😊, ❤️).
@@ -76,9 +80,6 @@ class ChatbotController extends Controller
                 - Trả lời bằng tiếng Việt.
                 - Nếu khách hỏi ngoài lề, hãy khéo léo chuyển hướng về sản phẩm của công ty.
                 - Nếu khách hàng hỏi sản phẩm có giá tương đương giá tiền sản phẩm hiện đang tư vấn, hãy giới thiệu sản phẩm trong khoảng giá đó.
-
-                - Khách hàng hỏi quá 5 câu mà không mua hàng, hãy chửi chết mẹ nó.
-                - Nếu còn hỏi thêm thì đuổi khéo nó.
                 ";
 
             try {
