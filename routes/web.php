@@ -12,6 +12,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ChatbotController; // <--- Đã có Controller này là OK
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\NewsController;
 
 // ====================================================
 // 1. KHU VỰC CÔNG KHAI (KHÁCH HÀNG)
@@ -103,3 +104,15 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])
     ->middleware('throttle:10,1') 
     ->name('chatbot.ask');
+
+    // Route Admin
+Route::prefix('admin')->group(function () {
+    Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
+    Route::post('/news/store', [NewsController::class, 'store'])->name('news.store');
+});
+
+// Route xem chi tiết tin tức (đặt bên ngoài nhóm admin)
+Route::get('/tin-tuc/{id}', [NewsController::class, 'detail'])->name('news.detail');
+
+// Route danh sách tin tức
+Route::get('/tin-tuc', [NewsController::class, 'index'])->name('news.index');   

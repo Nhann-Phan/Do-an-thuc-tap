@@ -69,7 +69,7 @@
 
                 <div class="flex items-center space-x-6 ml-auto">
                     <nav class="hidden md:flex space-x-6 font-medium text-sm uppercase text-gray-600 items-center h-full">
-                        <a href="/" class="hover:text-blue-800 transition">Trang chủ</a>
+                        {{-- <a href="/" class="hover:text-blue-800 transition">Trang chủ</a> --}}
                         <a href="#" class="hover:text-blue-800 transition">Giới thiệu</a>
 
                         <div class="group static h-full flex items-center py-6"> 
@@ -117,7 +117,7 @@
                         </div>
 
                         <a href="#gallery" class="hover:text-blue-800 transition">Dự án</a>
-                        <a href="#" class="hover:text-blue-800 transition">Tin tức</a>
+                        <a href="{{ route('news.index') }}" class="hover:text-blue-800 transition">Tin tức</a>
                         <a href="#footer" class="hover:text-blue-800 transition">Liên hệ</a>
                     </nav>
 

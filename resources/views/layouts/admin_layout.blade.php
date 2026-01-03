@@ -129,10 +129,18 @@
                 <i class="fas fa-list"></i>
                 <span>Quản lý Danh mục</span>
             </a>
+            
             <a href="{{ route('product.index_admin') }}" class="menu-item {{ request()->is('admin/products*') ? 'active' : '' }}">
                 <i class="fas fa-boxes"></i>
                 <span>Tất cả sản phẩm</span>
             </a>
+
+            {{-- MENU TIN TỨC (NEW) --}}
+            <a href="{{ route('news.create') }}" class="menu-item {{ request()->is('admin/news*') ? 'active' : '' }}">
+                <i class="fas fa-newspaper"></i>
+                <span>Quản lý Tin tức</span>
+            </a>
+
             <a href="{{ route('gallery.index') }}" class="menu-item {{ request()->is('admin/gallery*') ? 'active' : '' }}">
                 <i class="fas fa-images"></i>
                 <span>Thư viện ảnh</span>

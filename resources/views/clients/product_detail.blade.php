@@ -84,6 +84,8 @@
                                     {{ $product->brand ?? 'Đang cập nhật' }}
                                 </span>
                             </li>
+                            <li>
+                                
                         </ul>
                     </div>
                     {{-- === KẾT THÚC === --}}

@@ -60,26 +60,15 @@
                         <p class="text-gray-500 text-sm mt-1 ml-4">{{ $currentCategory->name }}</p>
                     @endif
                 </div>
-                {{-- <div class="hidden md:flex gap-2">
-                    <div class="swiper-button-prev-product w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer bg-white"><i class="fas fa-chevron-left"></i></div>
-                    <div class="swiper-button-next-product w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer bg-white"><i class="fas fa-chevron-right"></i></div>
-                </div> --}}
             </div>
 
             <div class="swiper myProductSwiper !pb-12 px-2 cursor-grab active:cursor-grabbing">
                 <div class="swiper-wrapper">
-                    
-                    {{-- 
-                        QUAN TRỌNG: KỸ THUẬT NHÂN BẢN SLIDE (x4 lần) 
-                        Để đảm bảo Loop hoạt động kể cả khi chỉ có 1-2 sản phẩm HOT 
-                    --}}
                     @for ($i = 0; $i < 4; $i++)
                         @foreach($products as $product)
-                            {{-- Chỉ hiển thị sản phẩm HOT --}}
                             @if($product->is_hot || (isset($product->status) && $product->status == 'hot')) 
                             <div class="swiper-slide select-none h-auto">
                                 <div class="bg-white border rounded hover:shadow-xl transition duration-300 relative group flex flex-col h-full">
-                                    {{-- Badge HOT --}}
                                     <span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded z-10 animate-pulse">HOT</span>
                                     @if($product->sale_price)
                                         <span class="absolute top-2 right-2 bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded z-10">-Sale</span>
@@ -116,30 +105,22 @@
                             @endif
                         @endforeach
                     @endfor
-                    {{-- KẾT THÚC NHÂN BẢN --}}
-
                 </div>
                 <div class="swiper-pagination-product swiper-pagination"></div>
             </div>
         </div>
     </section>
 
-        <section class="py-16 bg-white" id="gallery">
+    <section class="py-16 bg-white" id="gallery">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-end mb-10">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800 uppercase border-blue-600 pl-3">Ảnh công trình thực tế</h2>
-                    {{-- <p class="text-gray-500 mt-2 ml-5">Kéo sang trái/phải để xem thêm các dự án.</p> --}}
                 </div>
-                {{-- <div class="hidden md:flex gap-2">
-                    <div class="swiper-button-prev-project w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-left"></i></div>
-                    <div class="swiper-button-next-project w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-right"></i></div>
-                </div> --}}
             </div>
 
             <div class="swiper myProjectSwiper !pb-12 px-2 cursor-grab active:cursor-grabbing"> 
                 <div class="swiper-wrapper">
-                    {{-- NHÂN BẢN DỰ ÁN NẾU ÍT HƠN 4 ĐỂ KÉO MƯỢT --}}
                     @if(isset($projectImages) && count($projectImages) > 0)
                         @for($i = 0; $i < (count($projectImages) < 4 ? 4 : 1); $i++)
                             @foreach($projectImages as $img)
@@ -148,7 +129,6 @@
                                     <img src="{{ asset($img->image_path) }}" 
                                          class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700 pointer-events-none" 
                                          draggable="false">
-                                    
                                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
                                         <p class="text-white font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition duration-300 line-clamp-2">
                                             {{ $img->caption ?? 'Dự án GPM' }}
@@ -168,6 +148,78 @@
                 </div>
                 <div class="swiper-pagination-project swiper-pagination"></div>
             </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-gray-50 border-t border-gray-100">
+        <div class="container mx-auto px-4">
+            
+            <div class="flex justify-between items-end mb-8 border-b border-gray-200 pb-3">
+                <h2 class="text-2xl font-bold text-gray-800 uppercase border-l-4 border-blue-600 pl-3">Cập Nhật Mới</h2>
+                <a href="{{ route('news.index') }}" class="text-sm font-semibold text-gray-500 hover:text-blue-600 flex items-center transition">
+                    Tin Tức >
+                </a>
+            </div>
+
+            @if(isset($latestNews) && count($latestNews) > 0)
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                {{-- 2 TIN LỚN (Cột 1 & 2) --}}
+                @foreach($latestNews->take(2) as $news)
+                <div class="group cursor-pointer flex flex-col h-full bg-white rounded-lg border border-transparent hover:border-gray-200 hover:shadow-lg transition duration-300 overflow-hidden">
+                    <div class="overflow-hidden relative aspect-video bg-gray-200">
+                        @if($news->image)
+                            <img src="{{ asset($news->image) }}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+                        @else
+                            <div class="flex items-center justify-center h-full text-gray-400"><i class="fas fa-newspaper text-4xl"></i></div>
+                        @endif
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition duration-300"></div>
+                    </div>
+                    
+                    <div class="p-4 flex-grow flex flex-col">
+                        <h3 class="text-lg font-bold text-gray-800 group-hover:text-blue-600 leading-snug mb-2 line-clamp-2">
+                            {{ $news->title }}
+                        </h3>
+                        <p class="text-gray-500 text-sm mb-3 line-clamp-2 flex-grow">
+                            {{ $news->summary }}
+                        </p>
+                        <div class="text-xs text-gray-400 mt-auto pt-3 border-t border-gray-100 flex items-center">
+                            <i class="far fa-clock mr-1"></i> Tin Tức | {{ $news->created_at->format('d-m-Y') }}
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+
+                {{-- DANH SÁCH TIN NHỎ (Cột 3) --}}
+                <div class="lg:col-span-1 bg-white p-5 rounded-lg border border-gray-100 shadow-sm h-full">
+                    <div class="flex flex-col space-y-5 h-full">
+                        @foreach($latestNews->skip(2)->take(3) as $subNews)
+                        <div class="group cursor-pointer border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                            <h4 class="text-sm font-bold text-gray-700 group-hover:text-blue-600 leading-snug mb-1 line-clamp-3">
+                                {{ $subNews->title }}
+                            </h4>
+                            <div class="text-[11px] text-gray-400 mt-1">
+                                Tin Tức | {{ $subNews->created_at->format('d-m-Y') }}
+                            </div>
+                        </div>
+                        @endforeach
+                        
+                        {{-- Nếu ít hơn 3 tin phụ thì hiện khoảng trống --}}
+                        @if($latestNews->count() <= 2)
+                            <div class="flex-grow flex items-center justify-center text-gray-400 italic text-xs">
+                                Đang cập nhật thêm tin tức...
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+            </div>
+            @else
+                <div class="text-center py-10 bg-white rounded border border-dashed border-gray-300">
+                    <p class="text-gray-400 italic">Chưa có tin tức nào được đăng tải.</p>
+                </div>
+            @endif
+
         </div>
     </section>
 

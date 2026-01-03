@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProjectImage;
+use App\Models\News; // <--- 1. MỚI THÊM: Import Model News
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 
@@ -19,7 +20,12 @@ class ProductController extends Controller
     {
         $products = Product::where('is_active', 1)->get();
         $projectImages = ProjectImage::latest()->take(6)->get();
-        return view('clients.store', compact('products', 'projectImages'));
+        
+        // <--- 2. MỚI THÊM: Lấy 5 tin tức mới nhất (Active) --->
+        $latestNews = News::where('is_active', 1)->latest()->take(5)->get();
+
+        // Gửi biến $latestNews sang view
+        return view('clients.store', compact('products', 'projectImages', 'latestNews'));
     }   
 
     public function showByCategory($id)
@@ -77,7 +83,6 @@ class ProductController extends Controller
 
     public function indexAdmin(Request $request)
     {
-        // Thêm logic tìm kiếm nếu có
         $query = Product::with('category')->latest();
         
         if ($request->has('keyword') && $request->keyword != '') {
@@ -100,21 +105,18 @@ class ProductController extends Controller
         return view('admin.product_create', compact('categories', 'selectedCategoryId'));
     }
 
-    // --- HÀM STORE (ĐÃ CẬP NHẬT BRAND) ---
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|max:255',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'brand' => 'nullable|string|max:255', // Validate brand
+            'brand' => 'nullable|string|max:255', 
         ]);
 
         $data = $request->all();
         $data['slug'] = Str::slug($request->name) . '-' . time();
         $data['price'] = $request->input('price', 0); 
-        
-        // Lưu Brand (Nếu không nhập thì để null)
         $data['brand'] = $request->brand;
 
         if ($request->hasFile('image')) {
@@ -141,7 +143,6 @@ class ProductController extends Controller
         return view('admin.product_edit', compact('product', 'categories'));
     }
 
-    // --- HÀM UPDATE (ĐÃ CẬP NHẬT BRAND) ---
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id); 
@@ -150,13 +151,11 @@ class ProductController extends Controller
             'name' => 'required|max:255',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'brand' => 'nullable|string|max:255', // Validate brand
+            'brand' => 'nullable|string|max:255', 
         ]);
 
         $data = $request->all();
         $data['slug'] = Str::slug($request->name) . '-' . $product->id;
-        
-        // Cập nhật Brand
         $data['brand'] = $request->brand;
 
         if ($request->hasFile('image')) {
