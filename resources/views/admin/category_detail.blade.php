@@ -24,6 +24,8 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ảnh</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên sản phẩm</th>
+                        {{-- CỘT MỚI: THƯƠNG HIỆU --}}
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thương hiệu</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá bán</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
@@ -51,6 +53,17 @@
                         <td class="px-6 py-4">
                             <div class="text-sm font-bold text-gray-900">{{ $product->name }}</div>
                             <div class="text-xs text-gray-500">{{ $product->sku }}</div>
+                        </td>
+
+                        {{-- HIỂN THỊ THƯƠNG HIỆU --}}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($product->brand)
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded bg-blue-50 text-blue-800 border border-blue-100 uppercase">
+                                    {{ $product->brand }}
+                                </span>
+                            @else
+                                <span class="text-xs text-gray-400 italic">---</span>
+                            @endif
                         </td>
 
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -89,7 +102,8 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-gray-500">
+                        {{-- Tăng colspan lên 7 vì thêm cột Brand --}}
+                        <td colspan="7" class="px-6 py-10 text-center text-gray-500">
                             <i class="fas fa-box-open text-4xl mb-3 text-gray-300 block"></i>
                             Chưa có sản phẩm nào trong danh mục này.
                         </td>

@@ -49,8 +49,11 @@
                         <th class="p-4 text-center w-20">Ảnh</th>
                         <th class="p-4">Tên sản phẩm</th>
                         <th class="p-4">Danh mục</th>
+                        {{-- CỘT MỚI: THƯƠNG HIỆU --}}
+                        <th class="p-4">Thương hiệu</th>
                         <th class="p-4">Giá bán</th>
-                        <th class="p-4 text-center">Trạng thái</th> <th class="p-4 text-right">Hành động</th>
+                        <th class="p-4 text-center">Trạng thái</th> 
+                        <th class="p-4 text-right">Hành động</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-sm">
@@ -83,6 +86,17 @@
                                 </a>
                             @else
                                 <span class="text-gray-400 italic">Chưa phân loại</span>
+                            @endif
+                        </td>
+
+                        {{-- HIỂN THỊ THƯƠNG HIỆU --}}
+                        <td class="p-4 align-middle">
+                            @if($product->brand)
+                                <span class="text-gray-700 font-medium bg-gray-100 px-2 py-1 rounded text-xs uppercase border border-gray-200">
+                                    {{ $product->brand }}
+                                </span>
+                            @else
+                                <span class="text-gray-400 italic text-xs">---</span>
                             @endif
                         </td>
 
@@ -124,7 +138,8 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="p-8 text-center text-gray-500">
+                        {{-- TĂNG COLSPAN LÊN 7 VÌ CÓ THÊM CỘT THƯƠNG HIỆU --}}
+                        <td colspan="7" class="p-8 text-center text-gray-500">
                             Không tìm thấy sản phẩm nào.
                         </td>
                     </tr>

@@ -9,25 +9,26 @@ class Product extends Model
 {
     use HasFactory;
 
-    // Khai báo cho phép lưu tất cả các cột chúng ta vừa tạo
+    // Khai báo cho phép lưu tất cả các cột
     protected $fillable = [
         'name', 
         'slug',
         'sku',              // Mã sản phẩm
+        'brand',            // Thương hiệu
         'category_id',      // ID danh mục
         'price',            // Giá bán
         'sale_price',       // Giá khuyến mãi
         'quantity',         // Số lượng
         'short_description', // Mô tả ngắn
-        'description',       // Bài viết chi tiết
-        'image',             // Ảnh đại diện
-        'gallery',           // Thư viện ảnh
-        'is_active',         // Trạng thái hiển thị
-        'is_hot'             // Sản phẩm HOT
+        'description',      // Bài viết chi tiết
+        'image',            // Ảnh đại diện
+        'gallery',          // Thư viện ảnh
+        'is_active',        // Trạng thái hiển thị
+        'is_hot'            // Sản phẩm HOT
     ];
 
     public function category()
-        {
-            return $this->belongsTo(Category::class, 'category_id');
-        }
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
 }

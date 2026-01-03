@@ -37,38 +37,33 @@ class ProductController extends Controller
         return view('clients.category_products', compact('products', 'menuCategories', 'currentCategory'));
     }
 
-    // --- HÀM SHOW: ĐÃ THÊM LOGIC LẤY SẢN PHẨM TƯƠNG TỰ ---
+    // --- HÀM SHOW ---
     public function show($id)
     {
-        // Load kèm quan hệ category để check cha/con
         $product = Product::with('category.parent', 'category.children')->findOrFail($id);
         
-        $relatedProducts = collect(); // Khởi tạo collection rỗng
+        $relatedProducts = collect(); 
 
         if ($product->category) {
             $cat = $product->category;
             $ids = [];
             
-            // Logic: Lấy hết ID của các danh mục liên quan (Anh em cùng cha hoặc Cha-Con)
             if ($cat->parent_id) {
-                // Nếu là mục con -> Lấy danh sách ID của các mục con khác cùng cha
                 if ($cat->parent) {
                      $ids = $cat->parent->children->pluck('id')->toArray();
-                     $ids[] = $cat->parent_id; // Thêm cả cha vào
+                     $ids[] = $cat->parent_id; 
                 }
             } else {
-                // Nếu là mục cha -> Lấy danh sách ID của các con
                 $ids = $cat->children->pluck('id')->toArray();
                 $ids[] = $cat->id;
             }
             
-            // Query lấy sản phẩm tương tự
             $relatedProducts = Product::where('is_active', 1)
-                                    ->whereIn('category_id', $ids) // Thuộc nhóm ID đã lọc
-                                    ->where('id', '!=', $id)       // Trừ chính sản phẩm đang xem
-                                    ->inRandomOrder()              // Lấy ngẫu nhiên
-                                    ->take(4)                      // Lấy 4 sản phẩm
-                                    ->get();
+                                      ->whereIn('category_id', $ids) 
+                                      ->where('id', '!=', $id)       
+                                      ->inRandomOrder()              
+                                      ->take(4)                      
+                                      ->get();
         }
 
         $menuCategories = Category::whereNull('parent_id')->with('children')->get();
@@ -80,18 +75,24 @@ class ProductController extends Controller
     // PHẦN 2: BACKEND ADMIN (QUẢN TRỊ)
     // ==========================================
 
-    public function indexAdmin()
+    public function indexAdmin(Request $request)
     {
-        $products = Product::with('category')->latest()->paginate(10);
+        // Thêm logic tìm kiếm nếu có
+        $query = Product::with('category')->latest();
+        
+        if ($request->has('keyword') && $request->keyword != '') {
+            $keyword = $request->keyword;
+            $query->where('name', 'like', "%{$keyword}%");
+        }
+
+        $products = $query->paginate(10);
         return view('admin.product_list', compact('products'));
     }
 
-    // --- HÀM CREATE: TỰ ĐỘNG BẮT ID DANH MỤC TỪ URL ---
     public function create(Request $request, $id = null)
     {
         $categories = Category::all(); 
         
-        // Ưu tiên lấy từ tham số hàm, sau đó đến route param, cuối cùng là query string
         $selectedCategoryId = $id;
         if (!$selectedCategoryId) $selectedCategoryId = $request->route('category_id');
         if (!$selectedCategoryId) $selectedCategoryId = $request->get('category_id');
@@ -99,18 +100,22 @@ class ProductController extends Controller
         return view('admin.product_create', compact('categories', 'selectedCategoryId'));
     }
 
-    // --- HÀM STORE: LƯU XONG QUAY LẠI FORM ĐỂ NHẬP TIẾP ---
+    // --- HÀM STORE (ĐÃ CẬP NHẬT BRAND) ---
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|max:255',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'brand' => 'nullable|string|max:255', // Validate brand
         ]);
 
         $data = $request->all();
         $data['slug'] = Str::slug($request->name) . '-' . time();
         $data['price'] = $request->input('price', 0); 
+        
+        // Lưu Brand (Nếu không nhập thì để null)
+        $data['brand'] = $request->brand;
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -124,7 +129,6 @@ class ProductController extends Controller
 
         Product::create($data);
 
-        // Quay lại trang create kèm theo ID danh mục để nhập tiếp
         return redirect()
                 ->route('product.create', ['category_id' => $request->category_id])
                 ->with('success', 'Đã thêm sản phẩm thành công! Mời nhập tiếp sản phẩm tiếp theo.');
@@ -137,18 +141,23 @@ class ProductController extends Controller
         return view('admin.product_edit', compact('product', 'categories'));
     }
 
+    // --- HÀM UPDATE (ĐÃ CẬP NHẬT BRAND) ---
     public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id); // Sửa lỗi undefined variable $product
+        $product = Product::findOrFail($id); 
 
         $request->validate([
             'name' => 'required|max:255',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'brand' => 'nullable|string|max:255', // Validate brand
         ]);
 
         $data = $request->all();
         $data['slug'] = Str::slug($request->name) . '-' . $product->id;
+        
+        // Cập nhật Brand
+        $data['brand'] = $request->brand;
 
         if ($request->hasFile('image')) {
             if ($product->image && File::exists(public_path($product->image))) {

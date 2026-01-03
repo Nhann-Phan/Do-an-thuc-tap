@@ -75,6 +75,19 @@
                         @endif
                     </div>
 
+                    {{-- === PHẦN THÊM THƯƠNG HIỆU === --}}
+                    <div class="text-gray-600 text-sm leading-relaxed mb-6">
+                        <ul class="space-y-1.5 list-disc pl-4 marker:text-blue-500">
+                            <li>
+                                <strong>Thương hiệu:</strong> 
+                                <span class="font-bold text-dark-700 ">
+                                    {{ $product->brand ?? 'Đang cập nhật' }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    {{-- === KẾT THÚC === --}}
+
                     <div class="flex gap-3 mt-auto">
                         <a href="{{ route('add_to_cart', $product->id) }}" class="flex-1 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-3 rounded text-sm uppercase tracking-wide transition flex items-center justify-center">
                             <i class="fas fa-cart-plus mr-2"></i> Thêm giỏ
@@ -132,6 +145,12 @@
                                             <div class="text-sm font-bold text-red-600">
                                                 {{ number_format($related->sale_price ?: $related->price) }} ₫
                                             </div>
+                                        </div>
+                                        
+                                        <div class="absolute bottom-20 left-0 w-full flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <a href="{{ route('add_to_cart', $related->id) }}" class="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-md hover:bg-blue-700">
+                                                Thêm vào giỏ
+                                            </a>
                                         </div>
 
                                     </div>

@@ -79,6 +79,14 @@
                                 </select>
                             </div>
 
+                            {{-- === THÊM TRƯỜNG NHẬP THƯƠNG HIỆU MỚI === --}}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Thương hiệu</label>
+                                <input type="text" name="brand" class="form-control" placeholder="Ví dụ: Dell, HP, TP-Link..." value="{{ old('brand') }}">
+                                <div class="form-text text-muted fst-italic text-xs">Để trống sẽ hiển thị "Đang cập nhật"</div>
+                            </div>
+                            {{-- === KẾT THÚC === --}}
+
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Giá bán (VNĐ)</label>
                                 <input type="number" name="price" class="form-control" placeholder="0" value="{{ old('price') }}">
