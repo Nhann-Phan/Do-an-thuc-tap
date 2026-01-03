@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>GPM Technology</title>
@@ -15,6 +14,7 @@
     
     <style>
         body { font-family: 'Inter', sans-serif; }
+        /* Hiệu ứng gạch chân menu */
         .hover-underline-animation { display: inline-block; position: relative; }
         .hover-underline-animation::after { content: ''; position: absolute; width: 100%; transform: scaleX(0); height: 2px; bottom: 0; left: 0; background-color: #0056b3; transform-origin: bottom right; transition: transform 0.25s ease-out; }
         .hover-underline-animation:hover::after { transform: scaleX(1); transform-origin: bottom left; }
@@ -27,6 +27,19 @@
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+
+        /* Style đặc biệt cho input form footer */
+        .footer-input {
+            background-color: #333;
+            border: 1px solid #444;
+            color: #fff;
+            transition: all 0.3s;
+        }
+        .footer-input:focus {
+            background-color: #444;
+            border-color: #dc2626; /* Red border on focus */
+            outline: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
@@ -60,7 +73,7 @@
                         <a href="#" class="hover:text-blue-800 transition">Giới thiệu</a>
 
                         <div class="group static h-full flex items-center py-6"> 
-                            <a href="#" class="text-blue-800 font-bold flex items-center transition relative z-10 cursor-pointer">
+                            <a href="#products" class="text-blue-800 font-bold flex items-center transition relative z-10 cursor-pointer">
                                 SẢN PHẨM <i class="fas fa-chevron-down ml-1 text-[10px]"></i>
                             </a>
                             <div class="absolute top-full left-0 w-full invisible opacity-0 translate-y-3 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out z-50 font-sans shadow-2xl border-t-2 border-blue-500 text-left">
@@ -104,9 +117,8 @@
                         </div>
 
                         <a href="#gallery" class="hover:text-blue-800 transition">Dự án</a>
-                        <a href="#" class="hover:text-blue-800 transition">Đối tác</a>
                         <a href="#" class="hover:text-blue-800 transition">Tin tức</a>
-                        <a href="#" class="hover:text-blue-800 transition">Liên hệ</a>
+                        <a href="#footer" class="hover:text-blue-800 transition">Liên hệ</a>
                     </nav>
 
                     <div class="h-6 w-px bg-gray-300 hidden md:block"></div>
@@ -143,9 +155,68 @@
         @yield('content')
     </main>
 
-    <footer class="bg-gray-800 text-gray-300 py-10 text-sm mt-auto">
-        <div class="container mx-auto px-4 text-center">
-            Copyright © 2025 TechShop An Giang.
+    <footer id="footer" class="mt-auto">
+        <div class="bg-[#1a1a1a] text-[#a3a3a3] py-12 border-t border-gray-800" style="background-color: rgb(30 64 80 / var(--tw-text-opacity, 1));">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    
+                    <div class="lg:col-span-5 space-y-5">
+                        <div>
+                            <h3 class="text-white font-bold text-lg uppercase leading-snug tracking-wide">Công ty TNHH MTV Thiết bị và phần mềm GPM Việt Nam</h3>
+                            {{-- <div class="h-1 w-16 bg-red-600 mt-2"></div> --}}
+                        </div>
+                        <div class="space-y-3 text-sm leading-relaxed">
+                            <p class="flex items-start"><i class="fas fa-map-marker-alt mt-1 mr-3 text-red-600"></i><span>38 đường số 9, KĐT Tây Sông Hậu, Long Xuyên, An Giang</span></p>
+                            <p class="flex items-center"><i class="fas fa-phone-alt mr-3 text-red-600"></i><span>Điện thoại: 0902 777 186</span></p>
+                            <p class="flex items-center"><i class="fas fa-envelope mr-3 text-red-600"></i><span>Email: contact@gpm.vn | Website: www.gpm.vn</span></p>
+                        </div>
+                        <div class="flex space-x-3 pt-2">
+                            <a href="https://www.facebook.com/gpm.vn" class="w-8 h-8 bg-gray-700 hover:bg-blue-600 text-white flex items-center justify-center rounded transition"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="w-8 h-8 bg-gray-700 hover:bg-red-600 text-white flex items-center justify-center rounded transition"><i class="fab fa-youtube"></i></a>
+                            <a href="#" class="w-8 h-8 bg-gray-700 hover:bg-blue-400 text-white flex items-center justify-center rounded transition"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-3">
+                        <div class="w-full h-44 bg-gray-800 rounded border border-gray-700 overflow-hidden shadow-lg relative group">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3924.627295380687!2d105.43232637486822!3d10.371655789753856!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x310a731e7543e577%3A0xc7507300c35471d8!2zMzggxJAuIFPhu5EgOSwgS2h1IMSRw7QgdGjhu4sgVMOieSBTw7RuZyBI4bqtdSwgVGjDoG5oIHBo4buRIExvbmcgWHV5w6puLCBBbiBHaWFuZyA5MDEwMCwgVmlldG5hbQ!5e0!3m2!1sen!2s!4v1709222400000!5m2!1sen!2s" 
+                                width="100%" 
+                                height="100%" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-4">
+                        <h3 class="text-white font-bold text-lg uppercase mb-2">ĐĂNG KÝ NHẬN THÔNG TIN</h3>
+                        <p class="text-xs mb-4 text-gray-400">Xin vui lòng để lại địa chỉ email, chúng tôi sẽ cập nhật những tin tức quan trọng của GPM tới quý khách</p>
+                        <form class="space-y-3">
+                            <div class="flex gap-2">
+                                <input type="text" placeholder="Họ và tên" style="background: #fff" class="footer-input w-1/2 text-sm px-3 py-2 rounded">
+                                <input type="email" placeholder="Email" style="background: #fff" class="footer-input w-1/2 text-sm px-3 py-2 rounded">
+                            </div>
+                            <button type="button" onclick="Swal.fire('Đã đăng ký!', 'Cảm ơn bạn đã quan tâm.', 'success')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 text-sm uppercase transition w-full shadow-md">Đăng ký</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-red-600 text-white text-[11px] md:text-xs py-3 relative border-t border-red-700">
+            <div class="container mx-auto px-4 flex flex-col md:flex-row justify-center items-center">
+                <div class="mb-1 md:mb-0 opacity-90">
+                    © 2025 Bản quyền thuộc về CÔNG TY GPM VIỆT NAM. Thiết kế website bởi GPM Tech.
+                </div>
+            </div>
+            
+            <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="hidden md:flex absolute bottom-0 right-4 bg-red-800 hover:bg-gray-800 text-white w-10 h-10 items-center justify-center border border-red-500 shadow-lg transition z-20 group">
+                <i class="fas fa-angle-double-up group-hover:-translate-y-1 transition-transform"></i>
+            </a>
         </div>
     </footer>
 
