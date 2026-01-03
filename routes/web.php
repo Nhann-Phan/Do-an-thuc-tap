@@ -10,7 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ChatbotController; // <--- Đã có Controller này là OK
+use App\Http\Controllers\ChatbotController; 
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\NewsController;
 
@@ -22,6 +22,10 @@ use App\Http\Controllers\NewsController;
 Route::get('/', [ProductController::class, 'index']);
 Route::get('/danh-muc/{id}', [ProductController::class, 'showByCategory'])->name('frontend.category.show');
 Route::get('/san-pham/{id}', [ProductController::class, 'show'])->name('product.detail');
+
+// --- Tin tức (News) ---
+Route::get('/tin-tuc', [NewsController::class, 'index'])->name('news.index');       // Danh sách tin
+Route::get('/tin-tuc/{id}', [NewsController::class, 'detail'])->name('news.detail'); // Chi tiết tin
 
 // --- Đặt lịch hẹn (Booking) ---
 Route::post('/book-appointment', [BookingController::class, 'store'])
@@ -48,8 +52,11 @@ Route::controller(CartController::class)->group(function () {
 Route::get('/thanh-toan', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/thanh-toan', [CheckoutController::class, 'process'])->name('checkout.process');
 
-// --- CHATBOT AI (Quan trọng để bấm nút hoạt động) ---
-Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
+// --- CHATBOT AI ---
+// Giới hạn 10 request trong 1 phút để tránh spam
+Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])
+    ->middleware('throttle:10,1') 
+    ->name('chatbot.ask');
 
 
 // ====================================================
@@ -60,6 +67,16 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // --- Dashboard ---
     Route::get('/', [AdminController::class, 'index']); 
     Route::get('/booking/update/{id}/{status}', [AdminController::class, 'updateStatus']);
+
+    // --- Quản lý Tin Tức (News) ---
+    Route::controller(NewsController::class)->prefix('news')->name('news.')->group(function () {
+        Route::get('/', 'indexAdmin')->name('index_admin'); // admin/news
+        Route::get('/create', 'create')->name('create');    // admin/news/create
+        Route::post('/store', 'store')->name('store');      // admin/news/store
+        Route::get('/{id}/edit', 'edit')->name('edit');     // admin/news/{id}/edit
+        Route::put('/{id}', 'update')->name('update');      // admin/news/{id}
+        Route::delete('/{id}', 'destroy')->name('destroy'); // admin/news/{id}
+    });
 
     // --- Quản lý Thư viện ảnh ---
     Route::controller(GalleryController::class)->prefix('gallery')->name('gallery.')->group(function () {
@@ -99,20 +116,3 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     });
 
 });
-
-// Giới hạn 10 request trong 1 phút cho route này
-Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])
-    ->middleware('throttle:10,1') 
-    ->name('chatbot.ask');
-
-    // Route Admin
-Route::prefix('admin')->group(function () {
-    Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
-    Route::post('/news/store', [NewsController::class, 'store'])->name('news.store');
-});
-
-// Route xem chi tiết tin tức (đặt bên ngoài nhóm admin)
-Route::get('/tin-tuc/{id}', [NewsController::class, 'detail'])->name('news.detail');
-
-// Route danh sách tin tức
-Route::get('/tin-tuc', [NewsController::class, 'index'])->name('news.index');   

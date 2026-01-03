@@ -9,6 +9,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h3 class="fw-bold text-secondary">Đăng Tin Tức Mới</h3>
+        <a href="{{ route('news.index_admin') }}" class="btn btn-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i> Quay lại
+    </a>
 </div>
 
 <div class="card border-0 shadow-sm">
@@ -45,9 +48,9 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Hình ảnh đại diện</label>
                                 <input type="file" name="image" class="form-control mb-2" accept="image/*" onchange="previewImage(this)">
-                                <img id="preview" src="https://via.placeholder.com/300x200?text=No+Image" class="img-fluid rounded border">
+                                {{-- <img id="preview" src="https://via.placeholder.com/300x200?text=No+Image" class="img-fluid rounded border"> --}}
                             </div>
-                            <hr>
+                            
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" name="is_active" id="activeSwitch" checked>
                                 <label class="form-check-label fw-bold" for="activeSwitch">Hiển thị ngay</label>

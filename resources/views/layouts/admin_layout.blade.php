@@ -136,7 +136,7 @@
             </a>
 
             {{-- MENU TIN TỨC (NEW) --}}
-            <a href="{{ route('news.create') }}" class="menu-item {{ request()->is('admin/news*') ? 'active' : '' }}">
+            <a href="{{ route('news.index_admin') }}" class="menu-item {{ request()->is('admin/news*') ? 'active' : '' }}">
                 <i class="fas fa-newspaper"></i>
                 <span>Quản lý Tin tức</span>
             </a>

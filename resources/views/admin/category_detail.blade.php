@@ -33,7 +33,15 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($category->products as $product)
-                    <tr class="hover:bg-gray-50 transition">
+                    {{-- 
+                        CẬP NHẬT: 
+                        1. Thêm onclick chuyển hướng sang trang edit
+                        2. Thêm class cursor-pointer
+                    --}}
+                    <tr class="hover:bg-blue-50 transition duration-150 cursor-pointer group"
+                        onclick="window.location='{{ route('product.edit', $product->id) }}'"
+                        title="Bấm để chỉnh sửa">
+                        
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ $loop->iteration }}
                         </td>
@@ -51,7 +59,7 @@
                         </td>
 
                         <td class="px-6 py-4">
-                            <div class="text-sm font-bold text-gray-900">{{ $product->name }}</div>
+                            <div class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition">{{ $product->name }}</div>
                             <div class="text-xs text-gray-500">{{ $product->sku }}</div>
                         </td>
 
@@ -88,13 +96,17 @@
                         </td>
 
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                            <a href="{{ route('product.edit', $product->id) }}" class="text-yellow-600 hover:text-yellow-900 bg-yellow-50 p-2 rounded hover:bg-yellow-100 transition" title="Sửa">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                            {{-- ĐÃ XÓA NÚT SỬA --}}
 
-                            <form action="{{ route('product.destroy', $product->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này không?')">
+                            <form action="{{ route('product.destroy', $product->id) }}" method="POST" class="inline-block">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900 bg-red-50 p-2 rounded hover:bg-red-100 transition" title="Xóa">
+                                {{-- 
+                                    QUAN TRỌNG: Thêm event.stopPropagation() vào nút xóa 
+                                --}}
+                                <button type="submit" 
+                                        class="text-red-600 hover:text-red-900 bg-red-50 p-2 rounded hover:bg-red-100 transition shadow-sm border border-red-100" 
+                                        title="Xóa"
+                                        onclick="event.stopPropagation(); return confirm('Bạn có chắc muốn xóa sản phẩm này không?')">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>

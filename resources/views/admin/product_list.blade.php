@@ -49,7 +49,6 @@
                         <th class="p-4 text-center w-20">Ảnh</th>
                         <th class="p-4">Tên sản phẩm</th>
                         <th class="p-4">Danh mục</th>
-                        {{-- CỘT MỚI: THƯƠNG HIỆU --}}
                         <th class="p-4">Thương hiệu</th>
                         <th class="p-4">Giá bán</th>
                         <th class="p-4 text-center">Trạng thái</th> 
@@ -58,7 +57,15 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-sm">
                     @forelse($products as $product)
-                    <tr class="hover:bg-gray-50 transition duration-150">
+                    {{-- 
+                        CẬP NHẬT: 
+                        1. Thêm onclick chuyển hướng sang trang edit
+                        2. Thêm class cursor-pointer
+                    --}}
+                    <tr class="hover:bg-blue-50 transition duration-150 cursor-pointer group" 
+                        onclick="window.location='{{ route('product.edit', $product->id) }}'"
+                        title="Bấm để chỉnh sửa">
+                        
                         <td class="p-4 text-center">
                             <div class="w-12 h-12 rounded border border-gray-200 overflow-hidden bg-white mx-auto flex items-center justify-center">
                                 @if($product->image)
@@ -70,7 +77,7 @@
                         </td>
 
                         <td class="p-4 align-middle">
-                            <div class="font-bold text-gray-800">{{ $product->name }}</div>
+                            <div class="font-bold text-gray-800 group-hover:text-blue-600 transition">{{ $product->name }}</div>
                             <div class="flex items-center mt-1 space-x-2">
                                 <span class="text-xs text-gray-500">ID: {{ $product->id }}</span>
                                 @if($product->is_hot)
@@ -80,8 +87,11 @@
                         </td>
 
                         <td class="p-4 align-middle">
+                            {{-- Sử dụng stopPropagation để click vào link danh mục không bị chuyển sang trang edit sản phẩm --}}
                             @if($product->category)
-                                <a href="{{ route('admin.category.products', $product->category->id) }}" class="text-blue-600 hover:underline">
+                                <a href="{{ route('admin.category.products', $product->category->id) }}" 
+                                   class="text-blue-600 hover:underline relative z-10" 
+                                   onclick="event.stopPropagation()">
                                     {{ $product->category->name }}
                                 </a>
                             @else
@@ -89,7 +99,6 @@
                             @endif
                         </td>
 
-                        {{-- HIỂN THỊ THƯƠNG HIỆU --}}
                         <td class="p-4 align-middle">
                             @if($product->brand)
                                 <span class="text-gray-700 font-medium bg-gray-100 px-2 py-1 rounded text-xs uppercase border border-gray-200">
@@ -123,13 +132,17 @@
 
                         <td class="p-4 align-middle text-right">
                             <div class="flex justify-end items-center space-x-2">
-                                <a href="{{ route('product.edit', $product->id) }}" class="w-9 h-9 bg-yellow-500 hover:bg-yellow-600 text-white rounded flex items-center justify-center transition shadow-sm" title="Sửa">
-                                    <i class="fas fa-pen text-sm"></i>
-                                </a>
+                                {{-- ĐÃ XÓA NÚT SỬA (VÌ CLICK VÀO DÒNG LÀ SỬA RỒI) --}}
                                 
-                                <form action="{{ route('product.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa không?')" class="inline">
+                                <form action="{{ route('product.destroy', $product->id) }}" method="POST" class="inline">
                                     @csrf @method('DELETE')
-                                    <button class="w-9 h-9 bg-red-600 hover:bg-red-700 text-white rounded flex items-center justify-center transition shadow-sm" title="Xóa">
+                                    {{-- 
+                                        QUAN TRỌNG: Thêm event.stopPropagation() 
+                                        để click nút xóa không kích hoạt click dòng 
+                                    --}}
+                                    <button class="w-9 h-9 bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded flex items-center justify-center transition shadow-sm" 
+                                            title="Xóa"
+                                            onclick="event.stopPropagation(); return confirm('Bạn có chắc muốn xóa không?')">
                                         <i class="fas fa-trash text-sm"></i>
                                     </button>
                                 </form>
@@ -138,7 +151,6 @@
                     </tr>
                     @empty
                     <tr>
-                        {{-- TĂNG COLSPAN LÊN 7 VÌ CÓ THÊM CỘT THƯƠNG HIỆU --}}
                         <td colspan="7" class="p-8 text-center text-gray-500">
                             Không tìm thấy sản phẩm nào.
                         </td>

@@ -1,0 +1,83 @@
+@extends('layouts.admin_layout')
+
+@section('content')
+
+{{-- Ẩn lỗi bảo mật CKEditor --}}
+<style>.cke_notification_warning { display: none !important; }</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-secondary">Chỉnh Sửa Tin Tức</h3>
+    <a href="{{ route('news.index_admin') }}" class="btn btn-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i> Quay lại
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        
+        <form action="{{ route('news.update', $news->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT') {{-- Bắt buộc cho hàm update --}}
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tiêu đề tin <span class="text-danger">*</span></label>
+                        <input type="text" name="title" class="form-control" required value="{{ old('title', $news->title) }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mô tả ngắn</label>
+                        <textarea name="short_content" class="form-control" rows="3">{{ old('short_content', $news->short_content) }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nội dung chi tiết</label>
+                        <textarea name="content" id="content" class="form-control" rows="10">{{ old('content', $news->content) }}</textarea>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card bg-light border-0 mb-3">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Hình ảnh đại diện</label>
+                                <input type="file" name="image" class="form-control mb-2" accept="image/*" onchange="previewImage(this)">
+                                
+                                <div class="text-center bg-white p-2 rounded border">
+                                    <img id="preview" 
+                                         src="{{ $news->image ? asset($news->image) : 'https://via.placeholder.com/300x200?text=No+Image' }}" 
+                                         class="img-fluid rounded" 
+                                         style="max-height: 200px;">
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_active" id="activeSwitch" {{ $news->is_active ? 'checked' : '' }}>
+                                <label class="form-check-label fw-bold" for="activeSwitch">Hiển thị ngay</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-warning w-100 py-3 fw-bold text-uppercase text-dark">
+                        <i class="fas fa-save me-1"></i> Lưu thay đổi
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<script>
+    CKEDITOR.replace('content', { height: 400 });
+    
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) { document.getElementById('preview').src = e.target.result; }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+@endsection

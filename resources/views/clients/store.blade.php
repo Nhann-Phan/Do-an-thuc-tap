@@ -55,7 +55,7 @@
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-end mb-8 pb-2">
                 <div>
-                    <h3 class="text-2xl font-bold text-gray-800 uppercase border-blue-600 pl-3">Sản phẩm nổi bật</h3>
+                    <h3 class="text-2xl font-bold text-gray-800 uppercase border-l-4 border-blue-600 pl-3">Sản phẩm nổi bật</h3>
                     @if(isset($currentCategory))
                         <p class="text-gray-500 text-sm mt-1 ml-4">{{ $currentCategory->name }}</p>
                     @endif
@@ -85,6 +85,15 @@
                                     </div>
 
                                     <div class="p-4 flex-grow flex flex-col border-t border-gray-100">
+                                        {{-- THƯƠNG HIỆU --}}
+                                        @if($product->brand)
+                                        <div class="mb-1">
+                                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border border-gray-200 px-1.5 py-0.5 rounded">
+                                                {{ $product->brand }}
+                                            </span>
+                                        </div>
+                                        @endif
+
                                         <h4 class="text-sm font-bold text-gray-700 mb-2 hover:text-blue-600 cursor-pointer line-clamp-2 min-h-[2.5rem]">
                                             <a href="{{ route('product.detail', $product->id) }}">{{ $product->name }}</a>
                                         </h4>
@@ -115,7 +124,7 @@
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-end mb-10">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800 uppercase border-blue-600 pl-3">Ảnh công trình thực tế</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 uppercase border-l-4 border-blue-600 pl-3">Ảnh công trình thực tế</h2>
                 </div>
             </div>
 
@@ -156,6 +165,7 @@
             
             <div class="flex justify-between items-end mb-8 border-b border-gray-200 pb-3">
                 <h2 class="text-2xl font-bold text-gray-800 uppercase border-l-4 border-blue-600 pl-3">Cập Nhật Mới</h2>
+                {{-- CẬP NHẬT: Link xem tất cả tin tức --}}
                 <a href="{{ route('news.index') }}" class="text-sm font-semibold text-gray-500 hover:text-blue-600 flex items-center transition">
                     Tin Tức >
                 </a>
@@ -166,7 +176,8 @@
                 
                 {{-- 2 TIN LỚN (Cột 1 & 2) --}}
                 @foreach($latestNews->take(2) as $news)
-                <div class="group cursor-pointer flex flex-col h-full bg-white rounded-lg border border-transparent hover:border-gray-200 hover:shadow-lg transition duration-300 overflow-hidden">
+                {{-- CẬP NHẬT: Thẻ A bao quanh toàn bộ bài viết --}}
+                <a href="{{ route('news.detail', $news->id) }}" class="group cursor-pointer flex flex-col h-full bg-white rounded-lg border border-transparent hover:border-gray-200 hover:shadow-lg transition duration-300 overflow-hidden">
                     <div class="overflow-hidden relative aspect-video bg-gray-200">
                         @if($news->image)
                             <img src="{{ asset($news->image) }}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
@@ -187,7 +198,7 @@
                             <i class="far fa-clock mr-1"></i> Tin Tức | {{ $news->created_at->format('d-m-Y') }}
                         </div>
                     </div>
-                </div>
+                </a>
                 @endforeach
 
                 {{-- DANH SÁCH TIN NHỎ (Cột 3) --}}
@@ -195,16 +206,20 @@
                     <div class="flex flex-col space-y-5 h-full">
                         @foreach($latestNews->skip(2)->take(3) as $subNews)
                         <div class="group cursor-pointer border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                            {{-- CẬP NHẬT: Tiêu đề có link chi tiết --}}
                             <h4 class="text-sm font-bold text-gray-700 group-hover:text-blue-600 leading-snug mb-1 line-clamp-3">
-                                {{ $subNews->title }}
+                                <a href="{{ route('news.detail', $subNews->id) }}">{{ $subNews->title }}</a>
                             </h4>
+                            
+                            {{-- CẬP NHẬT: Link xem danh sách --}}
                             <div class="text-[11px] text-gray-400 mt-1">
-                                Tin Tức | {{ $subNews->created_at->format('d-m-Y') }}
+                                <a href="{{ route('news.index') }}" class="hover:text-blue-600 transition">
+                                    Xem thêm | {{ $subNews->created_at->format('d-m-Y') }}
+                                </a>
                             </div>
                         </div>
                         @endforeach
                         
-                        {{-- Nếu ít hơn 3 tin phụ thì hiện khoảng trống --}}
                         @if($latestNews->count() <= 2)
                             <div class="flex-grow flex items-center justify-center text-gray-400 italic text-xs">
                                 Đang cập nhật thêm tin tức...
