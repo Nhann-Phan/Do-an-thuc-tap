@@ -23,7 +23,7 @@
 
 <div class="bg-white py-3 border-b border-gray-200 mb-6">
     <div class="container mx-auto px-4 text-xs font-bold text-gray-500 tracking-wide flex items-center gap-2">
-        <a href="/" class="hover:text-blue-600 transition"><i class="fas fa-home mr-1"></i> {{ __('messages.home') }}</a>
+        <a href="/" class="hover:text-blue-600 transition"><i class="fas fa-home mr-1"></i>Trang chủ</a>
         <i class="fas fa-angle-right text-gray-300 text-[10px]"></i>
         @if($product->category)
             <a href="{{ route('frontend.category.show', $product->category_id) }}" class="hover:text-blue-600 transition">{{ $product->category->name }}</a>

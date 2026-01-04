@@ -97,7 +97,7 @@
                                         <h4 class="text-sm font-bold text-gray-700 mb-2 hover:text-blue-600 cursor-pointer line-clamp-2 min-h-[2.5rem]">
                                             <a href="{{ route('product.detail', $product->id) }}">{{ $product->name }}</a>
                                         </h4>
-                                        <div class="mt-auto cursor-pointer">
+                                        <div class="mt-auto cursor-pointer ml-">
                                             {{-- GIÁ BÁN --}}
                                             @if($product->sale_price)
                                                 <span class="text-red-600 font-bold text-lg">{{ number_format($product->sale_price) }} đ</span>

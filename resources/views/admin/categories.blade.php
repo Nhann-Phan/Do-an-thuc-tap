@@ -3,10 +3,9 @@
 @section('content')
 
 <style>
-    /* ... (Giữ nguyên phần CSS cũ của bạn) ... */
     .category-card { border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 12px; overflow: hidden; height: 100%; transition: transform 0.2s; background: white; }
     .category-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .card-header-custom { background-color: #1e293b; color: white; padding: 12px 15px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; }
+    .card-header-custom { background-color: #1e293b; color: white; padding: 12px 15px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; }
     .child-item-wrapper { position: relative; border-bottom: 1px solid #f1f5f9; transition: background 0.2s; display: flex; justify-content: space-between; align-items: center; }
     .child-item-wrapper:last-child { border-bottom: none; }
     .child-item-wrapper:hover { background-color: #f0fdf4; }

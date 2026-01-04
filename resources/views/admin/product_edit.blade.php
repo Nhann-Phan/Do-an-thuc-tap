@@ -41,7 +41,9 @@
             @method('PUT')
             
             <div class="row">
-                {{-- CỘT TRÁI: TÊN & MÔ TẢ --}}
+                {{-- ==================================================== --}}
+                {{-- CỘT TRÁI (LỚN): TÊN, MÔ TẢ & BIẾN THỂ --}}
+                {{-- ==================================================== --}}
                 <div class="col-md-8">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Tên sản phẩm <span class="text-danger">*</span></label>
@@ -52,9 +54,53 @@
                         <label class="form-label fw-bold">Mô tả chi tiết</label>
                         <textarea name="description" id="description" class="form-control" rows="10">{{ old('description', $product->description) }}</textarea>
                     </div>
-                </div>
 
-                {{-- CỘT PHẢI: THÔNG TIN PHỤ --}}
+                    <div class="card border border-warning bg-white mb-3 mt-4">
+                        <div class="card-header bg-warning text-dark py-2 d-flex justify-content-between align-items-center">
+                            <span class="fw-bold"><i class="fas fa-tags me-1"></i> Các phiên bản giá (Tùy chọn)</span>
+                            <small class="text-dark fst-italic">Giá thấp nhất sẽ tự động cập nhật làm Giá chính</small>
+                        </div>
+                        <div class="card-body p-3">
+                            {{-- Header của bảng biến thể --}}
+                            <div class="row g-2 mb-2 fw-bold text-muted small border-bottom pb-1">
+                                <div class="col-6">Tên phiên bản (VD: 6 tháng)</div>
+                                <div class="col-5">Giá tiền (VNĐ)</div>
+                                <div class="col-1 text-center">Xóa</div>
+                            </div>
+
+                            <div id="variants-container">
+                                {{-- HIỂN THỊ CÁC BIẾN THỂ CŨ TỪ DATABASE --}}
+                                @foreach($product->variants as $index => $variant)
+                                <div class="row g-2 mb-3 align-items-center variant-item border-bottom pb-2 bg-light rounded p-2">
+                                    {{-- Input ẩn để biết đây là update dòng cũ --}}
+                                    <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $variant->id }}">
+                                    
+                                    <div class="col-6">
+                                        <input type="text" name="variants[{{ $index }}][name]" class="form-control" value="{{ $variant->name }}" placeholder="VD: Gói 1 năm" required>
+                                    </div>
+                                    <div class="col-5">
+                                        <input type="number" name="variants[{{ $index }}][price]" class="form-control" value="{{ $variant->price }}" placeholder="Nhập giá" required>
+                                    </div>
+                                    <div class="col-1 text-center">
+                                        {{-- Checkbox xóa --}}
+                                        <div class="form-check d-flex justify-content-center m-0 pt-1" title="Tick vào đây để xóa dòng này khi Lưu">
+                                            <input class="form-check-input border-danger" type="checkbox" name="variants[{{ $index }}][delete]" value="1">
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                            
+                            <button type="button" onclick="addVariant()" class="btn btn-outline-warning text-dark btn-sm w-100 border-dashed mt-2 py-2 fw-bold">
+                                <i class="fas fa-plus me-1"></i> Thêm phiên bản mới
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+
+                {{-- ==================================================== --}}
+                {{-- CỘT PHẢI (NHỎ): THÔNG TIN PHỤ & ẢNH --}}
+                {{-- ==================================================== --}}
                 <div class="col-md-4">
                     <div class="card bg-light border-0 mb-3">
                         <div class="card-body">
@@ -85,42 +131,11 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Giá bán chính (VNĐ)</label>
                                 <input type="number" name="price" class="form-control" value="{{ old('price', $product->price) }}">
+                                <div class="form-text text-xs text-primary">
+                                    <i class="fas fa-info-circle"></i> Giá này sẽ tự động cập nhật theo giá thấp nhất của các phiên bản (nếu có).
+                                </div>
                             </div>
 
-                            <div class="card border border-warning bg-white mb-3">
-                                <div class="card-header bg-warning text-dark py-1">
-                                    <small class="fw-bold"><i class="fas fa-tags me-1"></i> Các phiên bản giá</small>
-                                </div>
-                                <div class="card-body p-2">
-                                    <div id="variants-container">
-                                        {{-- HIỂN THỊ CÁC BIẾN THỂ CŨ TỪ DATABASE --}}
-                                        @foreach($product->variants as $index => $variant)
-                                        <div class="row g-1 mb-2 align-items-center variant-item border-bottom pb-2">
-                                            {{-- Input ẩn để biết đây là update dòng cũ --}}
-                                            <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $variant->id }}">
-                                            
-                                            <div class="col-5">
-                                                <input type="text" name="variants[{{ $index }}][name]" class="form-control form-control-sm" value="{{ $variant->name }}" placeholder="Tên" required>
-                                            </div>
-                                            <div class="col-5">
-                                                <input type="number" name="variants[{{ $index }}][price]" class="form-control form-control-sm" value="{{ $variant->price }}" placeholder="Giá" required>
-                                            </div>
-                                            <div class="col-2 text-end">
-                                                {{-- Checkbox xóa: Nếu tick vào thì Controller sẽ xóa --}}
-                                                <div class="form-check form-check-inline m-0" title="Xóa dòng này">
-                                                    <input class="form-check-input" type="checkbox" name="variants[{{ $index }}][delete]" value="1">
-                                                    <label class="form-check-label text-danger fw-bold text-xs"><i class="fas fa-trash"></i></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @endforeach
-                                    </div>
-                                    
-                                    <button type="button" onclick="addVariant()" class="btn btn-outline-warning text-dark btn-sm w-100 border-dashed mt-2">
-                                        <i class="fas fa-plus"></i> Thêm phiên bản mới
-                                    </button>
-                                </div>
-                            </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Ảnh sản phẩm</label>
                                 <input type="file" name="image" id="imageInput" class="form-control mb-2" accept="image/*" onchange="previewImage(this)">
@@ -152,7 +167,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold text-uppercase shadow">
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold text-uppercase shadow sticky-top" style="top: 20px; z-index: 10;">
                         <i class="fas fa-save me-1"></i> Lưu thay đổi
                     </button>
                 </div>
@@ -182,22 +197,22 @@
         }
     }
 
-    // --- SCRIPT THÊM BIẾN THỂ ---
+    // --- SCRIPT THÊM BIẾN THỂ (Cập nhật giao diện rộng hơn) ---
     function addVariant() {
         const container = document.getElementById('variants-container');
-        // Tạo index ngẫu nhiên lớn để tránh trùng với index của vòng lặp cũ
+        // Tạo index ngẫu nhiên để tránh trùng với index cũ
         const index = 'new_' + new Date().getTime(); 
         
         const html = `
-            <div class="row g-1 mb-2 align-items-center variant-item border-bottom pb-2 bg-light">
-                <div class="col-5">
-                    <input type="text" name="variants[${index}][name]" class="form-control form-control-sm" placeholder="Tên mới (VD: 2 năm)" required>
+            <div class="row g-2 mb-3 align-items-center variant-item border-bottom pb-2 bg-light p-2 rounded">
+                <div class="col-6">
+                    <input type="text" name="variants[${index}][name]" class="form-control" placeholder="Tên (VD: 2 năm)" required>
                 </div>
                 <div class="col-5">
-                    <input type="number" name="variants[${index}][price]" class="form-control form-control-sm" placeholder="Giá" required>
+                    <input type="number" name="variants[${index}][price]" class="form-control" placeholder="Giá tiền" required>
                 </div>
-                <div class="col-2 text-end">
-                    <button type="button" class="btn btn-sm text-danger" onclick="this.closest('.variant-item').remove()">
+                <div class="col-1 text-center">
+                    <button type="button" class="btn btn-sm btn-danger w-100" onclick="this.closest('.variant-item').remove()">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>

@@ -1,110 +1,101 @@
 @extends('layouts.admin_layout')
 
 @section('content')
-<script src="https://cdn.tailwindcss.com"></script>
 
-<div class="font-sans">
-    <div class="flex justify-between items-center mb-6">
+{{-- Sử dụng Bootstrap 5 chuẩn --}}
+<div class="container-fluid p-0">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="text-2xl font-bold text-gray-800">Quản lý: {{ $category->name }}</h3>
-            <p class="text-sm text-gray-500">Danh sách sản phẩm thuộc danh mục này</p>
+            <h3 class="fw-bold text-secondary mb-1">Quản lý: {{ $category->name }}</h3>
+            <small class="text-muted">Danh sách sản phẩm thuộc danh mục này</small>
         </div>
         
         <a href="{{ route('product.create', ['category_id' => $category->id]) }}" 
-           class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow flex items-center transition">
-            <i class="fas fa-plus mr-2"></i> Thêm Sản Phẩm Mới
+           class="btn btn-primary shadow-sm">
+            <i class="fas fa-plus me-2"></i> Thêm Sản Phẩm Mới
         </a>
     </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ảnh</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên sản phẩm</th>
-                        {{-- CỘT MỚI: THƯƠNG HIỆU --}}
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thương hiệu</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá bán</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr class="text-secondary small text-uppercase fw-bold">
+                        <th class="p-3 text-start">#</th>
+                        <th class="p-3 text-start">Ảnh</th>
+                        <th class="p-3 text-start">Tên sản phẩm</th>
+                        <th class="p-3 text-start">Thương hiệu</th>
+                        <th class="p-3 text-start">Giá bán</th>
+                        <th class="p-3 text-start">Trạng thái</th>
+                        <th class="p-3 text-end">Hành động</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="border-top-0">
                     @forelse($category->products as $product)
-                    {{-- 
-                        CẬP NHẬT: 
-                        1. Thêm onclick chuyển hướng sang trang edit
-                        2. Thêm class cursor-pointer
-                    --}}
-                    <tr class="hover:bg-blue-50 transition duration-150 cursor-pointer group"
+                    <tr class="cursor-pointer"
                         onclick="window.location='{{ route('product.edit', $product->id) }}'"
+                        style="cursor: pointer;"
                         title="Bấm để chỉnh sửa">
                         
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td class="p-3 text-muted small">
                             {{ $loop->iteration }}
                         </td>
 
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="p-3">
                             @if($product->image)
                                 <img src="{{ asset($product->image) }}" 
-                                     class="h-16 w-16 object-cover rounded border border-gray-200" 
+                                     class="rounded border" 
+                                     style="height: 64px; width: 64px; object-fit: cover;"
                                      onerror="this.src='https://via.placeholder.com/150?text=No+Img'">
                             @else
-                                <span class="inline-block h-16 w-16 rounded bg-gray-100 border border-gray-200 flex items-center justify-center text-xs text-gray-400">
+                                <span class="d-inline-flex align-items-center justify-content-center bg-light border rounded text-secondary small" 
+                                      style="height: 64px; width: 64px;">
                                     No Img
                                 </span>
                             @endif
                         </td>
 
-                        <td class="px-6 py-4">
-                            <div class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition">{{ $product->name }}</div>
-                            <div class="text-xs text-gray-500">{{ $product->sku }}</div>
+                        <td class="p-3">
+                            <div class="fw-bold text-dark mb-1">{{ $product->name }}</div>
+                            <div class="small text-muted">{{ $product->sku }}</div>
                         </td>
 
-                        {{-- HIỂN THỊ THƯƠNG HIỆU --}}
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="p-3">
                             @if($product->brand)
-                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded bg-blue-50 text-blue-800 border border-blue-100 uppercase">
+                                <span class="badge bg-light text-primary border border-primary-subtle text-uppercase">
                                     {{ $product->brand }}
                                 </span>
                             @else
-                                <span class="text-xs text-gray-400 italic">---</span>
+                                <span class="text-muted small fst-italic">---</span>
                             @endif
                         </td>
 
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="p-3">
                             @if($product->sale_price)
-                                <div class="text-sm font-bold text-red-600">{{ number_format($product->sale_price) }} đ</div>
-                                <div class="text-xs text-gray-400 line-through">{{ number_format($product->price) }} đ</div>
+                                <div class="fw-bold text-danger">{{ number_format($product->sale_price) }} đ</div>
+                                <div class="small text-muted text-decoration-line-through">{{ number_format($product->price) }} đ</div>
                             @else
-                                <div class="text-sm font-bold text-gray-900">{{ number_format($product->price) }} đ</div>
+                                <div class="fw-bold text-dark">{{ number_format($product->price) }} đ</div>
                             @endif
                         </td>
 
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="p-3">
                             @if($product->is_active)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Hiện</span>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">Hiện</span>
                             @else
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Ẩn</span>
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Ẩn</span>
                             @endif
 
                             @if($product->is_hot)
-                                <span class="ml-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">HOT</span>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-1">HOT</span>
                             @endif
                         </td>
 
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                            {{-- ĐÃ XÓA NÚT SỬA --}}
-
-                            <form action="{{ route('product.destroy', $product->id) }}" method="POST" class="inline-block">
+                        <td class="p-3 text-end">
+                            <form action="{{ route('product.destroy', $product->id) }}" method="POST" class="d-inline-block">
                                 @csrf @method('DELETE')
-                                {{-- 
-                                    QUAN TRỌNG: Thêm event.stopPropagation() vào nút xóa 
-                                --}}
                                 <button type="submit" 
-                                        class="text-red-600 hover:text-red-900 bg-red-50 p-2 rounded hover:bg-red-100 transition shadow-sm border border-red-100" 
+                                        class="btn btn-sm btn-outline-danger" 
                                         title="Xóa"
                                         onclick="event.stopPropagation(); return confirm('Bạn có chắc muốn xóa sản phẩm này không?')">
                                     <i class="fas fa-trash"></i>
@@ -114,10 +105,9 @@
                     </tr>
                     @empty
                     <tr>
-                        {{-- Tăng colspan lên 7 vì thêm cột Brand --}}
-                        <td colspan="7" class="px-6 py-10 text-center text-gray-500">
-                            <i class="fas fa-box-open text-4xl mb-3 text-gray-300 block"></i>
-                            Chưa có sản phẩm nào trong danh mục này.
+                        <td colspan="7" class="py-5 text-center text-muted">
+                            <i class="fas fa-box-open fa-3x mb-3 text-secondary opacity-25"></i>
+                            <p class="mb-0">Chưa có sản phẩm nào trong danh mục này.</p>
                         </td>
                     </tr>
                     @endforelse

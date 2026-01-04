@@ -17,7 +17,8 @@
 
     <div class="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
         
-        <div class="p-4 border-b border-gray-100 bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
+        {{-- Đã đổi p-4 thành p-3 --}}
+        <div class="p-3 border-b border-gray-100 bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center text-gray-700 font-medium text-sm">
                 <i class="fas fa-filter text-blue-500 mr-2"></i>
                 @if(isset($category))
@@ -46,13 +47,14 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-gray-100 text-gray-700 text-sm font-bold border-b">
-                        <th class="p-4 text-center w-20">Ảnh</th>
-                        <th class="p-4">Tên sản phẩm</th>
-                        <th class="p-4">Danh mục</th>
-                        <th class="p-4">Thương hiệu</th>
-                        <th class="p-4">Giá bán</th>
-                        <th class="p-4 text-center">Trạng thái</th> 
-                        <th class="p-4 text-right">Hành động</th>
+                        {{-- ĐÃ SỬA: Thay p-4 thành p-3 (tương đương 1rem trong Bootstrap) --}}
+                        <th class="p-3 text-center w-20">Ảnh</th>
+                        <th class="p-3">Tên sản phẩm</th>
+                        <th class="p-3">Danh mục</th>
+                        <th class="p-3">Thương hiệu</th>
+                        <th class="p-3">Giá bán</th>
+                        <th class="p-3 text-center">Trạng thái</th> 
+                        <th class="p-3 text-right">Hành động</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-sm">
@@ -61,7 +63,8 @@
                         onclick="window.location='{{ route('product.edit', $product->id) }}'"
                         title="Bấm để chỉnh sửa">
                         
-                        <td class="p-4 text-center">
+                        {{-- ĐÃ SỬA: p-3 --}}
+                        <td class="p-3 text-center">
                             <div class="w-12 h-12 rounded border border-gray-200 overflow-hidden bg-white mx-auto flex items-center justify-center">
                                 @if($product->image)
                                     <img src="{{ asset($product->image) }}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/50?text=Err'">
@@ -71,8 +74,9 @@
                             </div>
                         </td>
 
-                        <td class="p-4 align-middle">
-                            <div class="font-bold text-gray-800 group-hover:text-blue-600 transition">{{ $product->name }}</div>
+                        {{-- ĐÃ SỬA: p-3 --}}
+                        <td class="p-3 align-middle">
+                            <div class="font-bold text-gray-800 group-hover:text-blue-600 transition text-truncate">{{ $product->name }}</div>
                             <div class="flex flex-wrap items-center mt-1 gap-2">
                                 <span class="text-xs text-gray-500">ID: {{ $product->id }}</span>
                                 
@@ -80,7 +84,6 @@
                                     <span class="text-xs font-bold text-white bg-red-500 px-1 py-0.5 rounded">HOT</span>
                                 @endif
 
-                                {{-- CẬP NHẬT: Hiển thị nhãn nếu có Biến thể --}}
                                 @if($product->variants && $product->variants->count() > 0)
                                     <span class="text-[10px] font-semibold text-purple-700 bg-purple-100 border border-purple-200 px-1.5 py-0.5 rounded flex items-center">
                                         <i class="fas fa-tags mr-1"></i> {{ $product->variants->count() }} phiên bản
@@ -89,7 +92,7 @@
                             </div>
                         </td>
 
-                        <td class="p-4 align-middle">
+                        <td class="p-3 align-middle">
                             @if($product->category)
                                 <a href="{{ route('admin.category.products', $product->category->id) }}" 
                                    class="text-blue-600 hover:underline relative z-10" 
@@ -101,7 +104,7 @@
                             @endif
                         </td>
 
-                        <td class="p-4 align-middle">
+                        <td class="p-3 align-middle">
                             @if($product->brand)
                                 <span class="text-gray-700 font-medium bg-gray-100 px-2 py-1 rounded text-xs uppercase border border-gray-200">
                                     {{ $product->brand }}
@@ -111,23 +114,31 @@
                             @endif
                         </td>
 
-                        <td class="p-4 align-middle">
-                            @if($product->sale_price)
-                                <div class="font-bold text-red-600">{{ number_format($product->sale_price) }}đ</div>
-                                <div class="text-xs text-gray-400 line-through">{{ number_format($product->price) }}đ</div>
-                            @else
-                                <div class="font-bold text-gray-800">{{ number_format($product->price) }}đ</div>
-                            @endif
-                            
-                            {{-- Nếu có biến thể, hiện gợi ý giá nhỏ --}}
-                            @if($product->variants->count() > 0)
-                                <div class="text-[10px] text-gray-500 italic mt-0.5">
-                                    (Có giá tùy chọn)
+                        <td class="p-3 align-middle">
+                            @if($product->variants && $product->variants->count() > 0)
+                                @php
+                                    $minPrice = $product->variants->min('price');
+                                    $maxPrice = $product->variants->max('price');
+                                @endphp
+                                
+                                <div class="font-bold text-indigo-700">
+                                    @if($minPrice == $maxPrice)
+                                        {{ number_format($minPrice) }}đ
+                                    @else
+                                        {{ number_format($minPrice) }} - {{ number_format($maxPrice) }}đ
+                                    @endif
                                 </div>
+                            @else
+                                @if($product->sale_price)
+                                    <div class="font-bold text-red-600">{{ number_format($product->sale_price) }}đ</div>
+                                    <div class="text-xs text-gray-400 line-through">{{ number_format($product->price) }}đ</div>
+                                @else
+                                    <div class="font-bold text-gray-800">{{ number_format($product->price) }}đ</div>
+                                @endif
                             @endif
                         </td>
 
-                        <td class="p-4 align-middle text-center">
+                        <td class="p-3 align-middle text-center">
                             @if($product->is_active)
                                 <span class="bg-green-700 text-white text-xs font-bold px-3 py-1.5 rounded">
                                     Hiện
@@ -139,7 +150,7 @@
                             @endif
                         </td>
 
-                        <td class="p-4 align-middle text-right">
+                        <td class="p-3 align-middle text-right">
                             <div class="flex justify-end items-center space-x-2">
                                 <form action="{{ route('product.destroy', $product->id) }}" method="POST" class="inline">
                                     @csrf @method('DELETE')

@@ -8,7 +8,7 @@
             <ol class="list-none p-0 inline-flex">
                 <li class="flex items-center">
                     <a href="/" class="text-gray-500 hover:text-blue-600 transition no-underline"><i class="fas fa-home mr-1"></i> Trang chủ</a>
-                    <span class="mx-2 text-gray-400">/</span>
+                    <i class="fas fa-angle-right text-gray-300 text-[10px] ml-1 mr-1"></i>
                 </li>
                 <li class="text-blue-600 font-bold" aria-current="page">Giỏ hàng</li>
             </ol>

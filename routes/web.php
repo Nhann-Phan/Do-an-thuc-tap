@@ -114,5 +114,4 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::post('/{id}/status', 'updateStatus')->name('update_status');
         Route::delete('/{id}', 'destroy')->name('destroy');
     });
-
 });

@@ -52,7 +52,7 @@
                         </h2>
 
                         <p class="text-gray-500 text-sm line-clamp-3 mb-4 flex-grow">
-                            {{ $item->summary ?? strip_tags(Str::limit($item->content, 150)) }}
+                            {!! $item->short_content ?? strip_tags(Str::limit($item->content, 150)) !!}
                         </p>
 
                         <div class="pt-4 border-t border-gray-100 flex items-center justify-between mt-auto">

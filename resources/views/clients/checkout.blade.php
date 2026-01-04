@@ -8,11 +8,11 @@
             <ol class="list-none p-0 inline-flex">
                 <li class="flex items-center">
                     <a href="/" class="text-gray-500 hover:text-blue-600 transition"><i class="fas fa-home mr-1"></i> Trang chủ</a>
-                    <span class="mx-2 text-gray-400">/</span>
+                    <span><i class="fas fa-angle-right text-gray-300 text-[10px] ml-1 mr-1"></i></span>
                 </li>
                 <li class="flex items-center">
                     <a href="{{ route('cart.index') }}" class="text-gray-500 hover:text-blue-600 transition">Giỏ hàng</a>
-                    <span class="mx-2 text-gray-400">/</span>
+                    <span><i class="fas fa-angle-right text-gray-300 text-[10px] ml-1 mr-1"></i></span>
                 </li>
                 <li class="text-blue-600 font-bold" aria-current="page">Thanh toán</li>
             </ol>
