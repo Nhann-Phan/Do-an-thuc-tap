@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProjectImage;
-use App\Models\News; // <--- 1. MỚI THÊM: Import Model News
+use App\Models\News;
+use App\Models\ProductVariant; // <--- 1. QUAN TRỌNG: Phải import Model này
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 
@@ -18,13 +19,13 @@ class ProductController extends Controller
 
     public function index()
     {
-        $products = Product::where('is_active', 1)->get();
+        // Lấy sản phẩm hiển thị, kèm theo biến thể để tính giá min-max nếu cần
+        $products = Product::where('is_active', 1)->with('variants')->get();
         $projectImages = ProjectImage::latest()->take(6)->get();
         
-        // <--- 2. MỚI THÊM: Lấy 5 tin tức mới nhất (Active) --->
+        // Lấy 5 tin tức mới nhất
         $latestNews = News::where('is_active', 1)->latest()->take(5)->get();
 
-        // Gửi biến $latestNews sang view
         return view('clients.store', compact('products', 'projectImages', 'latestNews'));
     }   
 
@@ -36,6 +37,7 @@ class ProductController extends Controller
 
         $products = Product::whereIn('category_id', $categoryIds)
                            ->where('is_active', 1)
+                           ->with('variants') // Eager load variants
                            ->orderBy('created_at', 'desc')
                            ->get();
 
@@ -43,10 +45,10 @@ class ProductController extends Controller
         return view('clients.category_products', compact('products', 'menuCategories', 'currentCategory'));
     }
 
-    // --- HÀM SHOW ---
     public function show($id)
     {
-        $product = Product::with('category.parent', 'category.children')->findOrFail($id);
+        // Load kèm variants để hiển thị nút chọn giá
+        $product = Product::with(['category.parent', 'category.children', 'variants'])->findOrFail($id);
         
         $relatedProducts = collect(); 
 
@@ -67,6 +69,7 @@ class ProductController extends Controller
             $relatedProducts = Product::where('is_active', 1)
                                       ->whereIn('category_id', $ids) 
                                       ->where('id', '!=', $id)       
+                                      ->with('variants')
                                       ->inRandomOrder()              
                                       ->take(4)                      
                                       ->get();
@@ -83,7 +86,8 @@ class ProductController extends Controller
 
     public function indexAdmin(Request $request)
     {
-        $query = Product::with('category')->latest();
+        // Load thêm 'variants' để đếm số lượng phiên bản ở trang danh sách
+        $query = Product::with(['category', 'variants'])->latest();
         
         if ($request->has('keyword') && $request->keyword != '') {
             $keyword = $request->keyword;
@@ -105,6 +109,7 @@ class ProductController extends Controller
         return view('admin.product_create', compact('categories', 'selectedCategoryId'));
     }
 
+    // --- HÀM LƯU MỚI (CẬP NHẬT LOGIC LƯU VARIANTS) ---
     public function store(Request $request)
     {
         $request->validate([
@@ -129,7 +134,21 @@ class ProductController extends Controller
         $data['is_active'] = $request->has('is_active') ? 1 : 0;
         $data['is_hot'] = $request->has('is_hot') ? 1 : 0;
 
-        Product::create($data);
+        // 1. Tạo sản phẩm chính
+        $product = Product::create($data);
+
+        // 2. [MỚI] Lưu các biến thể (Variants) nếu có
+        if ($request->has('variants')) {
+            foreach ($request->variants as $variantData) {
+                if (!empty($variantData['name']) && !empty($variantData['price'])) {
+                    ProductVariant::create([
+                        'product_id' => $product->id, // Lấy ID vừa tạo
+                        'name' => $variantData['name'],
+                        'price' => $variantData['price']
+                    ]);
+                }
+            }
+        }
 
         return redirect()
                 ->route('product.create', ['category_id' => $request->category_id])
@@ -138,11 +157,13 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        $product = Product::findOrFail($id);
+        // Load variants để hiển thị trong form sửa
+        $product = Product::with('variants')->findOrFail($id);
         $categories = Category::all(); 
         return view('admin.product_edit', compact('product', 'categories'));
     }
 
+    // --- HÀM CẬP NHẬT (CẬP NHẬT LOGIC VARIANTS) ---
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id); 
@@ -171,7 +192,34 @@ class ProductController extends Controller
         $data['is_active'] = $request->has('is_active') ? 1 : 0;
         $data['is_hot'] = $request->has('is_hot') ? 1 : 0;
 
+        // 1. Cập nhật thông tin chính
         $product->update($data);
+
+        // 2. [MỚI] Xử lý cập nhật Biến thể (Variants)
+        if ($request->has('variants')) {
+            foreach ($request->variants as $variantData) {
+                
+                // Trường hợp A: Xóa biến thể (nếu tick chọn xóa)
+                if (isset($variantData['delete']) && $variantData['delete'] == 1) {
+                    if (isset($variantData['id'])) {
+                        ProductVariant::destroy($variantData['id']);
+                    }
+                    continue; // Bỏ qua dòng này
+                }
+
+                // Trường hợp B: Thêm mới hoặc Cập nhật
+                if (!empty($variantData['name']) && !empty($variantData['price'])) {
+                    ProductVariant::updateOrCreate(
+                        ['id' => $variantData['id'] ?? null], // Điều kiện tìm (nếu có ID thì tìm, không có thì null)
+                        [
+                            'product_id' => $product->id,
+                            'name' => $variantData['name'],
+                            'price' => $variantData['price']
+                        ]
+                    );
+                }
+            }
+        }
 
         return redirect()->route('admin.category.products', $product->category_id)->with('success', 'Cập nhật thành công!');
     }
@@ -184,6 +232,7 @@ class ProductController extends Controller
             File::delete(public_path($product->image));
         }
         
+        // Variants sẽ tự động xóa nhờ ràng buộc khóa ngoại (cascade) trong migration
         $product->delete();
 
         return redirect()->back()->with('success', 'Đã xóa sản phẩm!');
@@ -196,6 +245,7 @@ class ProductController extends Controller
         $categoryIds[] = $category->id;
 
         $products = Product::whereIn('category_id', $categoryIds)
+                           ->with('variants') // Load thêm variants
                            ->latest()
                            ->paginate(10);
         

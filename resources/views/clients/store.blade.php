@@ -97,7 +97,8 @@
                                         <h4 class="text-sm font-bold text-gray-700 mb-2 hover:text-blue-600 cursor-pointer line-clamp-2 min-h-[2.5rem]">
                                             <a href="{{ route('product.detail', $product->id) }}">{{ $product->name }}</a>
                                         </h4>
-                                        <div class="mt-auto">
+                                        <div class="mt-auto cursor-pointer">
+                                            {{-- GIÁ BÁN --}}
                                             @if($product->sale_price)
                                                 <span class="text-red-600 font-bold text-lg">{{ number_format($product->sale_price) }} đ</span>
                                                 <span class="text-gray-400 text-xs line-through ml-2">{{ number_format($product->price) }} đ</span>
@@ -160,25 +161,25 @@
         </div>
     </section>
 
-    <section class="py-16 bg-gray-50 border-t border-gray-100">
+<section class="py-16 bg-gray-50 border-t border-gray-100">
         <div class="container mx-auto px-4">
             
             <div class="flex justify-between items-end mb-8 border-b border-gray-200 pb-3">
                 <h2 class="text-2xl font-bold text-gray-800 uppercase border-l-4 border-blue-600 pl-3">Cập Nhật Mới</h2>
-                {{-- CẬP NHẬT: Link xem tất cả tin tức --}}
+                {{-- Link xem tất cả tin tức --}}
                 <a href="{{ route('news.index') }}" class="text-sm font-semibold text-gray-500 hover:text-blue-600 flex items-center transition">
-                    Tin Tức >
+                    Xem tất cả
                 </a>
             </div>
 
             @if(isset($latestNews) && count($latestNews) > 0)
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 
-                {{-- 2 TIN LỚN (Cột 1 & 2) --}}
-                @foreach($latestNews->take(2) as $news)
-                {{-- CẬP NHẬT: Thẻ A bao quanh toàn bộ bài viết --}}
+                {{-- HIỂN THỊ 3 TIN MỚI NHẤT (GRID 3 CỘT) --}}
+                @foreach($latestNews->take(3) as $news)
                 <a href="{{ route('news.detail', $news->id) }}" class="group cursor-pointer flex flex-col h-full bg-white rounded-lg border border-transparent hover:border-gray-200 hover:shadow-lg transition duration-300 overflow-hidden">
-                    <div class="overflow-hidden relative aspect-video bg-gray-200">
+                    {{-- ẢNH --}}
+                    <div class="overflow-hidden relative aspect-[16/9] bg-gray-200">
                         @if($news->image)
                             <img src="{{ asset($news->image) }}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
                         @else
@@ -187,46 +188,22 @@
                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition duration-300"></div>
                     </div>
                     
-                    <div class="p-4 flex-grow flex flex-col">
+                    {{-- NỘI DUNG --}}
+                    <div class="p-5 flex-grow flex flex-col">
                         <h3 class="text-lg font-bold text-gray-800 group-hover:text-blue-600 leading-snug mb-2 line-clamp-2">
                             {{ $news->title }}
                         </h3>
-                        <p class="text-gray-500 text-sm mb-3 line-clamp-2 flex-grow">
+                        <p class="text-gray-500 text-sm mb-4 line-clamp-2 flex-grow">
                             {{ $news->summary }}
                         </p>
-                        <div class="text-xs text-gray-400 mt-auto pt-3 border-t border-gray-100 flex items-center">
-                            <i class="far fa-clock mr-1"></i> Tin Tức | {{ $news->created_at->format('d-m-Y') }}
+                        
+                        <div class="text-xs text-gray-400 mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
+                            <span><i class="far fa-clock mr-1"></i> {{ $news->created_at->format('d-m-Y') }}</span>
+                            <span class="text-blue-600 font-semibold group-hover:underline">Xem chi tiết</span>
                         </div>
                     </div>
                 </a>
                 @endforeach
-
-                {{-- DANH SÁCH TIN NHỎ (Cột 3) --}}
-                <div class="lg:col-span-1 bg-white p-5 rounded-lg border border-gray-100 shadow-sm h-full">
-                    <div class="flex flex-col space-y-5 h-full">
-                        @foreach($latestNews->skip(2)->take(3) as $subNews)
-                        <div class="group cursor-pointer border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                            {{-- CẬP NHẬT: Tiêu đề có link chi tiết --}}
-                            <h4 class="text-sm font-bold text-gray-700 group-hover:text-blue-600 leading-snug mb-1 line-clamp-3">
-                                <a href="{{ route('news.detail', $subNews->id) }}">{{ $subNews->title }}</a>
-                            </h4>
-                            
-                            {{-- CẬP NHẬT: Link xem danh sách --}}
-                            <div class="text-[11px] text-gray-400 mt-1">
-                                <a href="{{ route('news.index') }}" class="hover:text-blue-600 transition">
-                                    Xem thêm | {{ $subNews->created_at->format('d-m-Y') }}
-                                </a>
-                            </div>
-                        </div>
-                        @endforeach
-                        
-                        @if($latestNews->count() <= 2)
-                            <div class="flex-grow flex items-center justify-center text-gray-400 italic text-xs">
-                                Đang cập nhật thêm tin tức...
-                            </div>
-                        @endif
-                    </div>
-                </div>
 
             </div>
             @else

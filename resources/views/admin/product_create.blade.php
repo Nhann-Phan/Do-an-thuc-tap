@@ -9,7 +9,6 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h3 class="fw-bold text-secondary">
         @if($selectedCategoryId)
-            {{-- Hiển thị tên danh mục đang nhập liệu --}}
             @php $catName = $categories->find($selectedCategoryId)->name ?? 'Mới'; @endphp
             Bảng nhập liệu: <span class="text-primary">{{ $catName }}</span>
         @else
@@ -28,9 +27,7 @@
         @if(session('success'))
             <div class="alert alert-success d-flex align-items-center mb-4">
                 <i class="fas fa-check-circle me-2 text-xl"></i>
-                <div>
-                    <strong>Thành công!</strong> {{ session('success') }}
-                </div>
+                <div><strong>Thành công!</strong> {{ session('success') }}</div>
             </div>
         @endif
 
@@ -70,9 +67,7 @@
                                     <option value="">-- Chọn danh mục --</option>
                                     @foreach($categories as $cat)
                                         <option value="{{ $cat->id }}" 
-                                            {{-- Logic: ID trên URL khớp ID danh mục -> Selected --}}
                                             {{ (isset($selectedCategoryId) && $selectedCategoryId == $cat->id) || old('category_id') == $cat->id ? 'selected' : '' }}>
-                                            
                                             {{ $cat->name }}
                                         </option>
                                     @endforeach
@@ -82,19 +77,30 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Thương hiệu</label>
                                 <input type="text" name="brand" class="form-control" placeholder="Ví dụ: Dell, HP, TP-Link..." value="{{ old('brand') }}">
-                                <div class="form-text text-muted fst-italic text-xs">Để trống sẽ hiển thị "Đang cập nhật"</div>
-                            </div>
-
-                            <div class ="mb-3">
-                                <label class="form-label fw-bold">Mô tả ngắn</label>
-                                <input name="short_description" class="form-control" rows="3">{{ old('short_description') }}</input>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Giá bán (VNĐ)</label>
+                                <label class="form-label fw-bold">Mô tả ngắn</label>
+                                <textarea name="short_description" class="form-control" rows="3">{{ old('short_description') }}</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Giá bán chính (VNĐ)</label>
                                 <input type="number" name="price" class="form-control" placeholder="0" value="{{ old('price') }}">
                             </div>
-                            
+
+                            <div class="card border border-primary bg-white mb-3">
+                                <div class="card-header bg-primary text-white py-1">
+                                    <small class="fw-bold"><i class="fas fa-tags me-1"></i> Các phiên bản giá (Tùy chọn)</small>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div id="variants-container">
+                                        </div>
+                                    <button type="button" onclick="addVariant()" class="btn btn-outline-primary btn-sm w-100 border-dashed">
+                                        <i class="fas fa-plus"></i> Thêm phiên bản (Ví dụ: 6 tháng, 1 năm)
+                                    </button>
+                                </div>
+                            </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Ảnh đại diện</label>
                                 <input type="file" name="image" id="imageInput" class="form-control mb-2" accept="image/*" onchange="previewImage(this)">
@@ -130,6 +136,7 @@
 <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 <script>
     CKEDITOR.replace( 'description', { height: 400, language: 'vi' });
+    
     function previewImage(input) {
         var preview = document.getElementById('preview');
         var placeholder = document.getElementById('placeholder-text');
@@ -145,6 +152,29 @@
             preview.style.display = 'none';
             placeholder.style.display = 'block';
         }
+    }
+
+    // --- SCRIPT THÊM BIẾN THỂ ---
+    function addVariant() {
+        const container = document.getElementById('variants-container');
+        const index = container.children.length; 
+        
+        const html = `
+            <div class="row g-1 mb-2 align-items-center variant-item border-bottom pb-2">
+                <div class="col-5">
+                    <input type="text" name="variants[${index}][name]" class="form-control form-control-sm" placeholder="Tên (VD: 6 tháng)" required>
+                </div>
+                <div class="col-5">
+                    <input type="number" name="variants[${index}][price]" class="form-control form-control-sm" placeholder="Giá (VNĐ)" required>
+                </div>
+                <div class="col-2 text-end">
+                    <button type="button" class="btn btn-sm text-danger hover-bg-light" onclick="this.closest('.variant-item').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
     }
 </script>
 @endsection

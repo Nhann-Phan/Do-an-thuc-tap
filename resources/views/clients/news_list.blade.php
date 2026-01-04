@@ -2,16 +2,12 @@
 
 @section('content')
 
-<div class="bg-gray-50 py-8 border-b border-gray-200">
+<div class="bg-gray-100 py-3 border-b border-gray-200">
     <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900 uppercase tracking-wide">Tin Tức Công Nghệ</h1>
-                <p class="text-gray-500 text-sm mt-2">Cập nhật xu hướng, giải pháp và thông tin mới nhất từ GPM</p>
-            </div>
             <div class="mt-4 md:mt-0 text-sm text-gray-500">
                 <a href="/" class="hover:text-blue-600 transition"><i class="fas fa-home"></i> Trang chủ</a>
-                <span class="mx-2 text-gray-300">/</span>
+                <span class="fas fa-angle-right text-xs text-gray-400"></span>
                 <span class="text-gray-900 font-medium">Tin tức</span>
             </div>
         </div>
@@ -64,7 +60,7 @@
                                 <i class="far fa-user mr-1"></i> Admin
                             </span>
                             <a href="{{ route('news.detail', $item->id) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center transition">
-                                Xem thêm <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                                Xem chi tiết <i class="fas fa-arrow-right ml-1 text-xs"></i>
                             </a>
                         </div>
                     </div>

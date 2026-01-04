@@ -110,14 +110,14 @@
 
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="logo-icon"><i class="fas fa-bolt"></i></div>
-            <span class="logo-text">TECH ADMIN</span>
+            <div class="logo-icon"><i class="fa-regular fa-user"></i></div>
+            <span class="logo-text">ADMIN</span>
         </div>
 
         <nav class="sidebar-menu">
             <a href="/admin" class="menu-item {{ request()->is('admin') ? 'active' : '' }}">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+                <span>Xử lý lịch sửa chữa</span>
             </a>
 
             <a href="{{ route('admin.orders.index') }}" class="menu-item {{ request()->is('admin/orders*') ? 'active' : '' }}">

@@ -2,22 +2,21 @@
 
 @section('content')
 
-<div class="bg-gray-50 py-3 border-b shadow-sm">
-    <div class="container mx-auto px-4">
+<div class="bg-white py-3 border-b border-gray-200 mb-6">
+    <div class="container mx-auto px-4 text-sm font-medium text-gray-500 tracking-wide">
         <nav class="text-sm font-medium text-gray-500">
-            <ol class="list-none p-0 inline-flex">
+            <ol class="list-none inline-flex">
                 <li class="flex items-center">
-                    <a href="/" class="text-gray-500 hover:text-blue-600 transition"><i class="fas fa-home mr-1"></i> Trang chủ</a>
-                    <span class="mx-2 text-gray-400">/</span>
+                    <a href="/" class="text-gray-500 hover:text-blue-600 transition"><i class="fas fa-home mr-1"></i> Trang chủ </a>
+                    <span class="fas fa-angle-right text-gray-300 text-[10px] ml-1 mr-1"></span>
                 </li>
                 @if($currentCategory->parent)
-                    <li class="flex items-center">
+                    <li class="flex items-center lowercase">
                         <a href="{{ route('frontend.category.show', $currentCategory->parent_id) }}" class="text-gray-500 hover:text-blue-600 transition">{{ $currentCategory->parent->name }}</a>
-                        <span class="mx-2 text-gray-400">/</span>
+                        <span class="fas fa-angle-right text-gray-300 text-[10px] ml-1 mr-1"></span>
                     </li>
                 @endif
                 <li class="text-blue-600 font-bold" aria-current="page">{{ $currentCategory->name }}</li>
-            </ol>
         </nav>
     </div>
 </div>
@@ -25,6 +24,7 @@
 <div class="container mx-auto px-4 py-8">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         
+        {{-- SIDEBAR DANH MỤC --}}
         <div class="hidden lg:block lg:col-span-1">
             <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
                 <div class="bg-white p-4 border-b font-bold uppercase text-gray-700 flex items-center">
@@ -49,6 +49,7 @@
             </div>
         </div>
 
+        {{-- DANH SÁCH SẢN PHẨM CHÍNH --}}
         <div class="col-span-1 lg:col-span-3">
             
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 pb-2 border-b border-gray-200">
@@ -96,14 +97,40 @@
                         </h3>
                         
                         <div class="mt-auto pt-2 border-t border-gray-50">
-                            @if($product->sale_price)
+                            {{-- ======================================================= --}}
+                            {{-- LOGIC HIỂN THỊ GIÁ (CÓ BIẾN THỂ HOẶC KHÔNG) --}}
+                            {{-- ======================================================= --}}
+                            
+                            @if($product->variants && $product->variants->count() > 0)
+                                {{-- TRƯỜNG HỢP 1: CÓ BIẾN THỂ (VARIANTS) --}}
+                                @php
+                                    $minPrice = $product->variants->min('price');
+                                    $maxPrice = $product->variants->max('price');
+                                @endphp
                                 <div class="flex flex-col">
-                                    <span class="text-red-600 font-bold text-lg">{{ number_format($product->sale_price) }}đ</span>
-                                    <span class="text-gray-400 text-xs line-through">{{ number_format($product->price) }}đ</span>
+                                    <span class="text-red-600 font-bold text-lg">
+                                        @if($minPrice == $maxPrice)
+                                            {{ number_format($minPrice) }}đ
+                                        @else
+                                            {{ number_format($minPrice) }} - {{ number_format($maxPrice) }}đ
+                                        @endif
+                                    </span>
+                                    {{-- Nếu muốn hiện thêm chữ nhỏ --}}
+                                    {{-- <span class="text-[10px] text-gray-400 italic">Tùy chọn phiên bản</span> --}}
                                 </div>
+
                             @else
-                                <span class="text-red-600 font-bold text-lg">{{ number_format($product->price) }}đ</span>
+                                {{-- TRƯỜNG HỢP 2: KHÔNG CÓ BIẾN THỂ (GIÁ THƯỜNG) --}}
+                                @if($product->sale_price)
+                                    <div class="flex flex-col">
+                                        <span class="text-red-600 font-bold text-lg">{{ number_format($product->sale_price) }}đ</span>
+                                        <span class="text-gray-400 text-xs line-through">{{ number_format($product->price) }}đ</span>
+                                    </div>
+                                @else
+                                    <span class="text-red-600 font-bold text-lg">{{ number_format($product->price) }}đ</span>
+                                @endif
                             @endif
+                            {{-- ======================================================= --}}
                         </div>
                     </div>
 

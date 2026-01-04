@@ -70,20 +70,57 @@
                                 </select>
                             </div>
 
-                            {{-- === TRƯỜNG THƯƠNG HIỆU (CẬP NHẬT) === --}}
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Thương hiệu</label>
                                 <input type="text" name="brand" class="form-control" 
                                        placeholder="Ví dụ: Dell, HP, TP-Link..." 
                                        value="{{ old('brand', $product->brand) }}">
                             </div>
-                            {{-- === KẾT THÚC === --}}
 
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Giá bán (VNĐ)</label>
+                                <label class="form-label fw-bold">Mô tả ngắn</label>
+                                <textarea name="short_description" class="form-control" rows="3">{{ old('short_description', $product->short_description) }}</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Giá bán chính (VNĐ)</label>
                                 <input type="number" name="price" class="form-control" value="{{ old('price', $product->price) }}">
                             </div>
 
+                            <div class="card border border-warning bg-white mb-3">
+                                <div class="card-header bg-warning text-dark py-1">
+                                    <small class="fw-bold"><i class="fas fa-tags me-1"></i> Các phiên bản giá</small>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div id="variants-container">
+                                        {{-- HIỂN THỊ CÁC BIẾN THỂ CŨ TỪ DATABASE --}}
+                                        @foreach($product->variants as $index => $variant)
+                                        <div class="row g-1 mb-2 align-items-center variant-item border-bottom pb-2">
+                                            {{-- Input ẩn để biết đây là update dòng cũ --}}
+                                            <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $variant->id }}">
+                                            
+                                            <div class="col-5">
+                                                <input type="text" name="variants[{{ $index }}][name]" class="form-control form-control-sm" value="{{ $variant->name }}" placeholder="Tên" required>
+                                            </div>
+                                            <div class="col-5">
+                                                <input type="number" name="variants[{{ $index }}][price]" class="form-control form-control-sm" value="{{ $variant->price }}" placeholder="Giá" required>
+                                            </div>
+                                            <div class="col-2 text-end">
+                                                {{-- Checkbox xóa: Nếu tick vào thì Controller sẽ xóa --}}
+                                                <div class="form-check form-check-inline m-0" title="Xóa dòng này">
+                                                    <input class="form-check-input" type="checkbox" name="variants[{{ $index }}][delete]" value="1">
+                                                    <label class="form-check-label text-danger fw-bold text-xs"><i class="fas fa-trash"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                    
+                                    <button type="button" onclick="addVariant()" class="btn btn-outline-warning text-dark btn-sm w-100 border-dashed mt-2">
+                                        <i class="fas fa-plus"></i> Thêm phiên bản mới
+                                    </button>
+                                </div>
+                            </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Ảnh sản phẩm</label>
                                 <input type="file" name="image" id="imageInput" class="form-control mb-2" accept="image/*" onchange="previewImage(this)">
@@ -143,6 +180,30 @@
             }
             reader.readAsDataURL(input.files[0]);
         }
+    }
+
+    // --- SCRIPT THÊM BIẾN THỂ ---
+    function addVariant() {
+        const container = document.getElementById('variants-container');
+        // Tạo index ngẫu nhiên lớn để tránh trùng với index của vòng lặp cũ
+        const index = 'new_' + new Date().getTime(); 
+        
+        const html = `
+            <div class="row g-1 mb-2 align-items-center variant-item border-bottom pb-2 bg-light">
+                <div class="col-5">
+                    <input type="text" name="variants[${index}][name]" class="form-control form-control-sm" placeholder="Tên mới (VD: 2 năm)" required>
+                </div>
+                <div class="col-5">
+                    <input type="number" name="variants[${index}][price]" class="form-control form-control-sm" placeholder="Giá" required>
+                </div>
+                <div class="col-2 text-end">
+                    <button type="button" class="btn btn-sm text-danger" onclick="this.closest('.variant-item').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
     }
 </script>
 @endsection

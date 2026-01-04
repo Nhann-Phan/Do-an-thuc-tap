@@ -69,7 +69,7 @@
 
                 <div class="flex items-center space-x-6 ml-auto">
                     <nav class="hidden md:flex space-x-6 font-medium text-sm uppercase text-gray-600 items-center h-full">
-                        {{-- <a href="/" class="hover:text-blue-800 transition">Trang chủ</a> --}}
+                        <a href="/" class="hover:text-blue-800 transition">Trang chủ</a>
                         <a href="#" class="hover:text-blue-800 transition">Giới thiệu</a>
 
                         <div class="group static h-full flex items-center py-6"> 

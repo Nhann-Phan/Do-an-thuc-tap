@@ -5,24 +5,25 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        /* Tối ưu hóa chuyển động (Hardware Acceleration) */
-        .swiper-wrapper {
-            transition-timing-function: ease-out; /* Hiệu ứng lướt nhẹ nhàng */
+        /* Tối ưu hóa chuyển động */
+        .swiper-wrapper { transition-timing-function: ease-out; }
+        .swiper-slide { transform: translate3d(0, 0, 0); backface-visibility: hidden; }
+        .cursor-grab { cursor: grab; }
+        .cursor-grabbing { cursor: grabbing; }
+        
+        /* Style cho nút biến thể */
+        .variant-btn.active {
+            border-color: #2563eb; /* Blue-600 */
+            background-color: #eff6ff; /* Blue-50 */
+            color: #1d4ed8; /* Blue-700 */
+            font-weight: bold;
         }
-        .swiper-slide {
-            /* Giúp browser render mượt hơn, không bị giật hình */
-            transform: translate3d(0, 0, 0);
-            backface-visibility: hidden; 
-        }
-        /* Con trỏ khi kéo */
-        .cursor-grab { cursor: -webkit-grab; cursor: grab; }
-        .cursor-grabbing { cursor: -webkit-grabbing; cursor: grabbing; }
     </style>
 @endpush
 
 <div class="bg-white py-3 border-b border-gray-200 mb-6">
-    <div class="container mx-auto px-4 text-xs font-bold text-gray-500 uppercase tracking-wide flex items-center gap-2">
-        <a href="/" class="hover:text-blue-600 transition">TRANG CHỦ</a>
+    <div class="container mx-auto px-4 text-xs font-bold text-gray-500 tracking-wide flex items-center gap-2">
+        <a href="/" class="hover:text-blue-600 transition"><i class="fas fa-home mr-1"></i> {{ __('messages.home') }}</a>
         <i class="fas fa-angle-right text-gray-300 text-[10px]"></i>
         @if($product->category)
             <a href="{{ route('frontend.category.show', $product->category_id) }}" class="hover:text-blue-600 transition">{{ $product->category->name }}</a>
@@ -59,23 +60,44 @@
                     <h1 class="text-2xl font-bold text-gray-900 leading-snug mb-2">{{ $product->name }}</h1>
                     <div class="w-12 h-1 bg-blue-600 mb-4 rounded-full"></div>
 
-                    {{-- <div class="flex items-center text-sm mb-4 text-gray-600">
-                        <div class="flex text-yellow-400 text-xs mr-2">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                        <span class="border-l border-gray-300 pl-2 ml-2 text-green-600 font-bold"><i class="fas fa-check-circle mr-1"></i>Còn hàng</span>
-                    </div> --}}
-
+                    {{-- HIỂN THỊ GIÁ --}}
                     <div class="mb-5 bg-gray-50 p-3 rounded border border-gray-100">
-                        @if($product->sale_price)
-                            <span class="text-3xl font-bold text-red-600">{{ number_format($product->sale_price) }} ₫</span>
-                            <span class="text-sm text-gray-400 line-through ml-2">{{ number_format($product->price) }} ₫</span>
-                        @else
-                            <span class="text-3xl font-bold text-red-600">{{ number_format($product->price) }} ₫</span>
+                        {{-- Logic: Nếu có biến thể thì lấy giá biến thể đầu tiên, không thì lấy giá thường --}}
+                        @php
+                            $currentPrice = $product->variants->count() > 0 ? $product->variants->first()->price : ($product->sale_price ?? $product->price);
+                            $originalPrice = $product->sale_price ? $product->price : null;
+                            
+                            // Nếu đang hiện giá variant thì không hiện giá gạch ngang (vì logic phức tạp)
+                            if($product->variants->count() > 0) $originalPrice = null; 
+                        @endphp
+
+                        <span id="price-display" class="text-3xl font-bold text-red-600">
+                            {{ number_format($currentPrice) }} ₫
+                        </span>
+                        
+                        @if($originalPrice)
+                            <span class="text-sm text-gray-400 line-through ml-2">{{ number_format($originalPrice) }} ₫</span>
                         @endif
                     </div>
 
-                    {{-- === PHẦN THÊM THƯƠNG HIỆU === --}}
+                    {{-- === KHU VỰC CHỌN BIẾN THỂ (VARIANTS) === --}}
+                    @if($product->variants && $product->variants->count() > 0)
+                    <div class="mb-6">
+                        <h3 class="text-sm font-bold text-gray-800 mb-2">Chọn phiên bản: <span id="variant-name-display" class="font-normal text-blue-600">{{ $product->variants->first()->name }}</span></h3>
+                        <div class="flex flex-wrap gap-3">
+                            @foreach($product->variants->sortBy('price') as $index => $variant)
+                                <button type="button" 
+                                        onclick="selectVariant(this, '{{ $variant->id }}', {{ $variant->price }}, '{{ $variant->name }}')"
+                                        class="variant-btn border border-gray-300 px-4 py-2 rounded text-sm text-gray-700 hover:border-blue-400 transition {{ $index === 0 ? 'active' : '' }}"
+                                        data-id="{{ $variant->id }}">
+                                    {{ $variant->name }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                    {{-- === KẾT THÚC === --}}
+
                     <div class="text-gray-600 text-sm leading-relaxed mb-6">
                         <ul class="space-y-1.5 list-disc pl-4 marker:text-blue-500">
                             <li>
@@ -84,17 +106,21 @@
                                     {{ $product->brand ?? 'Đang cập nhật' }}
                                 </span>
                             </li>
-                            <li>
-                                
                         </ul>
                     </div>
-                    {{-- === KẾT THÚC === --}}
 
                     <div class="flex gap-3 mt-auto">
-                        <a href="{{ route('add_to_cart', $product->id) }}" class="flex-1 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-3 rounded text-sm uppercase tracking-wide transition flex items-center justify-center">
+                        {{-- Logic Add to Cart: Mặc định lấy ID variant đầu tiên nếu có --}}
+                        @php
+                            $defaultVariantId = $product->variants->count() > 0 ? $product->variants->first()->id : '';
+                            $addToCartUrl = route('add_to_cart', ['id' => $product->id, 'variant_id' => $defaultVariantId]);
+                            $buyNowUrl = route('buy_now', ['id' => $product->id, 'variant_id' => $defaultVariantId]);
+                        @endphp
+
+                        <a href="{{ $addToCartUrl }}" id="btn-add-to-cart" class="flex-1 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-3 rounded text-sm uppercase tracking-wide transition flex items-center justify-center">
                             <i class="fas fa-cart-plus mr-2"></i> Thêm giỏ
                         </a>
-                        <a href="{{ route('buy_now', $product->id) }}" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded text-sm uppercase tracking-wide transition flex items-center justify-center shadow-lg shadow-red-200">
+                        <a href="{{ $buyNowUrl }}" id="btn-buy-now" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded text-sm uppercase tracking-wide transition flex items-center justify-center shadow-lg shadow-red-200">
                             Mua ngay
                         </a>
                     </div>
@@ -117,13 +143,10 @@
                 <div class="relative w-full"> 
                     <div class="swiper mySwiper w-full overflow-hidden rounded-lg p-2 cursor-grab active:cursor-grabbing"> 
                         <div class="swiper-wrapper">
-                            
-                            {{-- NHÂN BẢN SLIDE ĐỂ KÉO ĐƯỢC (Đảm bảo số lượng > hiển thị) --}}
                             @for ($i = 0; $i < 4; $i++) 
                                 @foreach($relatedProducts as $related)
                                 <div class="swiper-slide h-auto">
                                     <div class="bg-white border border-gray-200 rounded-lg hover:shadow-lg hover:border-blue-400 transition-all duration-300 h-full flex flex-col group relative">
-                                        
                                         @if($related->sale_price)
                                             <span class="absolute top-2 right-2 z-10 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
                                                 -{{ round((($related->price - $related->sale_price)/$related->price)*100) }}%
@@ -154,15 +177,11 @@
                                                 Thêm vào giỏ
                                             </a>
                                         </div>
-
                                     </div>
                                 </div>
                                 @endforeach
                             @endfor
-                            {{-- KẾT THÚC NHÂN BẢN --}}
-
                         </div>
-                        {{-- <div class="swiper-pagination !bottom-0"></div> --}}
                     </div>
                 </div>
             </div>
@@ -195,42 +214,50 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
+    // === 1. XỬ LÝ CHỌN BIẾN THỂ (VARIANTS) ===
+    const baseUrlAddToCart = "{{ route('add_to_cart', $product->id) }}";
+    const baseUrlBuyNow = "{{ route('buy_now', $product->id) }}";
+
+    function selectVariant(btn, variantId, price, name) {
+        // A. Đổi màu nút active
+        document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // B. Cập nhật giá hiển thị
+        const formattedPrice = new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
+        document.getElementById('price-display').innerText = formattedPrice;
+        
+        // C. Cập nhật tên hiển thị
+        const nameDisplay = document.getElementById('variant-name-display');
+        if(nameDisplay) nameDisplay.innerText = name;
+
+        // D. Cập nhật link nút Mua hàng & Thêm giỏ
+        // Nối thêm param ?variant_id=... vào URL
+        document.getElementById('btn-add-to-cart').href = `${baseUrlAddToCart}?variant_id=${variantId}`;
+        document.getElementById('btn-buy-now').href = `${baseUrlBuyNow}?variant_id=${variantId}`;
+    }
+
+    // === 2. SWIPER SLIDER ===
     document.addEventListener('DOMContentLoaded', function() {
-        // Chờ 0.3s để Tailwind vẽ xong layout
         setTimeout(() => {
             const swiperEl = document.querySelector('.mySwiper');
             if (swiperEl) {
                 new Swiper('.mySwiper', {
-                    // Cấu hình Loop
                     loop: true, 
                     observer: true,
                     observeParents: true,
-                    
-                    // --- CẤU HÌNH ĐỘ MƯỢT (QUAN TRỌNG) ---
-                    grabCursor: true,       // Bàn tay nắm
-                    simulateTouch: true,    // Kéo được bằng chuột
-                    touchRatio: 1.5,        // Tăng độ nhạy khi kéo (Kéo 1 đi 1.5) -> Cảm giác nhanh hơn
-                    resistance: true,       // Kháng lực kéo ở biên
+                    grabCursor: true,      
+                    simulateTouch: true,    
+                    touchRatio: 1.5,        
+                    resistance: true,       
                     resistanceRatio: 0.65,
-                    
-                    // --- TỐC ĐỘ CHUYỂN SLIDE ---
-                    speed: 800, // 800ms = lướt êm hơn
-                    
-                    // --- TỰ ĐỘNG CHẠY (AUTOPLAY) ---
+                    speed: 800, 
                     autoplay: {
-                        delay: 3000, // Đợi 3s thôi (Thay vì 5s) -> Cảm giác liên tục hơn
-                        disableOnInteraction: false, // Thả tay ra là tính giờ chạy lại ngay
-                        // pauseOnMouseEnter: false, // Bỏ dòng này để chuột đè lên nó vẫn chạy (nếu muốn)
+                        delay: 3000, 
+                        disableOnInteraction: false, 
                     },
-                    
                     slidesPerView: 2, 
                     spaceBetween: 15, 
-                    
-                    pagination: {
-                        el: ".swiper-pagination",
-                        clickable: true,
-                    },
-
                     breakpoints: {
                         0: { slidesPerView: 2, spaceBetween: 10 },
                         640: { slidesPerView: 2, spaceBetween: 15 },

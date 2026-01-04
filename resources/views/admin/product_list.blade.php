@@ -57,11 +57,6 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-sm">
                     @forelse($products as $product)
-                    {{-- 
-                        CẬP NHẬT: 
-                        1. Thêm onclick chuyển hướng sang trang edit
-                        2. Thêm class cursor-pointer
-                    --}}
                     <tr class="hover:bg-blue-50 transition duration-150 cursor-pointer group" 
                         onclick="window.location='{{ route('product.edit', $product->id) }}'"
                         title="Bấm để chỉnh sửa">
@@ -78,16 +73,23 @@
 
                         <td class="p-4 align-middle">
                             <div class="font-bold text-gray-800 group-hover:text-blue-600 transition">{{ $product->name }}</div>
-                            <div class="flex items-center mt-1 space-x-2">
+                            <div class="flex flex-wrap items-center mt-1 gap-2">
                                 <span class="text-xs text-gray-500">ID: {{ $product->id }}</span>
+                                
                                 @if($product->is_hot)
                                     <span class="text-xs font-bold text-white bg-red-500 px-1 py-0.5 rounded">HOT</span>
+                                @endif
+
+                                {{-- CẬP NHẬT: Hiển thị nhãn nếu có Biến thể --}}
+                                @if($product->variants && $product->variants->count() > 0)
+                                    <span class="text-[10px] font-semibold text-purple-700 bg-purple-100 border border-purple-200 px-1.5 py-0.5 rounded flex items-center">
+                                        <i class="fas fa-tags mr-1"></i> {{ $product->variants->count() }} phiên bản
+                                    </span>
                                 @endif
                             </div>
                         </td>
 
                         <td class="p-4 align-middle">
-                            {{-- Sử dụng stopPropagation để click vào link danh mục không bị chuyển sang trang edit sản phẩm --}}
                             @if($product->category)
                                 <a href="{{ route('admin.category.products', $product->category->id) }}" 
                                    class="text-blue-600 hover:underline relative z-10" 
@@ -116,6 +118,13 @@
                             @else
                                 <div class="font-bold text-gray-800">{{ number_format($product->price) }}đ</div>
                             @endif
+                            
+                            {{-- Nếu có biến thể, hiện gợi ý giá nhỏ --}}
+                            @if($product->variants->count() > 0)
+                                <div class="text-[10px] text-gray-500 italic mt-0.5">
+                                    (Có giá tùy chọn)
+                                </div>
+                            @endif
                         </td>
 
                         <td class="p-4 align-middle text-center">
@@ -132,14 +141,8 @@
 
                         <td class="p-4 align-middle text-right">
                             <div class="flex justify-end items-center space-x-2">
-                                {{-- ĐÃ XÓA NÚT SỬA (VÌ CLICK VÀO DÒNG LÀ SỬA RỒI) --}}
-                                
                                 <form action="{{ route('product.destroy', $product->id) }}" method="POST" class="inline">
                                     @csrf @method('DELETE')
-                                    {{-- 
-                                        QUAN TRỌNG: Thêm event.stopPropagation() 
-                                        để click nút xóa không kích hoạt click dòng 
-                                    --}}
                                     <button class="w-9 h-9 bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded flex items-center justify-center transition shadow-sm" 
                                             title="Xóa"
                                             onclick="event.stopPropagation(); return confirm('Bạn có chắc muốn xóa không?')">

@@ -27,8 +27,15 @@ class Product extends Model
         'is_hot'            // Sản phẩm HOT
     ];
 
+    // Quan hệ với bảng Categories (Danh mục)
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    // --- BỔ SUNG: Quan hệ với bảng ProductVariants (Biến thể giá) ---
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class)->orderBy('created_at', 'asc');
     }
 }
