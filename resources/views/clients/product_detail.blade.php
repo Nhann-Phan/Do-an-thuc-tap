@@ -5,90 +5,115 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        /* Tối ưu hóa chuyển động */
-        .swiper-wrapper { transition-timing-function: ease-out; }
-        .swiper-slide { transform: translate3d(0, 0, 0); backface-visibility: hidden; }
-        .cursor-grab { cursor: grab; }
-        .cursor-grabbing { cursor: grabbing; }
+        /* Tùy chỉnh CSS cho nội dung bài viết (CKEditor) */
+        .product-description h2 { font-size: 1.5rem; font-weight: 700; margin: 1.5rem 0 1rem; color: #1e3a8a; }
+        .product-description h3 { font-size: 1.25rem; font-weight: 600; margin: 1.25rem 0 0.75rem; color: #1f2937; }
+        .product-description p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
+        .product-description ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .product-description img { border-radius: 0.5rem; margin: 1.5rem auto; max-width: 100%; height: auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         
-        /* Style cho nút biến thể */
+        /* Style cho nút biến thể khi Active */
         .variant-btn.active {
-            border-color: #2563eb; /* Blue-600 */
-            background-color: #eff6ff; /* Blue-50 */
-            color: #1d4ed8; /* Blue-700 */
-            font-weight: bold;
+            border-color: #2563eb;
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            font-weight: 600;
+            box-shadow: 0 0 0 1px #2563eb;
         }
     </style>
 @endpush
 
-<div class="bg-white py-3 border-b border-gray-200 mb-6">
-    <div class="container mx-auto px-4 text-xs font-bold text-gray-500 tracking-wide flex items-center gap-2">
-        <a href="/" class="hover:text-blue-600 transition"><i class="fas fa-home mr-1"></i>Trang chủ</a>
-        <i class="fas fa-angle-right text-gray-300 text-[10px]"></i>
-        @if($product->category)
-            <a href="{{ route('frontend.category.show', $product->category_id) }}" class="hover:text-blue-600 transition">{{ $product->category->name }}</a>
-            <i class="fas fa-angle-right text-gray-300 text-[10px]"></i>
-        @endif
-        <span class="text-gray-900">{{ $product->name }}</span>
+{{-- BREADCRUMB --}}
+<nav class="bg-gray-50 border-b border-gray-200 py-4 mb-8">
+    <div class="container mx-auto px-4">
+        <ol class="flex text-sm text-gray-500 items-center gap-2 overflow-hidden whitespace-nowrap font-medium">
+            <li>
+                <a href="/" class="hover:text-blue-600 transition flex items-center">
+                    <i class="fas fa-home mr-1.5"></i> Trang chủ
+                </a>
+            </li>
+            <li class="text-gray-300"><i class="fa-solid fa-angle-right"></i></li>
+            @if($product->category)
+                <li>
+                    <a href="{{ route('frontend.category.show', $product->category_id) }}" class="hover:text-blue-600 transition">
+                        {{ $product->category->name }}
+                    </a>
+                </li>
+                <li class="text-gray-300"><i class="fa-solid fa-angle-right"></i></li>
+            @endif
+            <li class="text-gray-900 truncate">{{ $product->name }}</li>
+        </ol>
     </div>
-</div>
+</nav>
 
-<div class="container mx-auto px-4 pb-12">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+{{-- MAIN CONTENT --}}
+<div class="container mx-auto px-4 pb-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
         
+        {{-- CỘT TRÁI (LỚN): ẢNH + THÔNG TIN + MÔ TẢ --}}
         <div class="lg:col-span-9">
             
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-10">
+            {{-- PRODUCT TOP SECTION --}}
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
+                {{-- 1. Ảnh sản phẩm (Chiếm 5 phần) --}}
                 <div class="md:col-span-5">
-                    <div class="border border-gray-200 rounded p-4 bg-white relative group overflow-hidden">
+                    <div class="border border-gray-200 rounded-xl p-4 bg-white relative group overflow-hidden shadow-sm">
                         @if($product->sale_price)
-                            <span class="absolute top-3 left-3 bg-red-600 text-white text-[11px] font-bold px-2 py-1 rounded shadow-sm z-10">
+                            <div class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-md z-10">
                                 -{{ round((($product->price - $product->sale_price)/$product->price)*100) }}%
-                            </span>
+                            </div>
                         @endif
-                        <div class="aspect-[1/1] flex items-center justify-center">
+                        
+                        <div class="aspect-square flex items-center justify-center overflow-hidden bg-white">
                             @if($product->image)
-                                <img src="{{ asset($product->image) }}" class="max-w-full max-h-full object-contain cursor-zoom-in" alt="{{ $product->name }}">
+                                <img src="{{ asset($product->image) }}" class="max-w-full max-h-full object-contain cursor-zoom-in transition duration-500 hover:scale-110" alt="{{ $product->name }}">
                             @else
-                                <img src="https://via.placeholder.com/500x500?text=No+Image" class="opacity-50">
+                                <div class="text-gray-300 flex flex-col items-center">
+                                    <i class="fas fa-image text-5xl mb-2"></i>
+                                    <span class="text-sm">No Image</span>
+                                </div>
                             @endif
                         </div>
                     </div>
                 </div>
 
-                <div class="md:col-span-7 flex flex-col">
-                    <h1 class="text-2xl font-bold text-gray-900 leading-snug mb-2">{{ $product->name }}</h1>
-                    <div class="w-12 h-1 bg-blue-600 mb-4 rounded-full"></div>
+                {{-- 2. Thông tin chi tiết (Chiếm 7 phần) --}}
+                <div class="md:col-span-7 flex flex-col h-full">
+                    <h1 class="text-lg md:text-xl font-bold text-gray-900 leading-snug mb-3">{{ $product->name }}</h1>
+                    
+                    <div class="flex items-center gap-4 mb-5 text-sm">
+                        {{-- <div class="w-16 h-1 bg-blue-600 rounded-full"></div> --}}
+                        <span class="text-gray-500">Mã SP: <span class="font-mono text-gray-700 font-bold">{{ $product->id }}</span></span>
+                    </div>
 
-                    {{-- HIỂN THỊ GIÁ --}}
-                    <div class="mb-5 bg-gray-50 p-3 rounded border border-gray-100">
-                        {{-- Logic: Nếu có biến thể thì lấy giá biến thể đầu tiên, không thì lấy giá thường --}}
+                    {{-- Khu vực giá --}}
+                    <div class="mb-6 bg-gray-50 rounded-xl border border-gray-100 flex items-end gap-3">
                         @php
                             $currentPrice = $product->variants->count() > 0 ? $product->variants->first()->price : ($product->sale_price ?? $product->price);
                             $originalPrice = $product->sale_price ? $product->price : null;
-                            
-                            // Nếu đang hiện giá variant thì không hiện giá gạch ngang (vì logic phức tạp)
                             if($product->variants->count() > 0) $originalPrice = null; 
                         @endphp
 
-                        <span id="price-display" class="text-3xl font-bold text-red-600">
-                            {{ number_format($currentPrice) }} ₫
+                        <span id="price-display" class="text-2xl font-bold text-red-600 leading-none">
+                        Đơn giá: {{ number_format($currentPrice) }} ₫
                         </span>
                         
                         @if($originalPrice)
-                            <span class="text-sm text-gray-400 line-through ml-2">{{ number_format($originalPrice) }} ₫</span>
+                            <span class="text-sm text-gray-400 line-through mb-1">{{ number_format($originalPrice) }} ₫</span>
                         @endif
                     </div>
 
-                    {{-- === KHU VỰC CHỌN BIẾN THỂ (VARIANTS) === --}}
+                    {{-- Chọn biến thể (Variants) --}}
                     @if($product->variants && $product->variants->count() > 0)
                     <div class="mb-6">
-                        <h3 class="text-sm font-bold text-gray-800 mb-2">Chọn phiên bản: <span id="variant-name-display" class="font-normal text-blue-600">{{ $product->variants->first()->name }}</span></h3>
+                        <h3 class="text-sm font-bold text-gray-800 mb-3 uppercase tracking-wide">
+                            Chọn phiên bản: <span id="variant-name-display" class="font-normal text-blue-600 normal-case ml-1">{{ $product->variants->first()->name }}</span>
+                        </h3>
                         <div class="flex flex-wrap gap-3">
                             @foreach($product->variants->sortBy('price') as $index => $variant)
                                 <button type="button" 
                                         onclick="selectVariant(this, '{{ $variant->id }}', {{ $variant->price }}, '{{ $variant->name }}')"
-                                        class="variant-btn border border-gray-300 px-4 py-2 rounded text-sm text-gray-700 hover:border-blue-400 transition {{ $index === 0 ? 'active' : '' }}"
+                                        class="variant-btn px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white hover:border-blue-400 hover:text-blue-600 transition shadow-sm {{ $index === 0 ? 'active' : '' }}"
                                         data-id="{{ $variant->id }}">
                                     {{ $variant->name }}
                                 </button>
@@ -96,86 +121,104 @@
                         </div>
                     </div>
                     @endif
-                    {{-- === KẾT THÚC === --}}
 
-                    <div class="text-gray-600 text-sm leading-relaxed mb-6">
-                        <ul class="space-y-1.5 list-disc pl-4 marker:text-blue-500">
-                            <li>
-                                <strong>Thương hiệu:</strong> 
-                                <span class="font-bold text-dark-700 ">
-                                    {{ $product->brand ?? 'Đang cập nhật' }}
-                                </span>
+                    {{-- Thông tin bổ sung --}}
+                    <div class="text-gray-600 text-sm leading-relaxed mb-8 bg-white rounded-lg">
+                        <ul class="space-y-2">
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span>Thương hiệu: <strong class="text-gray-900">{{ $product->brand ?? 'Đang cập nhật' }}</strong></span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span>Tình trạng: <span class="text-green-600 font-medium">Còn hàng</span></span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span>Bảo hành chính hãng</span>
                             </li>
                         </ul>
                     </div>
 
-                    <div class="flex gap-3 mt-auto">
-                        {{-- Logic Add to Cart: Mặc định lấy ID variant đầu tiên nếu có --}}
+                    {{-- Nút mua hàng --}}
+                    <div class="flex gap-4 mt-auto">
                         @php
                             $defaultVariantId = $product->variants->count() > 0 ? $product->variants->first()->id : '';
                             $addToCartUrl = route('add_to_cart', ['id' => $product->id, 'variant_id' => $defaultVariantId]);
                             $buyNowUrl = route('buy_now', ['id' => $product->id, 'variant_id' => $defaultVariantId]);
                         @endphp
 
-                        <a href="{{ $addToCartUrl }}" id="btn-add-to-cart" class="flex-1 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-3 rounded text-sm uppercase tracking-wide transition flex items-center justify-center">
-                            <i class="fas fa-cart-plus mr-2"></i> Thêm giỏ
+                        <a href="{{ $addToCartUrl }}" id="btn-add-to-cart" class="flex-1 bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-3.5 rounded-xl text-sm uppercase tracking-wide transition flex items-center justify-center shadow-sm">
+                            <i class="fas fa-cart-plus mr-2 text-lg"></i> Thêm vào giỏ
                         </a>
-                        <a href="{{ $buyNowUrl }}" id="btn-buy-now" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded text-sm uppercase tracking-wide transition flex items-center justify-center shadow-lg shadow-red-200">
+                        <a href="{{ $buyNowUrl }}" id="btn-buy-now" class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 rounded-xl text-sm uppercase tracking-wide transition flex items-center justify-center shadow-lg shadow-red-200 transform hover:-translate-y-0.5">
                             Mua ngay
                         </a>
                     </div>
                 </div>
             </div>
 
-            <div class="mb-12">
+            {{-- PRODUCT DESCRIPTION SECTION --}}
+            <div class="mb-16">
                 <div class="border-b border-gray-200 mb-6">
-                    <button class="inline-block py-2 px-4 border-b-2 border-blue-600 text-blue-600 font-bold text-sm uppercase">Chi tiết sản phẩm</button>
+                    <h2 class="inline-block py-3 px-1 border-b-2 border-blue-600 text-blue-800 font-bold text-lg uppercase tracking-wide">
+                        Chi tiết sản phẩm
+                    </h2>
                 </div>
-                <div class="text-gray-700 leading-7 text-[15px] description-content">
-                    {!! $product->description ?? '<p class="text-gray-400 italic">Đang cập nhật nội dung...</p>' !!}
+                {{-- Nội dung CKEditor --}}
+                <div class="product-description text-gray-700 leading-7 text-[15px]">
+                    {!! $product->description ?? '<div class="p-8 text-center text-gray-400 bg-gray-50 rounded-lg italic">Đang cập nhật nội dung chi tiết...</div>' !!}
                 </div>
             </div>
 
+            {{-- RELATED PRODUCTS SLIDER --}}
             @if(isset($relatedProducts) && count($relatedProducts) > 0)
-            <div class="mt-12 select-none"> 
-                <h3 class="text-lg font-bold text-gray-800 uppercase mb-6 border-l-4 border-red-600 pl-3">Sản phẩm tương tự</h3>
+            <div class="select-none"> 
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 uppercase border-l-4 border-red-600 pl-3">Sản phẩm tương tự</h3>
+                </div>
                 
                 <div class="relative w-full"> 
-                    <div class="swiper mySwiper w-full overflow-hidden rounded-lg p-2 cursor-grab active:cursor-grabbing"> 
+                    <div class="swiper mySwiper w-full overflow-hidden rounded-xl p-1 cursor-grab active:cursor-grabbing"> 
                         <div class="swiper-wrapper">
+                            {{-- Loop giả lập slide để test hiển thị --}}
                             @for ($i = 0; $i < 4; $i++) 
                                 @foreach($relatedProducts as $related)
                                 <div class="swiper-slide h-auto">
-                                    <div class="bg-white border border-gray-200 rounded-lg hover:shadow-lg hover:border-blue-400 transition-all duration-300 h-full flex flex-col group relative">
+                                    <div class="bg-white border border-gray-200 rounded-xl hover:shadow-xl hover:border-blue-300 transition-all duration-300 h-full flex flex-col group relative overflow-hidden">
+                                        
+                                        {{-- Badge Sale --}}
                                         @if($related->sale_price)
                                             <span class="absolute top-2 right-2 z-10 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
                                                 -{{ round((($related->price - $related->sale_price)/$related->price)*100) }}%
                                             </span>
                                         @endif
 
-                                        <div class="relative pt-[100%] overflow-hidden bg-white p-4 border-b border-gray-50">
-                                            <a href="{{ route('product.detail', $related->id) }}" class="absolute inset-0 flex items-center justify-center pointer-events-none md:pointer-events-auto">
+                                        {{-- Image --}}
+                                        <div class="relative pt-[100%] overflow-hidden bg-white p-6 border-b border-gray-50">
+                                            <a href="{{ route('product.detail', $related->id) }}" class="absolute inset-0 flex items-center justify-center">
                                                 @if($related->image)
-                                                    <img src="{{ asset($related->image) }}" class="max-h-full max-w-full object-contain pointer-events-none">
+                                                    <img src="{{ asset($related->image) }}" class="max-h-full max-w-full object-contain transition duration-500 group-hover:scale-110">
                                                 @else
-                                                    <img src="https://via.placeholder.com/300" class="opacity-50 pointer-events-none">
+                                                    <i class="fas fa-image text-4xl text-gray-300"></i>
                                                 @endif
                                             </a>
                                         </div>
 
-                                        <div class="p-3 text-center flex-grow flex flex-col justify-between">
-                                            <h4 class="text-[13px] font-medium text-gray-700 mb-2 line-clamp-2 h-10 hover:text-blue-600">
+                                        {{-- Content --}}
+                                        <div class="p-4 flex-grow flex flex-col">
+                                            <h4 class="text-sm font-bold text-gray-700 mb-2 line-clamp-2 hover:text-blue-600 transition h-10">
                                                 <a href="{{ route('product.detail', $related->id) }}">{{ $related->name }}</a>
                                             </h4>
-                                            <div class="text-sm font-bold text-red-600">
-                                                {{ number_format($related->sale_price ?: $related->price) }} ₫
+                                            
+                                            <div class="mt-auto flex items-center justify-between">
+                                                <span class="text-red-600 font-bold text-base">
+                                                    {{ number_format($related->sale_price ?: $related->price) }} ₫
+                                                </span>
+                                                <a href="{{ route('add_to_cart', $related->id) }}" class="w-8 h-8 rounded-full bg-gray-100 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition shadow-sm" title="Thêm vào giỏ">
+                                                    <i class="fas fa-plus text-xs"></i>
+                                                </a>
                                             </div>
-                                        </div>
-                                        
-                                        <div class="absolute bottom-20 left-0 w-full flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            <a href="{{ route('add_to_cart', $related->id) }}" class="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold shadow-md hover:bg-blue-700">
-                                                Thêm vào giỏ
-                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -189,22 +232,39 @@
 
         </div>
 
+        {{-- CỘT PHẢI (NHỎ): SIDEBAR --}}
         <div class="lg:col-span-3">
-            <h4 class="font-bold text-gray-800 uppercase border-b-2 border-blue-600 inline-block mb-4 pb-1 text-sm">Sản phẩm nổi bật</h4>
-            <div class="space-y-4">
-                @if(isset($relatedProducts) && count($relatedProducts) > 0)
-                    @foreach($relatedProducts->take(5) as $hotItem)
-                    <a href="{{ route('product.detail', $hotItem->id) }}" class="flex gap-3 group bg-white border border-transparent hover:border-gray-200 p-2 rounded transition">
-                        <div class="w-14 h-14 border border-gray-100 rounded bg-white p-1 flex-shrink-0 flex items-center justify-center">
-                            <img src="{{ asset($hotItem->image) }}" class="max-w-full max-h-full object-contain" onerror="this.src='https://via.placeholder.com/100'">
-                        </div>
-                        <div>
-                            <h5 class="text-xs font-bold text-gray-700 group-hover:text-blue-600 leading-tight mb-1 line-clamp-2">{{ $hotItem->name }}</h5>
-                            <span class="text-red-600 font-bold text-xs">{{ number_format($hotItem->sale_price ?: $hotItem->price) }} ₫</span>
-                        </div>
-                    </a>
-                    @endforeach
-                @endif
+            <div class="sticky top-24">
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                        <h4 class="font-bold text-gray-800 uppercase text-sm border-l-4 border-blue-600 pl-3">Sản phẩm nổi bật</h4>
+                    </div>
+                    
+                    <div class="divide-y divide-gray-100">
+                        @if(isset($relatedProducts) && count($relatedProducts) > 0)
+                            @foreach($relatedProducts->take(5) as $hotItem)
+                            <a href="{{ route('product.detail', $hotItem->id) }}" class="flex gap-3 p-4 hover:bg-blue-50/50 transition group items-center">
+                                <div class="w-16 h-16 border border-gray-200 rounded-lg bg-white p-1 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                    <img src="{{ asset($hotItem->image) }}" class="max-w-full max-h-full object-contain" onerror="this.src='https://via.placeholder.com/100'">
+                                </div>
+                                <div>
+                                    <h5 class="text-sm font-bold text-gray-700 group-hover:text-blue-600 leading-snug mb-1 line-clamp-2">
+                                        {{ $hotItem->name }}
+                                    </h5>
+                                    <span class="text-red-600 font-bold text-sm">
+                                        {{ number_format($hotItem->sale_price ?: $hotItem->price) }} ₫
+                                    </span>
+                                </div>
+                            </a>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+                
+                {{-- Banner Quảng cáo (Nếu có) --}}
+                {{-- <div class="mt-6 rounded-xl overflow-hidden shadow-md">
+                    <img src="https://via.placeholder.com/300x400" class="w-full">
+                </div> --}}
             </div>
         </div>
 

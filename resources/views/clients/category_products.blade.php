@@ -2,149 +2,202 @@
 
 @section('content')
 
-<div class="bg-white py-3 border-b border-gray-200 mb-6">
-    <div class="container mx-auto px-4 text-sm font-medium text-gray-500 tracking-wide">
-        <nav class="text-sm font-medium text-gray-500">
-            <ol class="list-none inline-flex">
-                <li class="flex items-center">
-                    <a href="/" class="text-gray-500 hover:text-blue-600 transition"><i class="fas fa-home mr-1"></i> Trang chủ </a>
-                    <span class="fas fa-angle-right text-gray-300 text-[10px] ml-1 mr-1"></span>
+{{-- BREADCRUMB --}}
+<nav class="bg-gray-50 border-b border-gray-200 py-4 mb-8">
+    <div class="container mx-auto px-4">
+        <ol class="flex text-sm text-gray-500 items-center gap-2 overflow-hidden whitespace-nowrap font-medium">
+            <li>
+                <a href="/" class="hover:text-blue-600 transition flex items-center">
+                    <i class="fas fa-home mr-1.5"></i> Trang chủ
+                </a>
+            </li>
+            <li class="text-gray-300"><i class="fa-solid fa-angle-right"></i></li>
+            
+            @if($currentCategory->parent)
+                <li>
+                    <a href="{{ route('frontend.category.show', $currentCategory->parent_id) }}" class="hover:text-blue-600 transition">
+                        {{ $currentCategory->parent->name }}
+                    </a>
                 </li>
-                @if($currentCategory->parent)
-                    <li class="flex items-center lowercase">
-                        <a href="{{ route('frontend.category.show', $currentCategory->parent_id) }}" class="text-gray-500 hover:text-blue-600 transition">{{ $currentCategory->parent->name }}</a>
-                        <span class="fas fa-angle-right text-gray-300 text-[10px] ml-1 mr-1"></span>
-                    </li>
-                @endif
-                <li class="text-blue-600 font-bold" aria-current="page">{{ $currentCategory->name }}</li>
-        </nav>
+                <li class="text-gray-300"><i class="fa-solid fa-angle-right"></i></li>
+            @endif
+            
+            <li class="text-gray-900 font-bold truncate">{{ $currentCategory->name }}</li>
+        </ol>
     </div>
-</div>
+</nav>
 
-<div class="container mx-auto px-4 py-8">
+{{-- MAIN CONTENT --}}
+<div class="container mx-auto px-4 pb-16">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         
-        {{-- SIDEBAR DANH MỤC --}}
-        <div class="hidden lg:block lg:col-span-1">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
-                <div class="bg-white p-4 border-b font-bold uppercase text-gray-700 flex items-center">
-                    <i class="fas fa-list-ul mr-2 text-blue-600"></i> Danh mục liên quan
+        {{-- SIDEBAR: DANH MỤC (Ẩn trên Mobile, Hiện trên Large screen) --}}
+        <aside class="hidden lg:block lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-24">
+                <div class="bg-gray-50 px-5 py-4 border-b border-gray-200">
+                    <h3 class="font-bold text-gray-800 uppercase text-sm flex items-center tracking-wide">
+                        <i class="fas fa-list-ul mr-2 text-blue-600"></i> Danh mục sản phẩm
+                    </h3>
                 </div>
-                <div class="flex flex-col">
+                
+                <div class="flex flex-col py-2">
                     @foreach($menuCategories as $cat)
-                        <a href="{{ route('frontend.category.show', $cat->id) }}" class="px-4 py-3 border-b border-gray-50 hover:bg-blue-50 hover:text-blue-700 transition flex items-center {{ $currentCategory->id == $cat->id ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600' }}">
-                            <i class="{{ $cat->icon ?? 'fas fa-caret-right' }} mr-2 text-gray-400 text-xs"></i> {{ $cat->name }}
+                        {{-- Danh mục cha --}}
+                        <a href="{{ route('frontend.category.show', $cat->id) }}" 
+                           class="px-5 py-3 text-sm font-medium transition flex items-center justify-between group 
+                                  {{ $currentCategory->id == $cat->id ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50' }}">
+                            <span class="flex items-center">
+                                <i class="{{ $cat->icon ?? 'fas fa-folder' }} mr-3 text-xs {{ $currentCategory->id == $cat->id ? 'text-blue-500' : 'text-gray-400 group-hover:text-blue-500' }}"></i> 
+                                {{ $cat->name }}
+                            </span>
+                            @if($cat->children && $cat->children->count() > 0)
+                                <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
+                            @endif
                         </a>
                         
-                        {{-- Hiển thị con nếu đang ở danh mục cha hoặc chính nó --}}
-                        @if($currentCategory->id == $cat->id || $currentCategory->parent_id == $cat->id)
-                            @foreach($cat->children as $child)
-                                <a href="{{ route('frontend.category.show', $child->id) }}" class="pl-10 pr-4 py-2 border-b border-gray-50 text-sm hover:text-blue-600 flex items-center {{ $currentCategory->id == $child->id ? 'text-blue-600 font-bold' : 'text-gray-500' }}">
-                                    <span class="mr-2">•</span> {{ $child->name }}
-                                </a>
-                            @endforeach
+                        {{-- Danh mục con (Chỉ hiện khi đang ở trong nhóm cha này) --}}
+                        @if(($currentCategory->id == $cat->id || $currentCategory->parent_id == $cat->id) && $cat->children && $cat->children->count() > 0)
+                            <div class="bg-gray-50/30 border-t border-b border-gray-100 py-1">
+                                @foreach($cat->children as $child)
+                                    <a href="{{ route('frontend.category.show', $child->id) }}" 
+                                       class="pl-12 pr-5 py-2 text-xs transition flex items-center relative
+                                              {{ $currentCategory->id == $child->id ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-blue-600' }}">
+                                        @if($currentCategory->id == $child->id)
+                                            <span class="absolute left-9 w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                        @endif
+                                        {{ $child->name }}
+                                    </a>
+                                @endforeach
+                            </div>
                         @endif
                     @endforeach
                 </div>
             </div>
-        </div>
+        </aside>
 
-        {{-- DANH SÁCH SẢN PHẨM CHÍNH --}}
+        {{-- MAIN PRODUCT LIST --}}
         <div class="col-span-1 lg:col-span-3">
             
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 pb-2 border-b border-gray-200">
-                <h1 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">
+            {{-- Header & Sort --}}
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 gap-4">
+                <h1 class="text-2xl font-bold text-gray-900 flex items-center">
                     {{ $currentCategory->name }} 
-                    <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-gray-100 bg-gray-500 rounded-full">{{ $products->count() }}</span>
+                    <span class="ml-3 inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                        {{ $products->count() }} sản phẩm
+                    </span>
                 </h1>
                 
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm text-gray-500">Sắp xếp:</span>
-                    <select class="border border-gray-300 rounded text-sm px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                        <option>Mới nhất</option>
-                        <option>Giá tăng dần</option>
-                        <option>Giá giảm dần</option>
-                    </select>
+                <div class="flex items-center text-sm">
+                    <label for="sort" class="text-gray-500 mr-2">Sắp xếp:</label>
+                    <div class="relative">
+                        <select id="sort" class="appearance-none bg-white border border-gray-300 text-gray-700 py-1.5 pl-3 pr-8 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm cursor-pointer hover:border-gray-400 transition">
+                            <option>Mới nhất</option>
+                            <option>Giá tăng dần</option>
+                            <option>Giá giảm dần</option>
+                            <option>Tên A-Z</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            {{-- Product Grid --}}
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 @forelse($products as $product)
-                <div class="group bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-400 transition duration-300 flex flex-col h-full relative overflow-hidden">
+                <div class="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
                     
-                    @if($product->is_hot)
-                        <span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow z-10">-HOT</span>
-                    @endif
-
-                    <div class="relative overflow-hidden p-4 bg-white h-48 flex items-center justify-center">
-                        <a href="{{ route('product.detail', $product->id) }}" class="block w-full h-48 flex items-center justify-center bg-white rounded-t-lg overflow-hidden">
-                            @if($product->image)
-                                <img src="{{ asset($product->image) }}" 
-                                     class="w-full h-full object-contain hover:scale-105 transition duration-500" 
-                                     alt="{{ $product->name }}"
-                                     onerror="this.onerror=null;this.src='https://via.placeholder.com/300x300?text=No+Image'">
-                            @else
-                                <img src="https://via.placeholder.com/300x300?text=No+Image" class="w-full h-full object-contain opacity-50">
-                            @endif
-                        </a>
+                    {{-- Badges --}}
+                    <div class="absolute top-3 left-3 z-10 flex flex-col gap-1">
+                        @if($product->is_hot)
+                            <span class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm uppercase tracking-wider animate-pulse">HOT</span>
+                        @endif
+                        @if($product->sale_price)
+                            <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                                -{{ round((($product->price - $product->sale_price)/$product->price)*100) }}%
+                            </span>
+                        @endif
                     </div>
 
+                    {{-- Image --}}
+                    <div class="relative pt-[100%] overflow-hidden bg-white border-b border-gray-50 group-hover:border-gray-100 transition-colors">
+                        <a href="{{ route('product.detail', $product->id) }}" class="absolute inset-0 flex items-center justify-center p-6">
+                            @if($product->image)
+                                <img src="{{ asset($product->image) }}" 
+                                     class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition duration-500 ease-out" 
+                                     alt="{{ $product->name }}">
+                            @else
+                                <div class="text-gray-300 flex flex-col items-center">
+                                    <i class="fas fa-image text-4xl mb-1 opacity-50"></i>
+                                </div>
+                            @endif
+                        </a>
+                        
+                        {{-- Quick Action (Optional) --}}
+                        <div class="absolute bottom-0 left-0 w-full p-2 translate-y-full group-hover:translate-y-0 transition duration-300">
+                            <a href="{{ route('product.detail', $product->id) }}" class="block w-full bg-blue-600/90 hover:bg-blue-700 text-white text-center text-xs font-bold py-2 rounded shadow-md backdrop-blur-sm uppercase tracking-wide">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+
+                    {{-- Content --}}
                     <div class="p-4 flex flex-col flex-grow">
-                        <h3 class="text-sm font-bold text-gray-700 mb-2 line-clamp-2 h-10 group-hover:text-blue-600 transition">
+                        {{-- Name --}}
+                        <h3 class="text-sm font-bold text-gray-700 mb-2 line-clamp-2 h-10 group-hover:text-blue-600 transition leading-snug">
                             <a href="{{ route('product.detail', $product->id) }}" title="{{ $product->name }}">
                                 {{ $product->name }}
                             </a>
                         </h3>
                         
-                        <div class="mt-auto pt-2 border-t border-gray-50">
-                            {{-- ======================================================= --}}
-                            {{-- LOGIC HIỂN THỊ GIÁ (CÓ BIẾN THỂ HOẶC KHÔNG) --}}
-                            {{-- ======================================================= --}}
-                            
+                        {{-- Price Logic --}}
+                        <div class="mt-auto pt-3 border-t border-gray-50 flex flex-col justify-end min-h-[3rem]">
                             @if($product->variants && $product->variants->count() > 0)
-                                {{-- TRƯỜNG HỢP 1: CÓ BIẾN THỂ (VARIANTS) --}}
+                                {{-- Có biến thể --}}
                                 @php
                                     $minPrice = $product->variants->min('price');
                                     $maxPrice = $product->variants->max('price');
                                 @endphp
-                                <div class="flex flex-col">
-                                    <span class="text-red-600 font-bold text-lg">
-                                        @if($minPrice == $maxPrice)
-                                            {{ number_format($minPrice) }}đ
-                                        @else
-                                            {{ number_format($minPrice) }} - {{ number_format($maxPrice) }}đ
-                                        @endif
-                                    </span>
-                                    {{-- Nếu muốn hiện thêm chữ nhỏ --}}
-                                    {{-- <span class="text-[10px] text-gray-400 italic">Tùy chọn phiên bản</span> --}}
-                                </div>
-
+                                <span class="text-red-600 font-bold text-base block">
+                                    @if($minPrice == $maxPrice)
+                                        {{ number_format($minPrice) }}đ
+                                    @else
+                                        {{ number_format($minPrice) }} - {{ number_format($maxPrice) }}đ
+                                    @endif
+                                </span>
                             @else
-                                {{-- TRƯỜNG HỢP 2: KHÔNG CÓ BIẾN THỂ (GIÁ THƯỜNG) --}}
+                                {{-- Không biến thể --}}
                                 @if($product->sale_price)
-                                    <div class="flex flex-col">
-                                        <span class="text-red-600 font-bold text-lg">{{ number_format($product->sale_price) }}đ</span>
-                                        <span class="text-gray-400 text-xs line-through">{{ number_format($product->price) }}đ</span>
+                                    <div>
+                                        <span class="text-red-600 font-bold text-base block">{{ number_format($product->sale_price) }}đ</span>
+                                        <span class="text-gray-400 text-xs line-through block">{{ number_format($product->price) }}đ</span>
                                     </div>
                                 @else
-                                    <span class="text-red-600 font-bold text-lg">{{ number_format($product->price) }}đ</span>
+                                    <span class="text-red-600 font-bold text-base block">{{ number_format($product->price) }}đ</span>
                                 @endif
                             @endif
-                            {{-- ======================================================= --}}
                         </div>
                     </div>
-
                 </div>
                 @empty
-                    <div class="col-span-full py-12 text-center bg-white rounded-lg shadow-sm border border-dashed border-gray-300">
-                        <div class="text-gray-300 mb-4 text-6xl"><i class="fas fa-box-open"></i></div>
-                        <h5 class="text-gray-500 font-medium mb-4">Chưa có sản phẩm nào trong danh mục này</h5>
-                        <a href="/" class="inline-block px-6 py-2 border border-blue-600 text-blue-600 font-bold rounded-full hover:bg-blue-600 hover:text-white transition">
-                            Quay về trang chủ
-                        </a>
+                <div class="col-span-full py-16 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white shadow-sm mb-4 text-gray-300">
+                        <i class="fas fa-box-open text-3xl"></i>
                     </div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-1">Chưa có sản phẩm</h3>
+                    <p class="text-gray-500 text-sm mb-6">Danh mục này hiện chưa có sản phẩm nào được cập nhật.</p>
+                    <a href="/" class="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 transition text-sm">
+                        <i class="fas fa-arrow-left mr-2"></i> Quay về trang chủ
+                    </a>
+                </div>
                 @endforelse
             </div>
+            
+            {{-- Pagination (Nếu có) --}}
+            {{-- <div class="mt-12 flex justify-center">
+                {{ $products->links('pagination::tailwind') }}
+            </div> --}}
             
         </div>
     </div>

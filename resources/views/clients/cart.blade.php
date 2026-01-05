@@ -2,51 +2,59 @@
 
 @section('content')
 
-<div class="bg-gray-50 py-3 border-b border-gray-200 shadow-sm relative z-0">
+{{-- BREADCRUMB --}}
+<nav class="bg-gray-50 border-b border-gray-200 py-4 mb-8">
     <div class="container mx-auto px-4">
-        <nav class="text-xs font-medium text-gray-500 mb-1">
-            <ol class="list-none p-0 inline-flex">
-                <li class="flex items-center">
-                    <a href="/" class="text-gray-500 hover:text-blue-600 transition no-underline"><i class="fas fa-home mr-1"></i> Trang chủ</a>
-                    <i class="fas fa-angle-right text-gray-300 text-[10px] ml-1 mr-1"></i>
-                </li>
-                <li class="text-blue-600 font-bold" aria-current="page">Giỏ hàng</li>
-            </ol>
-        </nav>
-        <h1 class="text-xl font-extrabold text-gray-800 uppercase tracking-tight m-0 flex items-center">
-            <i class="fas fa-shopping-cart mr-2 text-blue-600"></i> Giỏ hàng của bạn
-        </h1>
+        <ol class="flex text-sm text-gray-500 items-center gap-2 overflow-hidden whitespace-nowrap font-medium">
+            <li>
+                <a href="/" class="hover:text-blue-600 transition flex items-center">
+                    <i class="fas fa-home mr-1.5"></i> Trang chủ
+                </a>
+            </li>
+            <li class="text-gray-300"><i class="fa-solid fa-angle-right"></i></li>
+            <li class="text-gray-900 font-bold">Giỏ hàng</li>
+        </ol>
     </div>
-</div>
+</nav>
 
-<div class="bg-gray-50 min-h-screen pb-10">
-    <div class="container mx-auto px-4 py-6 font-sans">
+{{-- MAIN CONTENT --}}
+<div class="bg-white min-h-[60vh] pb-16 mb-20">
+    <div class="container mx-auto px-4 font-sans">
         
+        {{-- Tiêu đề --}}
+        <h1 class="text-2xl font-bold text-gray-800 uppercase tracking-tight mb-6 flex items-center">
+            <i class="fas fa-shopping-cart mr-3 text-blue-600"></i> Giỏ hàng của bạn
+        </h1>
+
+        {{-- Thông báo thành công --}}
         @if(session('cart_success'))
-            <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-3 mb-5 rounded shadow-sm flex justify-between items-center text-sm">
+            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6 flex justify-between items-center shadow-sm">
                 <div class="flex items-center">
                     <i class="fas fa-check-circle mr-2 text-lg"></i>
-                    <span>{{ session('cart_success') }}</span>
+                    <span class="font-medium">{{ session('cart_success') }}</span>
                 </div>
-                <button onclick="this.parentElement.remove();" class="text-green-700 hover:text-green-900 focus:outline-none">
+                <button onclick="this.parentElement.remove();" class="text-green-600 hover:text-green-800 transition focus:outline-none">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
         @endif
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
+            {{-- CỘT TRÁI: DANH SÁCH SẢN PHẨM --}}
             <div class="lg:col-span-8">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    
+                    {{-- Table Wrapper cho Mobile --}}
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-gray-100 text-gray-600 text-[11px] uppercase font-bold border-b border-gray-200">
-                                    <th class="px-4 py-3">Sản phẩm</th>
-                                    <th class="px-4 py-3 text-center">Đơn giá</th>
-                                    <th class="px-4 py-3 text-center">Số lượng</th>
-                                    <th class="px-4 py-3 text-center">Thành tiền</th>
-                                    <th class="px-4 py-3 text-center">Xóa</th>
+                                <tr class="bg-gray-50 text-gray-500 text-xs uppercase font-bold border-b border-gray-200 tracking-wider">
+                                    <th class="px-6 py-4">Sản phẩm</th>
+                                    <th class="px-6 py-4 text-center whitespace-nowrap">Đơn giá</th>
+                                    <th class="px-6 py-4 text-center whitespace-nowrap">Số lượng</th>
+                                    <th class="px-6 py-4 text-center whitespace-nowrap">Thành tiền</th>
+                                    <th class="px-6 py-4 text-center">Xóa</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
@@ -54,50 +62,63 @@
                                 @if(session('cart'))
                                     @foreach(session('cart') as $id => $details)
                                         @php $total += $details['price'] * $details['quantity'] @endphp
-                                        <tr data-id="{{ $id }}" class="hover:bg-blue-50/50 transition duration-150 group">
+                                        <tr data-id="{{ $id }}" class="hover:bg-blue-50/30 transition duration-150 group">
                                             
-                                            <td class="px-4 py-3">
-                                                <div class="flex items-center">
-                                                    <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded border border-gray-200 bg-white">
-                                                        <img src="{{ $details['image'] }}" alt="{{ $details['name'] }}" class="h-full w-full object-cover object-center">
+                                            {{-- Tên & Ảnh --}}
+                                            <td class="px-6 py-4 min-w-[250px]">
+                                                <div class="flex items-start">
+                                                    <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-1">
+                                                        <img src="{{ $details['image'] }}" alt="{{ $details['name'] }}" class="h-full w-full object-contain mix-blend-multiply">
                                                     </div>
-                                                    <div class="ml-3">
-                                                        <div class="text-xs font-bold text-gray-800 line-clamp-2 w-48 leading-tight group-hover:text-blue-600 transition">
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-bold text-gray-800 line-clamp-2 hover:text-blue-600 transition mb-1">
                                                             <a href="{{ route('product.detail', $id) }}">{{ $details['name'] }}</a>
                                                         </div>
-                                                        <div class="text-[10px] text-gray-400 mt-1">Mã: #{{ $id }}</div>
+                                                        @if(isset($details['variant_name']))
+                                                            <div class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                                                                {{ $details['variant_name'] }}
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </td>
                                             
-                                            <td class="px-4 py-3 text-center text-xs font-medium text-gray-600">
+                                            {{-- Đơn giá --}}
+                                            <td class="px-6 py-4 text-center text-sm font-medium text-gray-600 whitespace-nowrap">
                                                 {{ number_format($details['price']) }}đ
                                             </td>
 
-                                            <td class="px-4 py-3 text-center">
+                                            {{-- Số lượng --}}
+                                            <td class="px-6 py-4 text-center">
                                                 <input type="number" value="{{ $details['quantity'] }}" min="1"
-                                                    class="quantity update-cart w-14 text-center border border-gray-300 rounded py-1 focus:outline-none focus:border-blue-500 text-xs font-bold text-gray-700"
+                                                    class="quantity update-cart w-16 text-center border border-gray-300 rounded-lg py-1.5 text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm"
                                                 >
                                             </td>
 
-                                            <td class="px-4 py-3 text-center text-xs font-bold text-blue-600">
+                                            {{-- Thành tiền --}}
+                                            <td class="px-6 py-4 text-center text-sm font-bold text-blue-600 whitespace-nowrap">
                                                 {{ number_format($details['price'] * $details['quantity']) }}đ
                                             </td>
 
-                                            <td class="px-4 py-3 text-center">
-                                                <button class="remove-from-cart text-gray-400 hover:text-red-500 transition p-1.5 rounded-full hover:bg-red-50" title="Xóa">
-                                                    <i class="fas fa-trash-alt text-xs"></i>
+                                            {{-- Xóa --}}
+                                            <td class="px-6 py-4 text-center">
+                                                <button class="remove-from-cart w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition mx-auto" title="Xóa sản phẩm">
+                                                    <i class="fas fa-trash-alt text-sm"></i>
                                                 </button>
                                             </td>
                                         </tr>
                                     @endforeach
                                 @else
+                                    {{-- GIỎ HÀNG TRỐNG --}}
                                     <tr>
-                                        <td colspan="5" class="px-6 py-12 text-center">
+                                        <td colspan="5" class="px-6 py-16 text-center">
                                             <div class="flex flex-col items-center justify-center">
-                                                <i class="fas fa-shopping-basket text-6xl text-gray-200 mb-4"></i>
-                                                <p class="text-gray-500 text-sm mb-4 font-medium">Giỏ hàng của bạn đang trống!</p>
-                                                <a href="/" class="px-6 py-2 bg-blue-600 text-white font-bold rounded-full shadow hover:bg-blue-700 transition text-xs uppercase tracking-wide">
+                                                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-300 mb-4">
+                                                    <i class="fas fa-shopping-basket text-4xl"></i>
+                                                </div>
+                                                <p class="text-gray-800 text-lg font-bold mb-2">Giỏ hàng của bạn đang trống!</p>
+                                                <p class="text-gray-500 text-sm mb-6">Hãy chọn thêm sản phẩm để mua sắm nhé.</p>
+                                                <a href="/" class="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition transform hover:-translate-y-0.5 text-sm uppercase tracking-wide">
                                                     Mua sắm ngay
                                                 </a>
                                             </div>
@@ -110,21 +131,22 @@
                 </div>
                 
                 @if(session('cart'))
-                    <div class="mt-4">
-                        <a href="/" class="inline-flex items-center text-xs text-gray-500 hover:text-blue-600 font-bold transition">
-                            <i class="fas fa-long-arrow-alt-left mr-2"></i> Tiếp tục xem sản phẩm
+                    <div class="mt-6">
+                        <a href="/" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition group">
+                            <i class="fas fa-arrow-left mr-2 transform group-hover:-translate-x-1 transition"></i> Tiếp tục xem sản phẩm
                         </a>
                     </div>
                 @endif
             </div>
 
+            {{-- CỘT PHẢI: TỔNG TIỀN (SIDEBAR) --}}
             <div class="lg:col-span-4">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sticky top-24">
-                    <h2 class="text-sm font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100 uppercase tracking-wide">
-                        <i class="fas fa-calculator mr-2 text-blue-600"></i> Cộng giỏ hàng
+                <div class="bg-white rounded-xl shadow-lg border border-blue-100 p-6 sticky top-24">
+                    <h2 class="text-sm font-bold text-gray-800 mb-5 pb-3 border-b border-gray-100 uppercase tracking-wide flex items-center">
+                        <i class="fas fa-receipt mr-2 text-blue-600"></i> Cộng giỏ hàng
                     </h2>
                     
-                    <div class="space-y-3 mb-6 text-xs">
+                    <div class="space-y-3 mb-6 text-sm">
                         <div class="flex justify-between text-gray-600">
                             <span>Tạm tính:</span>
                             <span class="font-bold">{{ number_format($total) }}đ</span>
@@ -133,19 +155,19 @@
                             <span>Giảm giá:</span>
                             <span class="font-bold text-green-600">0đ</span>
                         </div>
-                        <div class="flex justify-between items-center pt-3 border-t border-dashed border-gray-200">
-                            <span class="text-sm font-bold text-gray-800">Tổng cộng:</span>
-                            <span class="text-xl font-bold text-red-600">{{ number_format($total) }}đ</span>
+                        <div class="flex justify-between items-center pt-4 border-t border-dashed border-gray-200 mt-2">
+                            <span class="text-base font-bold text-gray-800">Tổng cộng:</span>
+                            <span class="text-2xl font-extrabold text-red-600">{{ number_format($total) }}đ</span>
                         </div>
                         <p class="text-[10px] text-gray-400 text-right italic">(Đã bao gồm VAT nếu có)</p>
                     </div>
 
                     @if(session('cart') && count(session('cart')) > 0)
-                        <a href="{{ route('checkout.index') }}" class="block w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-bold text-center rounded-lg shadow-md transition transform hover:-translate-y-0.5 mb-3 text-xs uppercase tracking-wide">
+                        <a href="{{ route('checkout.index') }}" class="block w-full py-3.5 px-4 bg-red-600 hover:bg-red-700 text-white font-bold text-center rounded-xl shadow-lg transition transform hover:-translate-y-0.5 mb-3 text-sm uppercase tracking-wide">
                             Tiến hành thanh toán <i class="fas fa-arrow-right ml-2"></i>
                         </a>
                     @else
-                        <button disabled class="block w-full py-3 px-4 bg-gray-300 text-gray-500 font-bold text-center rounded-lg cursor-not-allowed mb-3 text-xs uppercase tracking-wide">
+                        <button disabled class="block w-full py-3.5 px-4 bg-gray-200 text-gray-400 font-bold text-center rounded-xl cursor-not-allowed mb-3 text-sm uppercase tracking-wide">
                             Giỏ hàng trống
                         </button>
                     @endif
@@ -156,6 +178,7 @@
     </div>
 </div>
 
+@push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
     // 1. Cập nhật số lượng (Ajax)
@@ -204,4 +227,6 @@
         }
     });
 </script>
+@endpush
+
 @endsection
