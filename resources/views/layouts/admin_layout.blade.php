@@ -5,190 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang Quản Trị - TechShop</title>
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {{-- Tailwind CSS CDN --}}
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    {{-- FontAwesome & Font --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --sidebar-collapsed: 70px; 
-            --sidebar-expanded: 260px;
-            --sidebar-bg: #0f172a;
-            --topbar-height: 60px;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Sidebar transition & width logic */
+        .sidebar { width: 70px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar:hover { width: 260px; }
+        
+        /* Main wrapper margin logic matches sidebar width */
+        .main-wrapper { margin-left: 70px; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar:hover ~ .main-wrapper { margin-left: 260px; }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #f3f4f6; 
-            overflow-x: hidden; 
-        }
-
-        /* --- SIDEBAR --- */
-        .sidebar {
-            position: fixed;
-            top: 0; left: 0; height: 100vh;
-            width: var(--sidebar-collapsed);
-            background-color: var(--sidebar-bg);
-            transition: width 0.3s ease-in-out;
-            z-index: 1000;
-            display: flex; flex-direction: column;
-            overflow: hidden;
-            border-right: 1px solid rgba(255,255,255,0.05);
-        }
-        .sidebar:hover {
-            width: var(--sidebar-expanded);
-            box-shadow: 5px 0 15px rgba(0,0,0,0.1);
-        }
-
-        /* LOGO */
-        .sidebar-header {
-            height: var(--topbar-height);
-            display: flex; align-items: center;
-            background: rgba(0,0,0,0.2);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            white-space: nowrap; overflow: hidden;
-        }
-        .logo-icon {
-            min-width: var(--sidebar-collapsed);
-            display: flex; justify-content: center;
-            font-size: 1.4rem; color: #facc15;
-        }
-        .logo-text {
-            color: #fff; font-weight: 700; font-size: 1.1rem;
-            opacity: 0; transition: opacity 0.2s 0.1s;
-        }
-        .sidebar:hover .logo-text { opacity: 1; }
-
-        /* MENU */
-        .sidebar-menu { flex-grow: 1; padding: 10px 0; overflow-y: auto; }
+        /* Hide scrollbar for sidebar menu */
         .sidebar-menu::-webkit-scrollbar { display: none; }
+        .sidebar-menu { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .menu-item {
-            display: flex; align-items: center; height: 50px;
-            color: #94a3b8; text-decoration: none;
-            transition: all 0.2s; border-left: 3px solid transparent;
-            white-space: nowrap; overflow: hidden;
-        }
-        .menu-item:hover, .menu-item.active {
-            background: rgba(255,255,255,0.05);
-            color: #fff; border-left-color: #3b82f6;
-        }
-        .menu-item i {
-            min-width: var(--sidebar-collapsed);
-            display: flex; justify-content: center; font-size: 1.2rem;
-        }
-        .menu-item span { opacity: 0; transition: opacity 0.3s; }
-        .sidebar:hover .menu-item span { opacity: 1; }
-
-        .sidebar-footer { padding-bottom: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
-
-        /* --- MAIN WRAPPER --- */
-        .main-wrapper {
-            margin-left: var(--sidebar-collapsed);
-            min-height: 100vh;
-            display: flex; flex-direction: column;
-            transition: margin-left 0.3s ease-in-out;
-        }
-        .sidebar:hover + .main-wrapper { margin-left: var(--sidebar-expanded); }
-
-        .topbar {
-            height: var(--topbar-height); background: #fff;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 25px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-            position: sticky; top: 0; z-index: 99;
-        }
-
-        .content-body { padding: 25px; flex-grow: 1; }
-        .page-content-card {
-            background: #fff; border-radius: 12px; padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #e5e7eb;
-            min-height: 100%;
-        }
+        /* Active menu item styling */
+        .menu-item.active { background-color: rgba(255,255,255,0.05); color: #fff; border-left-color: #3b82f6; }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800 overflow-x-hidden">
 
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="logo-icon"><i class="fa-regular fa-user"></i></div>
-            <span class="logo-text">ADMIN</span>
+    {{-- SIDEBAR --}}
+    <aside class="sidebar fixed top-0 left-0 h-screen bg-[#0f172a] z-50 flex flex-col overflow-hidden border-r border-white/5 shadow-xl group">
+        
+        {{-- Logo Header --}}
+        <div class="h-[60px] flex items-center bg-black/20 border-b border-white/5 whitespace-nowrap overflow-hidden flex-shrink-0">
+            <div class="min-w-[70px] flex justify-center text-xl text-yellow-400">
+                <i class="fa-regular fa-user"></i>
+            </div>
+            <span class="text-white font-bold text-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+                ADMIN
+            </span>
         </div>
 
-        <nav class="sidebar-menu">
-            <a href="/admin" class="menu-item {{ request()->is('admin') ? 'active' : '' }}">
-                <i class="fa-solid fa-screwdriver-wrench"></i>
-                <span>Xử lý lịch sửa chữa</span>
+        {{-- Menu Items --}}
+        <nav class="sidebar-menu flex-grow py-2 overflow-y-auto">
+            <a href="/admin" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden group/item {{ request()->is('admin') ? 'active' : '' }}">
+                <div class="min-w-[70px] flex justify-center text-lg">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                </div>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Xử lý lịch sửa chữa</span>
             </a>
 
-            <a href="{{ route('admin.orders.index') }}" class="menu-item {{ request()->is('admin/orders*') ? 'active' : '' }}">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Quản lý Đơn hàng</span>
+            <a href="{{ route('admin.orders.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/orders*') ? 'active' : '' }}">
+                <div class="min-w-[70px] flex justify-center text-lg">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Quản lý Đơn hàng</span>
             </a>
 
-            <a href="{{ route('categories.index') }}" class="menu-item {{ request()->is('admin/categories*') ? 'active' : '' }}">
-                <i class="fas fa-list"></i>
-                <span>Quản lý Danh mục</span>
+            <a href="{{ route('categories.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/categories*') ? 'active' : '' }}">
+                <div class="min-w-[70px] flex justify-center text-lg">
+                    <i class="fas fa-list"></i>
+                </div>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Quản lý Danh mục</span>
             </a>
             
-            <a href="{{ route('product.index_admin') }}" class="menu-item {{ request()->is('admin/products*') ? 'active' : '' }}">
-                <i class="fas fa-boxes"></i>
-                <span>Tất cả sản phẩm</span>
+            <a href="{{ route('product.index_admin') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/products*') ? 'active' : '' }}">
+                <div class="min-w-[70px] flex justify-center text-lg">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Tất cả sản phẩm</span>
             </a>
 
-            {{-- MENU TIN TỨC (NEW) --}}
-            <a href="{{ route('news.index_admin') }}" class="menu-item {{ request()->is('admin/news*') ? 'active' : '' }}">
-                <i class="fas fa-newspaper"></i>
-                <span>Quản lý Tin tức</span>
+            <a href="{{ route('news.index_admin') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/news*') ? 'active' : '' }}">
+                <div class="min-w-[70px] flex justify-center text-lg">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Quản lý Tin tức</span>
             </a>
 
-            <a href="{{ route('gallery.index') }}" class="menu-item {{ request()->is('admin/gallery*') ? 'active' : '' }}">
-                <i class="fas fa-images"></i>
-                <span>Thư viện ảnh</span>
+            <a href="{{ route('gallery.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/gallery*') ? 'active' : '' }}">
+                <div class="min-w-[70px] flex justify-center text-lg">
+                    <i class="fas fa-images"></i>
+                </div>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Thư viện ảnh</span>
             </a>
         </nav>
 
-        <div class="sidebar-footer">
-            <a href="/" target="_blank" class="menu-item">
-                <i class="fas fa-globe"></i>
-                <span>Xem trang chủ</span>
+        {{-- Footer Menu --}}
+        <div class="pb-2 border-t border-white/5">
+            <a href="/" target="_blank" class="flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden">
+                <div class="min-w-[70px] flex justify-center text-lg">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Xem trang chủ</span>
             </a>
-            <a href="/logout" class="menu-item text-danger">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Đăng xuất</span>
+            <a href="/logout" class="flex items-center h-[50px] text-red-400 hover:bg-white/5 hover:text-red-300 border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden">
+                <div class="min-w-[70px] flex justify-center text-lg">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Đăng xuất</span>
             </a>
         </div>
     </aside>
 
-    <div class="main-wrapper">
-        <header class="topbar">
-            <div class="d-flex align-items-center">
-                <h5 class="m-0 fw-bold text-secondary">Hệ Thống Quản Trị</h5>
+    {{-- MAIN CONTENT WRAPPER --}}
+    <div class="main-wrapper flex flex-col min-h-screen">
+        
+        {{-- TOPBAR --}}
+        <header class="h-[60px] bg-white flex items-center justify-between px-6 shadow-sm sticky top-0 z-40 border-b border-gray-100">
+            <div class="flex items-center">
+                <h5 class="m-0 font-bold text-gray-600 text-lg">Hệ Thống Quản Trị</h5>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <div class="text-end d-none d-sm-block">
-                    <div class="fw-bold small text-dark">Admin</div>
-                    <div class="text-success small" style="font-size: 11px;"><i class="fas fa-circle me-1"></i>Online</div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <div class="font-bold text-sm text-gray-800">Admin</div>
+                    <div class="text-green-600 text-[11px] font-medium flex items-center justify-end">
+                        <i class="fas fa-circle text-[8px] mr-1.5"></i>Online
+                    </div>
                 </div>
-                <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
-                    <i class="fas fa-user text-secondary"></i>
+                <div class="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500">
+                    <i class="fas fa-user"></i>
                 </div>
             </div>
         </header>
 
-        <main class="content-body">
+        {{-- CONTENT BODY --}}
+        <main class="flex-grow p-6">
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
-                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div id="alert-success" class="flex items-center justify-between p-4 mb-4 text-green-800 border border-green-200 rounded-lg bg-green-50 shadow-sm" role="alert">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <span class="text-sm font-medium">{{ session('success') }}</span>
+                    </div>
+                    <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8" onclick="document.getElementById('alert-success').remove()">
+                        <span class="sr-only">Close</span>
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             @endif
 
-            <div class="page-content-card">
+            <div class="bg-white rounded-xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-200 min-h-full">
                 @yield('content')
             </div>
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
