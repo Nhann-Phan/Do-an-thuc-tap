@@ -20,7 +20,7 @@ class NewsController extends Controller
                         ->latest()
                         ->paginate(9);
 
-        return view('clients.news_list', compact('newsList'));
+        return view('clients.news.news_list', compact('newsList'));
     }
 
     public function detail($id)
@@ -35,7 +35,7 @@ class NewsController extends Controller
                             ->take(5)
                             ->get();
 
-        return view('clients.news_detail', compact('news', 'relatedNews'));
+        return view('clients.news.news_detail', compact('news', 'relatedNews'));
     }
 
     // ==========================================
@@ -111,7 +111,7 @@ class NewsController extends Controller
             if ($news->image && File::exists(public_path($news->image))) {
                 File::delete(public_path($news->image));
             }
-            
+
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/news'), $filename);

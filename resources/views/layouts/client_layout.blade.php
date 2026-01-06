@@ -73,8 +73,37 @@
                 {{-- Desktop Menu --}}
                 <div class="flex items-center space-x-8 ml-auto">
                     <nav class="hidden md:flex space-x-8 font-medium text-sm uppercase text-gray-600 items-center h-full">
-                        <a href="/" class="hover:text-blue-700 transition hover-underline-animation py-1">Trang chủ</a>
-                        <a href="#" class="hover:text-blue-700 transition hover-underline-animation py-1">Giới thiệu</a>
+                        {{-- ... --}}
+<a href="/" class="hover:text-blue-700 transition hover-underline-animation py-1">Trang chủ</a>
+
+{{-- MENU GIỚI THIỆU (DROPDOWN ĐỘNG) --}}
+<div class="group relative h-full flex items-center">
+    <a href="#" class="hover:text-blue-700 transition hover-underline-animation py-1 flex items-center cursor-pointer">
+        Giới thiệu <i class="fas fa-chevron-down ml-1 text-[10px] transition-transform group-hover:rotate-180"></i>
+    </a>
+    
+    {{-- Dropdown Content --}}
+    <div class="absolute top-full left-0 w-64 invisible opacity-0 translate-y-3 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out z-50 shadow-xl bg-white border-t-2 border-blue-600 rounded-b-lg overflow-hidden">
+        {{-- Khoảng trống vô hình để chuột không bị mất hover khi di chuyển xuống --}}
+        <div class="absolute -top-4 left-0 w-full h-4 bg-transparent"></div>
+
+        <ul class="py-1 text-left">
+            @if(isset($introPages) && $introPages->count() > 0)
+                @foreach($introPages as $page)
+                    <li>
+                        <a href="{{ route('client.page.detail', $page->slug) }}" class="block px-5 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition border-b border-gray-50 last:border-0">
+                            <i class="fas fa-angle-right mr-2 text-xs text-gray-300"></i> {{ $page->title }}
+                        </a>
+                    </li>
+                @endforeach
+            @else
+                {{-- Hiển thị nếu chưa có dữ liệu --}}
+                <li><span class="block px-5 py-3 text-sm text-gray-400 italic">Đang cập nhật...</span></li>
+            @endif
+        </ul>
+    </div>
+</div>
+{{-- ... --}}
 
                         {{-- Mega Menu Sản Phẩm --}}
                         {{-- Class 'static' ở đây rất quan trọng để nó căn theo container cha --}}
@@ -250,7 +279,7 @@
         
         {{-- Chat Button --}}
         <div class="fixed bottom-8 right-6 z-40 print:hidden">
-            <button id="chat-btn" onclick="toggleChat()" class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] flex items-center justify-center w-14 h-14 transition transform hover:scale-110 active:scale-95">
+            <button id="chat-btn" onclick="toggleChat()" class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] flex items-center justify-center w-14 h-14 transition transform hover:scale-110 active:scale-95    ">
                 <i class="fas fa-comment-dots text-2xl"></i>
             </button>
         </div>

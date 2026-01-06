@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View; // 1. Import View
 use App\Models\Category; // 2. Import Model Category
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\URL;
+use App\Models\Page; // Import Model Page
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,8 +24,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Dùng Bootstrap cho phân trang (nếu bạn dùng paginate)
-        Paginator::useBootstrap();
+        View::composer('*', function ($view) {
+            $introPages = Page::where('is_active', true)
+                              ->orderBy('position', 'asc')
+                              ->get();
+            $view->with('introPages', $introPages);
+        });
+
+        // Nếu đang chạy ngrok (hoặc môi trường production), ép dùng HTTPS
+        if($this->app->environment('production') || str_contains(request()->url(), 'ngrok-free.app')) {
+            URL::forceScheme('https');
+    }
 
         // 3. CHIA SẺ BIẾN $menuCategories CHO TẤT CẢ CÁC VIEW
         // Dùng try-catch để tránh lỗi khi chạy lệnh migrate lúc chưa có bảng dữ liệu

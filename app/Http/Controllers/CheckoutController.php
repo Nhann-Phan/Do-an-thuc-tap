@@ -16,7 +16,7 @@ class CheckoutController extends Controller
         if (count($cart) == 0) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng đang trống!');
         }
-        return view('clients.checkout', compact('cart'));
+        return view('clients.cart.checkout', compact('cart'));
     }
 
     public function process(Request $request)

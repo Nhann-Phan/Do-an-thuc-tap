@@ -83,6 +83,15 @@
                 <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Quản lý Tin tức</span>
             </a>
 
+            {{-- --- MỤC MỚI: QUẢN LÝ TRANG (PAGES) --- --}}
+            <a href="{{ route('pages.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/pages*') ? 'active' : '' }}">
+                <div class="min-w-[70px] flex justify-center text-lg">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Quản lý Trang (Giới thiệu)</span>
+            </a>
+            {{-- ------------------------------------- --}}
+
             <a href="{{ route('gallery.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/gallery*') ? 'active' : '' }}">
                 <div class="min-w-[70px] flex justify-center text-lg">
                     <i class="fas fa-images"></i>

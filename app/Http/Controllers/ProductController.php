@@ -42,7 +42,7 @@ class ProductController extends Controller
                            ->get();
 
         $menuCategories = Category::whereNull('parent_id')->with('children')->get();
-        return view('clients.category_products', compact('products', 'menuCategories', 'currentCategory'));
+        return view('clients.category.category_products', compact('products', 'menuCategories', 'currentCategory'));
     }
 
     public function show($id)
@@ -77,7 +77,7 @@ class ProductController extends Controller
 
         $menuCategories = Category::whereNull('parent_id')->with('children')->get();
         
-        return view('clients.product_detail', compact('product', 'menuCategories', 'relatedProducts'));
+        return view('clients.category.product_detail', compact('product', 'menuCategories', 'relatedProducts'));
     }
 
     // ==========================================

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 // --- IMPORT CÁC CONTROLLER ---
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProductController; 
@@ -13,15 +14,22 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ChatbotController; 
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Admin\PageController; // Import Controller quản lý trang giới thiệu
+use App\Http\Controllers\Admin\PageSectionController;
 
 // ====================================================
 // 1. KHU VỰC CÔNG KHAI (KHÁCH HÀNG)
 // ====================================================
 
 // --- Trang chủ & Sản phẩm ---
-Route::get('/', [ProductController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('home'); // Sử dụng HomeController cho trang chủ
+Route::get('/san-pham', [ProductController::class, 'index']); // Trang danh sách sản phẩm (nếu có)
 Route::get('/danh-muc/{id}', [ProductController::class, 'showByCategory'])->name('frontend.category.show');
 Route::get('/san-pham/{id}', [ProductController::class, 'show'])->name('product.detail');
+
+// --- Trang Giới thiệu (Pages) ---
+Route::get('/gioi-thieu/{slug}', [HomeController::class, 'showPage'])->name('client.page.detail');
 
 // --- Tin tức (News) ---
 Route::get('/tin-tuc', [NewsController::class, 'index'])->name('news.index');       // Danh sách tin
@@ -78,6 +86,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::delete('/{id}', 'destroy')->name('destroy'); // admin/news/{id}
     });
 
+    // --- Quản lý Trang Giới thiệu (Pages) ---
+    Route::resource('pages', PageController::class);
+
     // --- Quản lý Thư viện ảnh ---
     Route::controller(GalleryController::class)->prefix('gallery')->name('gallery.')->group(function () {
         Route::get('/', 'index')->name('index');
@@ -114,4 +125,27 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::post('/{id}/status', 'updateStatus')->name('update_status');
         Route::delete('/{id}', 'destroy')->name('destroy');
     });
+});
+
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    
+    // ... Các route cũ ...
+
+    // Route quản lý trang đơn (Giới thiệu)
+    Route::resource('pages', PageController::class);
+
+    // Quản lý Sections (Các khối nội dung chi tiết)
+    Route::controller(PageSectionController::class)->group(function () {
+        // Danh sách & Thêm mới
+        Route::get('pages/{page}/sections', 'index')->name('page_sections.index');
+        Route::post('pages/{page}/sections', 'store')->name('page_sections.store');
+        
+        // Sửa & Cập nhật (Đây là phần bạn đang thiếu/lỗi)
+        Route::get('page-sections/{section}/edit', 'edit')->name('page_sections.edit');
+        Route::put('page-sections/{section}', 'update')->name('page_sections.update');
+        
+        // Xóa
+        Route::delete('page-sections/{section}', 'destroy')->name('page_sections.destroy');
+    });
+
 });
