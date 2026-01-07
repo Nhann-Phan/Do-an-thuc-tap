@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\News;
 use App\Models\Page;
-// use App\Models\Gallery; // Tạm thời comment dòng này nếu chưa tạo Model Gallery
+use App\Models\ProjectImage;
 
 class HomeController extends Controller
 {
@@ -24,8 +24,8 @@ class HomeController extends Controller
                           ->get();
 
         // 3. Lấy hình ảnh dự án (Xử lý an toàn khi chưa có Gallery)
-        // $projectImages = \App\Models\Gallery::inRandomOrder()->take(6)->get(); 
-        $projectImages = collect([]); // Trả về rỗng để không gây lỗi view
+        $projectImages = ProjectImage::latest()->take(6)->get(); 
+        // $projectImages = collect([]); // Trả về rỗng để không gây lỗi view
 
         return view('clients.store', compact('products', 'latestNews', 'projectImages'));
     }
