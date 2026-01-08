@@ -40,13 +40,28 @@ class PageSectionController extends Controller
                 $data['image'] = '/uploads/sections/' . $filename;
             }
         } 
+        elseif ($request->type == 'intro') {
+            // --- XỬ LÝ CHO KHỐI INTRO (MỚI) ---
+            $data['content'] = $input['intro_content'] ?? '';
+            $data['slogan'] = $input['intro_slogan'] ?? '';
+            $data['button_text'] = $input['intro_btn_text'] ?? '';
+            $data['button_link'] = $input['intro_btn_link'] ?? '';
+
+            // Upload Logo
+            if ($request->hasFile('intro_logo')) {
+                $file = $request->file('intro_logo');
+                $filename = time() . '_logo_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads/sections'), $filename);
+                $data['image'] = '/uploads/sections/' . $filename;
+            }
+        }
         elseif ($request->type == 'cta') {
             $data['subtext'] = $input['cta_subtext'] ?? '';
             $data['button_text'] = $input['cta_btn_text'] ?? '';
             $data['button_link'] = $input['cta_btn_link'] ?? '';
         }
         elseif ($request->type == 'stats') {
-            // Xử lý mảng thống kê (giả sử nhập 4 ô cố định từ form)
+            // Xử lý mảng thống kê
             $stats = [];
             if(isset($input['stat_number'])) {
                 foreach($input['stat_number'] as $key => $val) {
@@ -73,24 +88,14 @@ class PageSectionController extends Controller
         return redirect()->back()->with('success', 'Đã thêm khối nội dung thành công!');
     }
 
-    // Xóa Section
-    public function destroy($id)
-    {
-        $section = PageSection::findOrFail($id);
-        $section->delete();
-        return redirect()->back()->with('success', 'Đã xóa khối nội dung.');
-    }
-
-    // ... các hàm index, store, destroy cũ giữ nguyên ...
-
-    // 1. Hàm hiển thị form sửa
+    // Hiển thị form sửa
     public function edit($id)
     {
         $section = PageSection::findOrFail($id);
         return view('admin.page_sections.edit', compact('section'));
     }
 
-    // 2. Hàm thực hiện cập nhật
+    // Thực hiện cập nhật
     public function update(Request $request, $id)
     {
         $section = PageSection::findOrFail($id);
@@ -108,7 +113,6 @@ class PageSectionController extends Controller
             $data['content'] = $input['content_text'] ?? $data['content'] ?? '';
             $data['layout'] = $input['layout'] ?? $data['layout'] ?? 'image_right';
             
-            // Upload ảnh mới nếu có
             if ($request->hasFile('image_file')) {
                 $file = $request->file('image_file');
                 $filename = time() . '_' . $file->getClientOriginalName();
@@ -116,6 +120,20 @@ class PageSectionController extends Controller
                 $data['image'] = '/uploads/sections/' . $filename;
             }
         } 
+        elseif ($section->type == 'intro') {
+            // --- CẬP NHẬT CHO KHỐI INTRO (MỚI) ---
+            $data['content'] = $input['intro_content'] ?? $data['content'] ?? '';
+            $data['slogan'] = $input['intro_slogan'] ?? $data['slogan'] ?? '';
+            $data['button_text'] = $input['intro_btn_text'] ?? $data['button_text'] ?? '';
+            $data['button_link'] = $input['intro_btn_link'] ?? $data['button_link'] ?? '';
+
+            if ($request->hasFile('intro_logo')) {
+                $file = $request->file('intro_logo');
+                $filename = time() . '_logo_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads/sections'), $filename);
+                $data['image'] = '/uploads/sections/' . $filename;
+            }
+        }
         elseif ($section->type == 'cta') {
             $data['subtext'] = $input['cta_subtext'] ?? '';
             $data['button_text'] = $input['cta_btn_text'] ?? '';
@@ -145,5 +163,13 @@ class PageSectionController extends Controller
 
         return redirect()->route('page_sections.index', $section->page_id)
                          ->with('success', 'Đã cập nhật khối thành công!');
+    }
+
+    // Xóa Section
+    public function destroy($id)
+    {
+        $section = PageSection::findOrFail($id);
+        $section->delete();
+        return redirect()->back()->with('success', 'Đã xóa khối nội dung.');
     }
 }

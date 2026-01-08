@@ -74,7 +74,7 @@ class PageController extends Controller
         // 1. Validate
         $request->validate([
             'title' => 'required|max:255',
-            'content' => 'required',
+            'content' => 'nullable',
             // Slug phải là duy nhất, ngoại trừ chính id hiện tại
             'slug' => 'required|unique:pages,slug,' . $id,
         ], [
@@ -104,4 +104,15 @@ class PageController extends Controller
 
         return redirect()->route('pages.index')->with('success', 'Đã xóa trang thành công!');
     }
+
+    public function toggleMenu(Request $request, $id)
+{
+    $page = Page::find($id);
+    if ($page) {
+        $page->show_in_menu = $request->show_in_menu;
+        $page->save();
+        return response()->json(['success' => true, 'message' => 'Cập nhật thành công']);
+    }
+    return response()->json(['success' => false, 'message' => 'Không tìm thấy trang'], 404);
+}
 }

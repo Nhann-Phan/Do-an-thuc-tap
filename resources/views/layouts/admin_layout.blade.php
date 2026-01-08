@@ -88,7 +88,7 @@
                 <div class="min-w-[70px] flex justify-center text-lg">
                     <i class="fas fa-file-alt"></i>
                 </div>
-                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Quản lý Trang (Giới thiệu)</span>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Thông tin Công ty</span>
             </a>
             {{-- ------------------------------------- --}}
 

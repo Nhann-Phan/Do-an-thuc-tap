@@ -2,7 +2,7 @@
 
 @section('content')
 
-    {{-- 1. HERO BANNER (Đã sửa lỗi layout) --}}
+    {{-- 1. HERO BANNER --}}
     <div class="relative bg-gray-900 h-[400px] md:h-[500px] overflow-hidden group">
         {{-- Ảnh nền --}}
         <div class="absolute inset-0 w-full h-full overflow-hidden">
@@ -10,7 +10,7 @@
                  class="w-full h-full object-cover opacity-60 transform group-hover:scale-105 transition duration-[2s]">
         </div>
         
-        {{-- Nội dung đè lên (Đã sửa: bỏ class 'relative' thừa gây lỗi) --}}
+        {{-- Nội dung đè lên --}}
         <div class="absolute inset-0 z-10 flex items-center">
             <div class="container mx-auto px-4">
                 <div class="max-w-2xl text-white animate-fade-in">
@@ -32,7 +32,7 @@
         <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-slate-50 to-transparent z-10"></div>
     </div>  
 
-    {{-- 2. GIỚI THIỆU (INTRO) --}}
+    {{-- 2. GIỚI THIỆU (INTRO) - DỮ LIỆU ĐỘNG TỪ ADMIN --}}
     <section class="py-16 md:py-24 bg-slate-50 relative overflow-hidden">
         {{-- Background Decoration --}}
         <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
@@ -40,10 +40,18 @@
             <i class="fas fa-share-alt text-[200px] absolute -bottom-10 -right-10 text-gray-200 opacity-30 -rotate-12"></i>
         </div>
 
+        {{-- Logic lấy dữ liệu section intro --}}
+        @php
+            $introSection = $page?->sections->where('type', 'intro')->first();
+            $data = $introSection?->data ?? [];
+        @endphp
+
         <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-16">
                 <span class="text-blue-600 font-bold tracking-wider uppercase text-sm">Về chúng tôi</span>
-                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mt-2 uppercase tracking-wide">Giới thiệu công ty</h2>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mt-2 uppercase tracking-wide">
+                    {{ $introSection->title ?? 'Giới thiệu công ty' }}
+                </h2>
                 <div class="w-24 h-1.5 bg-blue-600 mx-auto mt-4 rounded-full"></div>
             </div>
 
@@ -53,12 +61,20 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
                     {{-- Text Content --}}
                     <div class="space-y-6 text-gray-600 text-justify leading-relaxed">
-                        <p class="text-lg">
-                            Công ty TNHH MTV Thiết bị và phần mềm <span class="font-bold text-blue-700">GPM Việt Nam</span> tự hào là đơn vị tiên phong trong lĩnh vực công nghệ thông tin tại khu vực, chuyên cung cấp các giải pháp chuyển đổi số toàn diện.
-                        </p>
-                        <p>
-                            Với đội ngũ kỹ sư giàu kinh nghiệm, nhiệt huyết và am hiểu thị trường địa phương, chúng tôi cam kết mang đến những sản phẩm chất lượng cao, vận hành ổn định với chi phí tối ưu nhất cho doanh nghiệp của bạn.
-                        </p>
+                        <div class="prose prose-lg text-gray-600 max-w-none">
+                            @if(!empty($data['content']))
+                                {{-- Hiển thị nội dung từ Admin --}}
+                                {!! nl2br(e($data['content'])) !!}
+                            @else
+                                {{-- Nội dung mặc định nếu chưa nhập --}}
+                                <p class="text-lg">
+                                    Công ty TNHH MTV Thiết bị và phần mềm <span class="font-bold text-blue-700">GPM Việt Nam</span> tự hào là đơn vị tiên phong trong lĩnh vực công nghệ thông tin tại khu vực, chuyên cung cấp các giải pháp chuyển đổi số toàn diện.
+                                </p>
+                                <p>
+                                    Với đội ngũ kỹ sư giàu kinh nghiệm, nhiệt huyết và am hiểu thị trường địa phương, chúng tôi cam kết mang đến những sản phẩm chất lượng cao, vận hành ổn định với chi phí tối ưu nhất cho doanh nghiệp của bạn.
+                                </p>
+                            @endif
+                        </div>
                         
                         <div class="pt-6 mt-4 border-t border-gray-100">
                             <div class="flex items-start text-sm font-medium text-gray-500">
@@ -73,16 +89,22 @@
                     {{-- Logo / Branding Box --}}
                     <div class="flex justify-center items-center">
                         <div class="text-center p-8 rounded-2xl bg-slate-50 border border-slate-100 shadow-inner transform hover:scale-105 transition duration-500 w-full max-w-sm">
-                            <div class="inline-flex items-center justify-center mb-6">
-                                <i class="fas fa-chart-pie text-6xl text-blue-600 mr-3"></i> 
-                                <div class="flex flex-col items-start">
-                                    <span class="text-5xl font-black text-gray-800 tracking-tighter leading-none">GPM</span>
-                                    <span class="text-xs font-bold text-blue-600 tracking-[0.3em] uppercase">Technology</span>
-                                </div>
+                            <div class="inline-flex items-center justify-center">
+                                @if(!empty($data['image']))
+                                    <img src="{{ asset($data['image']) }}" alt="Logo" class="h-20 object-contain" style="height: 50%;">
+                                @else
+                                    <i class="fas fa-chart-pie text-6xl text-blue-600 mr-3"></i> 
+                                    <div class="flex flex-col items-start">
+                                        <span class="text-5xl font-black text-gray-800 tracking-tighter leading-none">GPM</span>
+                                        <span class="text-xs font-bold text-blue-600 tracking-[0.3em] uppercase">Technology</span>
+                                    </div>
+                                @endif
                             </div>
-                            <div class="text-lg font-bold text-gray-700 mb-6">GIẢI PHÁP - CÔNG NGHỆ - TƯƠNG LAI</div>
-                            <a href="#" class="inline-block px-8 py-3 bg-white border-2 border-blue-600 text-blue-600 font-bold rounded-full hover:bg-blue-600 hover:text-white transition duration-300 shadow-sm hover:shadow-md">
-                                XEM CHI TIẾT
+                            <div class="text-lg font-bold text-gray-700 mb-6 uppercase">
+                                {{ $data['slogan'] ?? 'GIẢI PHÁP - CÔNG NGHỆ - TƯƠNG LAI' }}
+                            </div>
+                            <a href="{{ $data['button_link'] ?? '#' }}" class="inline-block px-8 py-3 bg-white border-2 border-blue-600 text-blue-600 font-bold rounded-full hover:bg-blue-600 hover:text-white transition duration-300 shadow-sm hover:shadow-md">
+                                {{ $data['button_text'] ?? 'XEM CHI TIẾT' }}
                             </a>
                         </div>
                     </div>
@@ -119,7 +141,7 @@
             {{-- Slider --}}
             <div class="swiper myProductSwiper !pb-12 px-1">
                 <div class="swiper-wrapper">
-                    @for ($i = 0; $i < 4; $i++) {{-- Loop demo --}}
+                    @for ($i = 0; $i < 4; $i++) {{-- Loop demo để test slider nếu ít sản phẩm --}}
                         @foreach($products as $product)
                             @if($product->is_hot || (isset($product->status) && $product->status == 'hot')) 
                             <div class="swiper-slide h-auto">
@@ -195,6 +217,7 @@
             <div class="swiper myProjectSwiper !pb-12 px-1"> 
                 <div class="swiper-wrapper">
                     @if(isset($projectImages) && count($projectImages) > 0)
+                        {{-- Loop demo để slider chạy đẹp nếu ít ảnh --}}
                         @for($i = 0; $i < (count($projectImages) < 4 ? 4 : 1); $i++)
                             @foreach($projectImages as $img)
                             <div class="swiper-slide">

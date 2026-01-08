@@ -3,39 +3,38 @@
 @section('content')
 
 {{-- 1. HEADER / BREADCRUMB --}}
-<div class="bg-gray-50 border-b border-gray-200">
-    <div class="container mx-auto px-4 py-12">
-        <div class="text-center max-w-4xl mx-auto">
-            <nav class="flex justify-center text-sm text-gray-500 mb-4 space-x-2 font-medium">
-                <a href="/" class="hover:text-blue-600 transition">Trang chủ</a>
-                <span>/</span>
-                <span class="text-gray-400">Giới thiệu</span>
-                <span>/</span>
-                <span class="text-blue-600 font-bold">{{ $page->title }}</span>
-            </nav>
-            <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight mb-6 leading-tight uppercase">
+<nav class="bg-gray-50 border-b border-gray-200 py-4">
+    <div class="container mx-auto px-4">
+        <ol class="flex text-sm text-gray-500 items-center gap-2 overflow-hidden whitespace-nowrap">
+            <li>
+                <a href="/" class="hover:text-blue-600 transition flex items-center">
+                    <i class="fas fa-home mr-1.5"></i> Trang chủ
+                </a>
+            </li>
+            <li class="text-gray-300"><i class="fa-solid fa-angle-right text-xs"></i></li>
+            <li>
+                <span class="hover:text-blue-600 transition cursor-default">Giới thiệu</span>
+            </li>
+            <li class="text-gray-300"><i class="fa-solid fa-angle-right text-xs"></i></li>
+            <li class="text-blue-600 font-bold truncate max-w-[200px] md:max-w-md" title="{{ $page->title }}">
                 {{ $page->title }}
-            </h1>
-            
-            @if($page->summary)
-                <p class="text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto italic">
-                    "{{ $page->summary }}"
-                </p>
-            @endif
-        </div>
+            </li>
+        </ol>
     </div>
-</div>
+</nav>
 
 {{-- 2. NỘI DUNG CHÍNH (CONTENT GỐC TỪ EDITOR) --}}
-@if($page->content)
-<div class="container mx-auto px-4 py-12">
-    <div class="prose prose-lg prose-blue max-w-4xl mx-auto text-gray-700 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-        {!! $page->content !!}
+@if(!empty($page->content) && trim(strip_tags($page->content)) != '')
+    
+    <div class="container mx-auto px-4 py-12">
+        <div class="prose prose-lg prose-blue max-w-4xl mx-auto text-gray-700 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+            {!! $page->content !!}
+        </div>
     </div>
-</div>
+
 @endif
 
-{{-- 3. RENDER CÁC SECTIONS ĐỘNG (Kiểm tra xem có sections không trước khi loop) --}}
+{{-- 3. RENDER CÁC SECTIONS ĐỘNG --}}
 @if(isset($page->sections) && $page->sections->count() > 0)
     <div class="flex flex-col gap-0">
         @foreach($page->sections as $section)
@@ -103,8 +102,53 @@
                     </div>
                 </section>
 
-            @endif
+            {{-- === TYPE: INTRO (Giới thiệu công ty - Card bên phải) === --}}
+            @elseif($section->type == 'intro')
+                <section class="py-16 bg-white">
+                    <div class="container mx-auto px-4">
+                        <div class="flex flex-col lg:flex-row items-center gap-12">
+                            
+                            {{-- CỘT TRÁI: Nội dung văn bản --}}
+                            <div class="lg:w-1/2">
+                                <div class="prose prose-lg text-gray-600 leading-relaxed text-justify">
+                                    {!! nl2br(e($section->data['content'] ?? '')) !!}
+                                </div>
+                                
+                                {{-- Ví dụ fix cứng icon địa chỉ nếu muốn đẹp như hình --}}
+                                <div class="mt-8 flex items-start gap-3 bg-blue-50 p-4 rounded-lg">
+                                    <div class="text-blue-600 mt-1"><i class="fas fa-map-marker-alt"></i></div>
+                                    <div class="text-sm text-gray-700 font-medium">
+                                        38 đường số 9, KĐT Tây Sông Hậu, Long Xuyên, An Giang
+                                    </div>
+                                </div>
+                            </div>
 
+                            {{-- CỘT PHẢI: Card Logo & Button --}}
+                            <div class="lg:w-1/2 w-full">
+                                <div class="bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] p-8 md:p-12 text-center border border-gray-100 max-w-md mx-auto lg:ml-auto">
+                                    
+                                    {{-- Logo --}}
+                                    @if(!empty($section->data['image']))
+                                        <img src="{{ asset($section->data['image']) }}" alt="Logo" class="h-16 mx-auto mb-6 object-contain">
+                                    @endif
+
+                                    {{-- Slogan --}}
+                                    <h3 class="text-gray-800 font-bold uppercase tracking-wider mb-8 text-sm md:text-base">
+                                        {{ $section->data['slogan'] ?? 'GIẢI PHÁP - CÔNG NGHỆ - TƯƠNG LAI' }}
+                                    </h3>
+
+                                    {{-- Button --}}
+                                    <a href="{{ $section->data['button_link'] ?? '#' }}" class="inline-block px-8 py-3 border-2 border-blue-600 text-blue-600 font-bold rounded-full hover:bg-blue-600 hover:text-white transition duration-300">
+                                        {{ $section->data['button_text'] ?? 'XEM CHI TIẾT' }}
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            @endif {{-- QUAN TRỌNG: Đã thêm thẻ đóng logic IF ở đây --}}
+        
         @endforeach
     </div>
 @endif

@@ -74,36 +74,33 @@
                 <div class="flex items-center space-x-8 ml-auto">
                     <nav class="hidden md:flex space-x-8 font-medium text-sm uppercase text-gray-600 items-center h-full">
                         {{-- ... --}}
-<a href="/" class="hover:text-blue-700 transition hover-underline-animation py-1">Trang chủ</a>
+            <a href="/" class="hover:text-blue-700 transition hover-underline-animation py-1">Trang chủ</a>
 
-{{-- MENU GIỚI THIỆU (DROPDOWN ĐỘNG) --}}
-<div class="group relative h-full flex items-center">
-    <a href="#" class="hover:text-blue-700 transition hover-underline-animation py-1 flex items-center cursor-pointer">
-        Giới thiệu <i class="fas fa-chevron-down ml-1 text-[10px] transition-transform group-hover:rotate-180"></i>
-    </a>
-    
-    {{-- Dropdown Content --}}
-    <div class="absolute top-full left-0 w-64 invisible opacity-0 translate-y-3 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out z-50 shadow-xl bg-white border-t-2 border-blue-600 rounded-b-lg overflow-hidden">
-        {{-- Khoảng trống vô hình để chuột không bị mất hover khi di chuyển xuống --}}
-        <div class="absolute -top-4 left-0 w-full h-4 bg-transparent"></div>
-
-        <ul class="py-1 text-left">
-            @if(isset($introPages) && $introPages->count() > 0)
-                @foreach($introPages as $page)
-                    <li>
-                        <a href="{{ route('client.page.detail', $page->slug) }}" class="block px-5 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition border-b border-gray-50 last:border-0">
-                            <i class="fas fa-angle-right mr-2 text-xs text-gray-300"></i> {{ $page->title }}
-                        </a>
-                    </li>
-                @endforeach
-            @else
-                {{-- Hiển thị nếu chưa có dữ liệu --}}
-                <li><span class="block px-5 py-3 text-sm text-gray-400 italic">Đang cập nhật...</span></li>
-            @endif
-        </ul>
-    </div>
-</div>
-{{-- ... --}}
+            {{-- MENU GIỚI THIỆU (DROPDOWN ĐỘNG) --}}
+            <div class="group relative h-full flex items-center">
+                <a href="#" class="hover:text-blue-700 transition hover-underline-animation py-1 flex items-center cursor-pointer">
+                    Giới thiệu <i class="fas fa-chevron-down ml-1 text-[10px] transition-transform group-hover:rotate-180"></i>
+                </a>
+                
+                {{-- Dropdown Content --}}
+                <div class="absolute left-0 w-64 invisible opacity-0 translate-y-3 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out z-50 top-full pt-5">
+                    <div class="bg-white shadow-xl rounded-b-lg overflow-hidden">
+                        <ul class="py-1 text-left">
+                            @if(isset($introPages) && $introPages->count() > 0)
+                                @foreach($introPages as $page)
+                                    <li>
+                                        <a href="{{ route('client.page.detail', $page->slug) }}" class="block px-5 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition border-b border-gray-50 last:border-0">
+                                            <i class="fas fa-angle-right mr-2 text-xs text-gray-300"></i> {{ $page->title }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            @else
+                                <li><span class="block px-5 py-3 text-sm text-gray-400 italic">Đang cập nhật...</span></li>
+                            @endif
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
                         {{-- Mega Menu Sản Phẩm --}}
                         {{-- Class 'static' ở đây rất quan trọng để nó căn theo container cha --}}
@@ -158,7 +155,7 @@
                             </div>
                         </div>
 
-                        <a href="#gallery" class="hover:text-blue-700 transition hover-underline-animation py-1">Dự án</a>
+                        <a href="/#gallery" class="hover:text-blue-700 transition hover-underline-animation py-1">Dự án</a>
                         <a href="{{ route('news.index') }}" class="hover:text-blue-700 transition hover-underline-animation py-1">Tin tức</a>
                         <a href="#footer" class="hover:text-blue-700 transition hover-underline-animation py-1">Liên hệ</a>
                     </nav>

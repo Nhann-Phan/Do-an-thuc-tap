@@ -149,3 +149,5 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     });
 
 });
+
+Route::patch('/admin/pages/{id}/toggle-menu', [PageController::class, 'toggleMenu'])->name('pages.toggle-menu');

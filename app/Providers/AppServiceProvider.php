@@ -24,17 +24,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // --- CẬP NHẬT Ở ĐÂY ---
         View::composer('*', function ($view) {
             $introPages = Page::where('is_active', true)
+                              ->where('show_in_menu', true) // <--- THÊM DÒNG NÀY: Chỉ lấy trang được phép hiện menu
                               ->orderBy('position', 'asc')
                               ->get();
             $view->with('introPages', $introPages);
         });
+        // ----------------------
 
         // Nếu đang chạy ngrok (hoặc môi trường production), ép dùng HTTPS
         if($this->app->environment('production') || str_contains(request()->url(), 'ngrok-free.app')) {
             URL::forceScheme('https');
-    }
+        }
 
         // 3. CHIA SẺ BIẾN $menuCategories CHO TẤT CẢ CÁC VIEW
         // Dùng try-catch để tránh lỗi khi chạy lệnh migrate lúc chưa có bảng dữ liệu
