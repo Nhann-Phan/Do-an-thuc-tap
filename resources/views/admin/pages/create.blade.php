@@ -54,11 +54,6 @@
                 </div>
 
                 <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
-                    <label class="block text-gray-700 font-bold mb-2">Mô tả ngắn (Sapo)</label>
-                    <textarea name="summary" rows="5" class="w-full border border-gray-300 p-3 rounded text-sm focus:border-blue-500 focus:outline-none" placeholder="Mô tả ngắn gọn về trang này (Tốt cho SEO)..."></textarea>
-                </div>
-
-                <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
                     <div class="mb-5">
                         <label class="block text-gray-700 font-bold mb-2">Thứ tự hiển thị</label>
                         <input type="number" name="position" value="0" class="w-full border border-gray-300 p-2 rounded">

@@ -10,12 +10,13 @@ use Illuminate\Support\Facades\File;
 class NewsController extends Controller
 {
     // ==========================================
-    // PHẦN 1: CLIENT (KHÁCH HÀNG)
+    // PHẦN 1: CLIENT (GIAO DIỆN KHÁCH HÀNG)
     // ==========================================
 
     public function index()
     {
-        // Lấy tất cả tin tức active, mới nhất lên đầu, phân trang 9 bài mỗi trang
+        // paginate() luôn trả về object, kể cả khi không có bài nào
+        // Nên bên view không bao giờ bị lỗi null
         $newsList = News::where('is_active', 1)
                         ->latest()
                         ->paginate(9);
@@ -23,14 +24,18 @@ class NewsController extends Controller
         return view('clients.news.news_list', compact('newsList'));
     }
 
-    public function detail($id)
+    public function detail($slug)
     {
-        // Tìm bài viết theo ID, nếu không thấy thì báo lỗi 404
-        $news = News::where('is_active', 1)->findOrFail($id);
+        // Tìm bài viết theo slug, nếu không thấy thì báo lỗi 404 (Trang không tồn tại)
+        // firstOrFail() là bắt buộc để tránh vào trang chi tiết trắng trơn
+        $news = News::where('is_active', 1)
+                    ->where('slug', $slug)
+                    ->firstOrFail();
 
-        // Lấy thêm các tin khác để hiển thị ở cột bên phải (trừ bài đang xem)
+        // Lấy tin liên quan (trừ bài đang xem)
+        // get() trả về collection rỗng nếu không có tin nào khác -> Không lỗi
         $relatedNews = News::where('is_active', 1)
-                            ->where('id', '!=', $id)
+                            ->where('id', '!=', $news->id)
                             ->latest()
                             ->take(5)
                             ->get();
@@ -39,81 +44,90 @@ class NewsController extends Controller
     }
 
     // ==========================================
-    // PHẦN 2: ADMIN (QUẢN TRỊ)
+    // PHẦN 2: ADMIN (QUẢN TRỊ VIÊN)
     // ==========================================
 
     // 1. DANH SÁCH TIN TỨC
     public function indexAdmin()
     {
+        // Admin cần xem cả tin ẩn và hiện nên không where is_active
         $newsList = News::latest()->paginate(10);
         
-        // SỬA LỖI: Trỏ đúng vào thư mục admin/news/index.blade.php
         return view('admin.news.news_list', compact('newsList'));
     }
 
-    // 2. HIỂN THỊ FORM THÊM MỚI
+    // 2. FORM THÊM MỚI
     public function create()
     {
-        // SỬA LỖI: Trỏ đúng vào thư mục admin/news/create.blade.php
         return view('admin.news.news_create');
     }
 
-    // 3. LƯU TIN TỨC MỚI
+    // 3. LƯU TIN MỚI
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'summary' => 'nullable|max:500',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ], [
+            'title.required' => 'Vui lòng nhập tiêu đề bài viết',
+            'image.image' => 'File tải lên phải là hình ảnh',
+            'image.max' => 'Ảnh không được quá 2MB'
         ]);
 
-        $data = $request->all();
+        $data = $request->except('image');
+        
+        // Tạo slug từ tiêu đề + timestamp để tránh trùng lặp
         $data['slug'] = Str::slug($request->title) . '-' . time();
         $data['is_active'] = $request->has('is_active') ? 1 : 0;
 
+        // Xử lý upload ảnh
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            // Đặt tên file an toàn (slug hóa tên file)
+            $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/news'), $filename);
             $data['image'] = 'uploads/news/' . $filename;
         }
 
         News::create($data);
 
-        // Chuyển hướng về trang danh sách sau khi thêm xong
         return redirect()->route('news.index_admin')->with('success', 'Đã đăng tin tức thành công!');
     }
 
-    // 4. HIỂN THỊ FORM SỬA
+    // 4. FORM SỬA
     public function edit($id)
     {
         $news = News::findOrFail($id);
-        
-        // SỬA LỖI: Trỏ đúng vào thư mục admin/news/edit.blade.php
         return view('admin.news.news_edit', compact('news'));
     }
 
-    // 5. CẬP NHẬT TIN TỨC
+    // 5. CẬP NHẬT
     public function update(Request $request, $id)
     {
         $news = News::findOrFail($id);
 
         $request->validate([
             'title' => 'required|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        $data = $request->all();
-        $data['slug'] = Str::slug($request->title) . '-' . $news->id; // Cập nhật slug mới
+        $data = $request->except('image');
+
+        // Cập nhật slug mới (nếu muốn giữ link cũ thì comment dòng này lại)
+        $data['slug'] = Str::slug($request->title) . '-' . $news->id;
         $data['is_active'] = $request->has('is_active') ? 1 : 0;
 
-        // Xử lý ảnh: Nếu có upload ảnh mới -> Xóa ảnh cũ -> Lưu ảnh mới
+        // Xử lý ảnh mới
         if ($request->hasFile('image')) {
+            // Xóa ảnh cũ
             if ($news->image && File::exists(public_path($news->image))) {
                 File::delete(public_path($news->image));
             }
 
+            // Lưu ảnh mới
             $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/news'), $filename);
             $data['image'] = 'uploads/news/' . $filename;
         }
@@ -123,7 +137,7 @@ class NewsController extends Controller
         return redirect()->route('news.index_admin')->with('success', 'Cập nhật bài viết thành công!');
     }
 
-    // 6. XÓA TIN TỨC
+    // 6. XÓA TIN
     public function destroy($id)
     {
         $news = News::findOrFail($id);

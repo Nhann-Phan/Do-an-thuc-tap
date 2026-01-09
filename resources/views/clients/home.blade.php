@@ -48,7 +48,6 @@
 
         <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-16">
-                <span class="text-blue-600 font-bold tracking-wider uppercase text-sm">Về chúng tôi</span>
                 <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mt-2 uppercase tracking-wide">
                     {{ $introSection->title ?? 'Giới thiệu công ty' }}
                 </h2>
@@ -74,15 +73,6 @@
                                     Với đội ngũ kỹ sư giàu kinh nghiệm, nhiệt huyết và am hiểu thị trường địa phương, chúng tôi cam kết mang đến những sản phẩm chất lượng cao, vận hành ổn định với chi phí tối ưu nhất cho doanh nghiệp của bạn.
                                 </p>
                             @endif
-                        </div>
-                        
-                        <div class="pt-6 mt-4 border-t border-gray-100">
-                            <div class="flex items-start text-sm font-medium text-gray-500">
-                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3 flex-shrink-0">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                </div>
-                                <span class="mt-1.5">38 đường số 9, KĐT Tây Sông Hậu, Long Xuyên, An Giang</span>
-                            </div>
                         </div>
                     </div>
 

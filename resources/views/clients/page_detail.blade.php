@@ -50,7 +50,6 @@
                             <div class="{{ $isImageRight ? 'lg:order-1' : 'lg:order-2' }}">
                                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6 relative inline-block">
                                     {{ $section->title }}
-                                    <span class="absolute bottom-0 left-0 w-1/3 h-1 bg-blue-600 rounded"></span>
                                 </h2>
                                 <div class="prose prose-lg text-gray-600 text-justify leading-relaxed">
                                     {!! $section->data['content'] ?? '' !!}

@@ -105,7 +105,7 @@
                         {{-- Mega Menu Sản Phẩm --}}
                         {{-- Class 'static' ở đây rất quan trọng để nó căn theo container cha --}}
                         <div class="group static h-full flex items-center py-6"> 
-                            <a href="#products" class="text-blue-800 font-bold flex items-center transition cursor-pointer">
+                            <a href="#products" class="hover:text-blue-700 transition hover-underline-animation py-1 flex items-center cursor-pointer">
                                 SẢN PHẨM <i class="fas fa-chevron-down ml-1 text-[10px] transition-transform group-hover:rotate-180"></i>
                             </a>
                             
@@ -183,7 +183,7 @@
                              <div class="absolute -top-2 right-3 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-100"></div>
                              <form action="#" method="GET" class="relative">
                                 <input type="text" name="q" id="searchInput" class="w-full border border-gray-300 text-gray-700 text-sm rounded-lg px-4 py-3 pr-16 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm transition" placeholder="Tìm kiếm sản phẩm...">
-                                <button type="submit" class="absolute right-1.5 top-1.5 text-white bg-blue-800 hover:bg-blue-700 rounded-md px-3 py-1.5 text-xs font-bold transition shadow-sm">
+                                <button type="submit" class="absolute right-1.5 top-1.5 text-white bg-blue-800 hover:bg-blue-700 rounded-md px-3 py-1.5 text-xs font-bold transition shadow-sm mt-0.5">
                                     TÌM KIẾM
                                 </button>
                             </form>
