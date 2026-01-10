@@ -11,10 +11,13 @@
                     <i class="fas fa-home mr-1.5"></i> Trang chủ
                 </a>
             </li>
-            <li class="text-gray-300"><i class="fa-solid fa-angle-right"></i></li>
-            <li><a href="{{ route('news.index') }}" class="hover:text-blue-600 transition">Tin tức</a></li>
-            <li class="text-gray-300"><i class="fa-solid fa-angle-right"></i></li>
-            <li class="text-gray-900 font-medium truncate max-w-[200px] md:max-w-md" title="{{ $news->title }}">
+            <li class="text-gray-300"><i class="fa-solid fa-angle-right text-xs"></i></li>
+            <li>
+                {{-- Link quay lại trang danh sách --}}
+                <a href="{{ route('client.news.index') }}" class="hover:text-blue-600 transition">Tin tức</a>
+            </li>
+            <li class="text-gray-300"><i class="fa-solid fa-angle-right text-xs"></i></li>
+            <li class="text-gray-900 font-medium truncate max-w-[200px] md:max-w-md text-blue-600" title="{{ $news->title }}">
                 {{ $news->title }}
             </li>
         </ol>
@@ -44,10 +47,10 @@
                             <i class="far fa-user mr-2 text-blue-600"></i> 
                             Đăng bởi: <span class="font-medium text-gray-700 ml-1">Admin</span>
                         </span>
-                        <span class="flex items-center">
+                        {{-- <span class="flex items-center">
                             <i class="far fa-eye mr-2 text-blue-600"></i> 
-                            Lượt xem: 125
-                        </span>
+                            Lượt xem: {{ $news->view_count ?? 0 }}
+                        </span> --}}
                     </div>
 
                     {{-- Summary (Mô tả ngắn) --}}
@@ -60,7 +63,6 @@
                     @endif
 
                     {{-- Content Body (Nội dung chính từ CKEditor) --}}
-                    {{-- Class 'content-body' dùng để CSS riêng cho các thẻ HTML thuần --}}
                     <div class="content-body text-gray-800 text-lg leading-relaxed">
                         {!! $news->content !!}
                     </div>
@@ -103,11 +105,12 @@
                         
                         <div class="divide-y divide-gray-100">
                             @forelse($relatedNews as $item)
-                            <a href="{{ route('news.detail', $item->id) }}" class="flex gap-4 p-5 hover:bg-blue-50/50 transition group items-start">
+                            {{-- QUAN TRỌNG: Dùng $item->slug thay vì $item->id để tránh lỗi 404 --}}
+                            <a href="{{ route('client.news.detail', $news->slug) }}" class="flex gap-4 p-5 hover:bg-blue-50/50 transition group items-start">
                                 {{-- Thumbnail nhỏ --}}
                                 <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 relative">
                                     @if($item->image)
-                                        <img src="{{ asset($item->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                                        <img src="{{ asset($news->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-gray-300">
                                             <i class="fas fa-newspaper"></i>
@@ -118,11 +121,11 @@
                                 {{-- Info --}}
                                 <div class="flex-grow min-w-0">
                                     <h4 class="text-sm font-bold text-gray-800 group-hover:text-blue-600 line-clamp-2 leading-snug mb-1.5 transition">
-                                        {{ $item->title }}
+                                        {{ $news->title }}
                                     </h4>
                                     <div class="flex items-center text-xs text-gray-400">
                                         <i class="far fa-clock mr-1.5"></i> 
-                                        {{ $item->created_at->format('d/m/Y') }}
+                                        {{ $news->created_at->format('d/m/Y') }}
                                     </div>
                                 </div>
                             </a>
@@ -134,13 +137,6 @@
                         </div>
                     </div>
 
-                    {{-- Box Quảng cáo / Banner (Nếu có) --}}
-                    {{-- 
-                    <div class="rounded-xl overflow-hidden shadow-md">
-                        <img src="https://via.placeholder.com/400x300?text=Banner+Quang+Cao" class="w-full h-auto">
-                    </div> 
-                    --}}
-
                 </div>
             </div>
         </div>
@@ -149,7 +145,7 @@
 
 {{-- CSS TÙY CHỈNH CHO NỘI DUNG BÀI VIẾT (CKEditor Content) --}}
 <style>
-    /* Reset styles for content-body to ensure WYSIWYG content looks good */
+    /* Reset styles for content-body */
     .content-body { color: #374151; /* gray-700 */ }
     
     /* Headings */

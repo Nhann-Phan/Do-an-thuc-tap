@@ -33,7 +33,7 @@ Route::get('/gioi-thieu/{slug}', [HomeController::class, 'showPage'])->name('cli
 
 // --- Tin tức (News) ---
 Route::get('/tin-tuc', [NewsController::class, 'index'])->name('news.index');       // Danh sách tin
-Route::get('/tin-tuc/{id}', [NewsController::class, 'detail'])->name('news.detail'); // Chi tiết tin
+Route::get('/tin-tuc/{id}', [NewsController::class, 'detail'])->name('news.news_detail'); // Chi tiết tin
 
 // --- Đặt lịch hẹn (Booking) ---
 Route::post('/book-appointment', [BookingController::class, 'store'])
