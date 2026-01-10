@@ -35,10 +35,9 @@ class PageController extends Controller
         // 1. Validate dữ liệu
         $request->validate([
             'title' => 'required|max:255',
-            'content' => 'required',
+            'content' => 'nullable',
         ], [
             'title.required' => 'Vui lòng nhập tiêu đề trang',
-            'content.required' => 'Nội dung không được để trống',
         ]);
 
         $data = $request->all();

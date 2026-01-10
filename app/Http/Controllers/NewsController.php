@@ -16,7 +16,6 @@ class NewsController extends Controller
     public function index()
     {
         // paginate() luôn trả về object, kể cả khi không có bài nào
-        // Nên bên view không bao giờ bị lỗi null
         $newsList = News::where('is_active', 1)
                         ->latest()
                         ->paginate(9);
@@ -24,16 +23,14 @@ class NewsController extends Controller
         return view('clients.news.news_list', compact('newsList'));
     }
 
-    public function detail($slug)
+    public function detail($id)
     {
-        // Tìm bài viết theo slug, nếu không thấy thì báo lỗi 404 (Trang không tồn tại)
-        // firstOrFail() là bắt buộc để tránh vào trang chi tiết trắng trơn
+        // ✅ CHUẨN: Tìm bài viết theo ID (khớp với Route /tin-tuc/{id})
         $news = News::where('is_active', 1)
-                    ->where('slug', $slug)
+                    ->where('id', $id)
                     ->firstOrFail();
 
         // Lấy tin liên quan (trừ bài đang xem)
-        // get() trả về collection rỗng nếu không có tin nào khác -> Không lỗi
         $relatedNews = News::where('is_active', 1)
                             ->where('id', '!=', $news->id)
                             ->latest()
@@ -50,9 +47,7 @@ class NewsController extends Controller
     // 1. DANH SÁCH TIN TỨC
     public function indexAdmin()
     {
-        // Admin cần xem cả tin ẩn và hiện nên không where is_active
         $newsList = News::latest()->paginate(10);
-        
         return view('admin.news.news_list', compact('newsList'));
     }
 
@@ -66,25 +61,26 @@ class NewsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|max:255',
+            'title'   => 'required|max:255',
             'summary' => 'nullable|max:500',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            // ✅ Thêm dòng này để cho phép nội dung trống lúc tạo mới (giống Page)
+            'content' => 'nullable', 
+            'image'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ], [
             'title.required' => 'Vui lòng nhập tiêu đề bài viết',
-            'image.image' => 'File tải lên phải là hình ảnh',
-            'image.max' => 'Ảnh không được quá 2MB'
+            'image.image'    => 'File tải lên phải là hình ảnh',
+            'image.max'      => 'Ảnh không được quá 2MB'
         ]);
 
         $data = $request->except('image');
         
-        // Tạo slug từ tiêu đề + timestamp để tránh trùng lặp
+        // Tạo slug
         $data['slug'] = Str::slug($request->title) . '-' . time();
         $data['is_active'] = $request->has('is_active') ? 1 : 0;
 
         // Xử lý upload ảnh
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            // Đặt tên file an toàn (slug hóa tên file)
             $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/news'), $filename);
             $data['image'] = 'uploads/news/' . $filename;
@@ -108,24 +104,25 @@ class NewsController extends Controller
         $news = News::findOrFail($id);
 
         $request->validate([
-            'title' => 'required|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'title'   => 'required|max:255',
+            'summary' => 'nullable|max:500',
+            'content' => 'nullable', // ✅ Cho phép cập nhật mà nội dung vẫn trống
+            'image'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $data = $request->except('image');
 
-        // Cập nhật slug mới (nếu muốn giữ link cũ thì comment dòng này lại)
+        // Cập nhật slug (giữ nguyên ID trong slug để SEO tốt hơn nếu muốn)
         $data['slug'] = Str::slug($request->title) . '-' . $news->id;
         $data['is_active'] = $request->has('is_active') ? 1 : 0;
 
         // Xử lý ảnh mới
         if ($request->hasFile('image')) {
-            // Xóa ảnh cũ
+            // Xóa ảnh cũ nếu có
             if ($news->image && File::exists(public_path($news->image))) {
                 File::delete(public_path($news->image));
             }
 
-            // Lưu ảnh mới
             $file = $request->file('image');
             $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/news'), $filename);

@@ -106,11 +106,11 @@
                         <div class="divide-y divide-gray-100">
                             @forelse($relatedNews as $item)
                             {{-- QUAN TRỌNG: Dùng $item->slug thay vì $item->id để tránh lỗi 404 --}}
-                            <a href="{{ route('client.news.detail', $news->slug) }}" class="flex gap-4 p-5 hover:bg-blue-50/50 transition group items-start">
+                            <a href="{{ route('client.news.detail', $item->slug) }}" class="flex gap-4 p-5 hover:bg-blue-50/50 transition group items-start">
                                 {{-- Thumbnail nhỏ --}}
                                 <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 relative">
                                     @if($item->image)
-                                        <img src="{{ asset($news->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                                        <img src="{{ asset($item->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-gray-300">
                                             <i class="fas fa-newspaper"></i>
@@ -121,7 +121,7 @@
                                 {{-- Info --}}
                                 <div class="flex-grow min-w-0">
                                     <h4 class="text-sm font-bold text-gray-800 group-hover:text-blue-600 line-clamp-2 leading-snug mb-1.5 transition">
-                                        {{ $news->title }}
+                                        {{ $item->title }}
                                     </h4>
                                     <div class="flex items-center text-xs text-gray-400">
                                         <i class="far fa-clock mr-1.5"></i> 

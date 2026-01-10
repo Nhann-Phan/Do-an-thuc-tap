@@ -250,7 +250,7 @@
                     <div class="h-10 w-1.5 bg-blue-600 rounded-r mr-4"></div>
                     <h2 class="text-2xl font-bold text-gray-800 uppercase">Tin tức & Sự kiện</h2>
                 </div>
-                <a href="{{ route('news.index') }}" class="group flex items-center text-sm font-semibold text-gray-500 hover:text-blue-600 transition bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-blue-200">
+                <a href="{{ route('client.news.index') }}" class="group flex items-center text-sm font-semibold text-gray-500 hover:text-blue-600 transition bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-blue-200">
                     Xem tất cả <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition"></i>
                 </a>
             </div>
@@ -260,7 +260,7 @@
                 
                 @foreach($latestNews->take(3) as $news)
                 <article class="flex flex-col h-full bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300 overflow-hidden group">
-                    <a href="{{ route('news.detail', $news->id) }}" class="overflow-hidden relative aspect-video bg-gray-100 block">
+                    <a href="{{ route('client.news.detail', $news->id) }}" class="overflow-hidden relative aspect-video bg-gray-100 block">
                         @if($news->image)
                             <img src="{{ asset($news->image) }}" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
                         @else
@@ -276,14 +276,14 @@
                             <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-100">Tin tức</span>
                         </div>
                         <h3 class="text-lg font-bold text-gray-800 group-hover:text-blue-600 leading-snug mb-3 line-clamp-2 transition">
-                            <a href="{{ route('news.detail', $news->id) }}">{{ $news->title }}</a>
+                            <a href="{{ route('client.news.detail', $news->id) }}">{{ $news->title }}</a>
                         </h3>
                         <p class="text-gray-500 text-sm mb-4 line-clamp-3 flex-grow leading-relaxed">
                             {{ $news->summary }}
                         </p>
                         
                         <div class="pt-4 border-t border-gray-100 mt-auto">
-                            <a href="{{ route('news.detail', $news->id) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center group/link">
+                            <a href="{{ route('client.news.detail', $news->id) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center group/link">
                                 Đọc tiếp <i class="fas fa-arrow-right ml-2 text-xs transform group-hover/link:translate-x-1 transition"></i>
                             </a>
                         </div>

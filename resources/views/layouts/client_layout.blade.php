@@ -156,7 +156,7 @@
                         </div>
 
                         <a href="/#gallery" class="hover:text-blue-700 transition hover-underline-animation py-1">Dự án</a>
-                        <a href="{{ route('news.index') }}" class="hover:text-blue-700 transition hover-underline-animation py-1">Tin tức</a>
+                        <a href="{{ route('client.news.index') }}" class="hover:text-blue-700 transition hover-underline-animation py-1">Tin tức</a>
                         <a href="#footer" class="hover:text-blue-700 transition hover-underline-animation py-1">Liên hệ</a>
                     </nav>
 

@@ -33,7 +33,7 @@
                 <article class="flex flex-col sm:flex-row bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-blue-300 transition-all duration-300 group h-full sm:h-48">
                     
                     {{-- ẢNH ĐẠI DIỆN (Bên trái trên Desktop, Bên trên ở Mobile) --}}
-                    <a href="{{ route('news.detail', $item->id) }}" class="relative w-full sm:w-72 shrink-0 overflow-hidden bg-gray-100 block">
+                    <a href="{{ route('client.news.detail', $item->id) }}" class="relative w-full sm:w-72 shrink-0 overflow-hidden bg-gray-100 block">
                         @if($item->image)
                             <img src="{{ asset($item->image) }}" alt="{{ $item->title }}" 
                                  class="w-full h-48 sm:h-full object-cover transform group-hover:scale-105 transition duration-700 ease-out">
@@ -60,7 +60,7 @@
                             </div>
 
                             <h3 class="text-lg font-bold text-gray-900 mb-2 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
-                                <a href="{{ route('news.detail', $item->id) }}" title="{{ $item->title }}">
+                                <a href="{{ route('client.news.detail', $item->id) }}" title="{{ $item->title }}">
                                     {{ $item->title }}
                                 </a>
                             </h3>
@@ -68,12 +68,6 @@
                             <div class="text-gray-500 text-sm line-clamp-2 leading-relaxed">
                                 {!! $item->short_content ?? strip_tags(Str::limit($item->content, 180)) !!}
                             </div>
-                        </div>
-
-                        <div class="mt-4 pt-3 border-t border-gray-50 flex items-center justify-end">
-                            <a href="{{ route('news.detail', $item->id) }}" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center transition uppercase group/link">
-                                Xem chi tiết <i class="fas fa-arrow-right ml-1 transform group-hover/link:translate-x-1 transition-transform"></i>
-                            </a>
                         </div>
                     </div>
                 </article>
