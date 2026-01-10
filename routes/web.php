@@ -21,7 +21,7 @@ use App\Http\Controllers\NewsController;
 // Admin Namespace
 use App\Http\Controllers\Admin\PageController; 
 use App\Http\Controllers\Admin\PageSectionController;
-
+use App\Http\Controllers\Admin\CustomerController;
 
 // ====================================================
 // 1. KHU VỰC CÔNG KHAI (KHÁCH HÀNG - CLIENT)
@@ -148,3 +148,18 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::delete('/{id}', 'destroy')->name('destroy');
     });
 });
+
+// --- Quản lý Khách hàng (CRM) ---
+Route::controller(CustomerController::class)
+    ->prefix('customers')
+    ->name('admin.customers.')
+    ->group(function () {
+        
+        // Danh sách khách hàng
+        Route::get('/', 'index')->name('index');
+        
+        // Chi tiết khách hàng (Xem lịch sử Booking + Order)
+        Route::get('/{id}', 'show')->name('show');
+        Route::get('/{id}/edit', 'edit')->name('edit');    // Form sửa
+        Route::put('/{id}', 'update')->name('update');     // Xử lý lưu
+    });

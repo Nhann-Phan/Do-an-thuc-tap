@@ -108,13 +108,21 @@
 
                         {{-- Phiên bản giá --}}
                         <div class="bg-white border border-blue-200 rounded-lg mb-4 overflow-hidden">
-                            <div class="bg-blue-50 px-3 py-2 border-b border-blue-100">
+                            <div class="bg-blue-50 px-3 py-2 border-b border-blue-100 flex justify-between items-center">
                                 <small class="font-bold text-blue-700 uppercase flex items-center">
-                                    <i class="fas fa-tags mr-1.5"></i> Các phiên bản giá (Tùy chọn)
+                                    <i class="fas fa-tags mr-1.5"></i> Các phiên bản & Tồn kho
                                 </small>
                             </div>
                             <div class="p-3">
+                                <div class="grid grid-cols-12 gap-2 mb-2 text-xs font-bold text-gray-500 uppercase text-center">
+                                    <div class="col-span-4 text-left">Tên</div>
+                                    <div class="col-span-4">Giá</div>
+                                    <div class="col-span-3">Số lượng</div>
+                                    <div class="col-span-1">Xóa</div>
+                                </div>
+                                
                                 <div id="variants-container" class="space-y-2"></div>
+                                
                                 <button type="button" onclick="addVariant()" class="mt-2 w-full py-2 border-2 border-dashed border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 hover:border-blue-400 transition text-sm font-bold flex items-center justify-center">
                                     <i class="fas fa-plus mr-1"></i> Thêm phiên bản
                                 </button>
@@ -183,21 +191,32 @@
         }
     }
 
-    // --- SCRIPT THÊM BIẾN THỂ (Đã convert sang Tailwind) ---
+    // --- SCRIPT THÊM BIẾN THỂ (ĐÃ CẬP NHẬT THÊM Ô SỐ LƯỢNG) ---
     function addVariant() {
         const container = document.getElementById('variants-container');
         const index = container.children.length; 
         
-        // HTML String bên dưới đã được thay class Bootstrap bằng Tailwind grid
+        // Chia cột: Tên (4) - Giá (4) - Số lượng (3) - Xóa (1) = 12 cột
         const html = `
             <div class="grid grid-cols-12 gap-2 mb-2 items-center variant-item border-b border-gray-100 pb-2">
-                <div class="col-span-5">
-                    <input type="text" name="variants[${index}][name]" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none" placeholder="Tên (VD: 6 tháng)" required>
+                
+                {{-- Cột Tên --}}
+                <div class="col-span-4">
+                    <input type="text" name="variants[${index}][name]" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none" placeholder="Tên (VD: Đỏ)" required>
                 </div>
-                <div class="col-span-5">
-                    <input type="number" name="variants[${index}][price]" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none" placeholder="Giá (VNĐ)" required>
+                
+                {{-- Cột Giá --}}
+                <div class="col-span-4">
+                    <input type="number" name="variants[${index}][price]" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none" placeholder="Giá" required>
                 </div>
-                <div class="col-span-2 text-right">
+
+                {{-- Cột Số lượng (MỚI) --}}
+                <div class="col-span-3">
+                    <input type="number" name="variants[${index}][quantity]" class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none text-center" placeholder="SL" value="0">
+                </div>
+
+                {{-- Nút Xóa --}}
+                <div class="col-span-1 text-right">
                     <button type="button" class="text-gray-400 hover:text-red-500 transition p-1" onclick="this.closest('.variant-item').remove()">
                         <i class="fas fa-times"></i>
                     </button>

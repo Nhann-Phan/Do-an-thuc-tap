@@ -13,7 +13,8 @@ class ProductVariant extends Model
     protected $fillable = [
         'product_id',
         'name',
-        'price'
+        'price',
+        'quantity',
     ];
 
     // Thiết lập quan hệ ngược lại với Product (nếu cần dùng sau này)

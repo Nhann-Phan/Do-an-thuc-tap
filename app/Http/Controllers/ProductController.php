@@ -68,7 +68,7 @@ class ProductController extends Controller
             
             $relatedProducts = Product::where('is_active', 1)
                                       ->whereIn('category_id', $ids) 
-                                      ->where('id', '!=', $id)       
+                                      ->where('id', '!=', $id)      
                                       ->with('variants')
                                       ->inRandomOrder()              
                                       ->take(4)                      
@@ -109,7 +109,7 @@ class ProductController extends Controller
         return view('admin.product_create', compact('categories', 'selectedCategoryId'));
     }
 
-    // --- HÀM LƯU MỚI (CẬP NHẬT LOGIC LƯU VARIANTS) ---
+    // --- HÀM LƯU MỚI (ĐÃ CẬP NHẬT: LƯU SỐ LƯỢNG) ---
     public function store(Request $request)
     {
         $request->validate([
@@ -137,14 +137,16 @@ class ProductController extends Controller
         // 1. Tạo sản phẩm chính
         $product = Product::create($data);
 
-        // 2. [MỚI] Lưu các biến thể (Variants) nếu có
+        // 2. [CẬP NHẬT] Lưu các biến thể (Variants) KÈM SỐ LƯỢNG
         if ($request->has('variants')) {
             foreach ($request->variants as $variantData) {
                 if (!empty($variantData['name']) && !empty($variantData['price'])) {
                     ProductVariant::create([
                         'product_id' => $product->id, // Lấy ID vừa tạo
-                        'name' => $variantData['name'],
-                        'price' => $variantData['price']
+                        'name'     => $variantData['name'],
+                        'price'    => $variantData['price'],
+                        // 🔥 THÊM DÒNG NÀY: Lưu số lượng, nếu không nhập thì mặc định 0
+                        'quantity' => isset($variantData['quantity']) ? (int)$variantData['quantity'] : 0 
                     ]);
                 }
             }
@@ -163,7 +165,7 @@ class ProductController extends Controller
         return view('admin.product_edit', compact('product', 'categories'));
     }
 
-    // --- HÀM CẬP NHẬT (CẬP NHẬT LOGIC VARIANTS) ---
+    // --- HÀM CẬP NHẬT (ĐÃ CẬP NHẬT: LƯU SỐ LƯỢNG) ---
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id); 
@@ -195,7 +197,7 @@ class ProductController extends Controller
         // 1. Cập nhật thông tin chính
         $product->update($data);
 
-        // 2. [MỚI] Xử lý cập nhật Biến thể (Variants)
+        // 2. [CẬP NHẬT] Xử lý cập nhật Biến thể (Variants) KÈM SỐ LƯỢNG
         if ($request->has('variants')) {
             foreach ($request->variants as $variantData) {
                 
@@ -210,11 +212,13 @@ class ProductController extends Controller
                 // Trường hợp B: Thêm mới hoặc Cập nhật
                 if (!empty($variantData['name']) && !empty($variantData['price'])) {
                     ProductVariant::updateOrCreate(
-                        ['id' => $variantData['id'] ?? null], // Điều kiện tìm (nếu có ID thì tìm, không có thì null)
+                        ['id' => $variantData['id'] ?? null], // Điều kiện tìm
                         [
                             'product_id' => $product->id,
-                            'name' => $variantData['name'],
-                            'price' => $variantData['price']
+                            'name'     => $variantData['name'],
+                            'price'    => $variantData['price'],
+                            // 🔥 THÊM DÒNG NÀY: Cập nhật số lượng
+                            'quantity' => isset($variantData['quantity']) ? (int)$variantData['quantity'] : 0
                         ]
                     );
                 }

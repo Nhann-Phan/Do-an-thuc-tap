@@ -9,7 +9,8 @@
         <p class="text-sm text-gray-500 mt-1">Danh sách tất cả sản phẩm hiện có trong hệ thống</p>
     </div>
     
-    <a href="{{ route('categories.index') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition flex items-center transform active:scale-95 text-sm uppercase">
+    {{-- Sửa link này trỏ về trang tạo mới (nếu bạn muốn chọn danh mục trước thì giữ nguyên link cũ) --}}
+    <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition flex items-center transform active:scale-95 text-sm uppercase">
         <i class="fas fa-plus mr-2"></i> Thêm sản phẩm mới
     </a>
 </div>
@@ -53,8 +54,9 @@
                     <th class="px-6 py-3 w-24 text-center">Ảnh</th>
                     <th class="px-6 py-3">Tên sản phẩm</th>
                     <th class="px-6 py-3 whitespace-nowrap">Danh mục</th>
-                    <th class="px-6 py-3 whitespace-nowrap">Thương hiệu</th>
                     <th class="px-6 py-3 whitespace-nowrap">Giá bán</th>
+                    {{-- THÊM CỘT KHO HÀNG --}}
+                    <th class="px-6 py-3 whitespace-nowrap text-center">Kho hàng</th> 
                     <th class="px-6 py-3 text-center whitespace-nowrap">Trạng thái</th> 
                     <th class="px-6 py-3 text-right whitespace-nowrap">Hành động</th>
                 </tr>
@@ -86,10 +88,8 @@
                                 <span class="text-[10px] font-bold text-red-600 bg-red-100 border border-red-200 px-1.5 py-0.5 rounded uppercase tracking-wider">HOT</span>
                             @endif
 
-                            @if($product->variants && $product->variants->count() > 0)
-                                <span class="text-[10px] font-semibold text-purple-700 bg-purple-100 border border-purple-200 px-1.5 py-0.5 rounded flex items-center">
-                                    <i class="fas fa-tags mr-1"></i> {{ $product->variants->count() }} phiên bản
-                                </span>
+                            @if($product->brand)
+                                <span class="text-[10px] text-gray-600 bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded uppercase">{{ $product->brand }}</span>
                             @endif
                         </div>
                     </td>
@@ -107,17 +107,6 @@
                         @endif
                     </td>
 
-                    {{-- Thương hiệu --}}
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @if($product->brand)
-                            <span class="text-gray-600 font-medium bg-gray-100 px-2 py-1 rounded text-xs uppercase border border-gray-200">
-                                {{ $product->brand }}
-                            </span>
-                        @else
-                            <span class="text-gray-400 italic text-xs">---</span>
-                        @endif
-                    </td>
-
                     {{-- Giá bán --}}
                     <td class="px-6 py-4 whitespace-nowrap">
                         @if($product->variants && $product->variants->count() > 0)
@@ -132,13 +121,37 @@
                                     {{ number_format($minPrice) }} - {{ number_format($maxPrice) }}đ
                                 @endif
                             </div>
+                            <div class="text-xs text-gray-400">{{ $product->variants->count() }} phiên bản</div>
                         @else
-                            @if($product->sale_price)
-                                <div class="font-bold text-red-600">{{ number_format($product->sale_price) }}đ</div>
-                                <div class="text-xs text-gray-400 line-through">{{ number_format($product->price) }}đ</div>
+                            <div class="font-bold text-gray-900">{{ number_format($product->price) }}đ</div>
+                        @endif
+                    </td>
+
+                    {{-- MỚI: KHO HÀNG (Tính tổng quantity của các variants) --}}
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                        @php
+                            $totalStock = 0;
+                            if($product->variants->count() > 0) {
+                                $totalStock = $product->variants->sum('quantity');
+                            }
+                        @endphp
+
+                        @if($product->variants->count() > 0)
+                            @if($totalStock == 0)
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700 border border-red-200">
+                                    Hết hàng
+                                </span>
+                            @elseif($totalStock < 10)
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">
+                                    Sắp hết ({{ $totalStock }})
+                                </span>
                             @else
-                                <div class="font-bold text-gray-900">{{ number_format($product->price) }}đ</div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                    {{ $totalStock }} sp
+                                </span>
                             @endif
+                        @else
+                            <span class="text-gray-400 text-xs italic">---</span>
                         @endif
                     </td>
 
@@ -161,7 +174,7 @@
                             @csrf @method('DELETE')
                             <button class="w-8 h-8 bg-white border border-gray-200 text-gray-400 hover:border-red-200 hover:text-red-600 hover:bg-red-50 rounded-lg flex items-center justify-center transition shadow-sm" 
                                     title="Xóa"
-                                    onclick="event.stopPropagation(); return confirm('Bạn có chắc muốn xóa không?')">
+                                    onclick="event.stopPropagation(); return confirm('Bạn có chắc muốn xóa không? Dữ liệu tồn kho cũng sẽ bị xóa!')">
                                 <i class="fas fa-trash text-xs"></i>
                             </button>
                         </form>
@@ -169,7 +182,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                    <td colspan="8" class="px-6 py-12 text-center text-gray-500">
                         <div class="flex flex-col items-center justify-center">
                             <i class="fas fa-box-open text-4xl text-gray-300 mb-3"></i>
                             <p>Không tìm thấy sản phẩm nào.</p>

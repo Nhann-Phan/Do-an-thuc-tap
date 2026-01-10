@@ -72,17 +72,19 @@
                     <div class="border border-yellow-200 rounded-xl overflow-hidden mt-6">
                         <div class="bg-yellow-50 px-4 py-3 border-b border-yellow-100 flex justify-between items-center">
                             <span class="font-bold text-yellow-800 flex items-center">
-                                <i class="fas fa-tags mr-2"></i> Các phiên bản giá (Tùy chọn)
+                                <i class="fas fa-tags mr-2"></i> Các phiên bản & Tồn kho
                             </span>
-                            <small class="text-gray-600 italic text-xs hidden sm:block">Giá thấp nhất sẽ tự động cập nhật làm Giá chính</small>
+                            <small class="text-gray-600 italic text-xs hidden sm:block">Lưu ý: Nếu xóa, dữ liệu tồn kho sẽ mất.</small>
                         </div>
                         
                         <div class="p-4 bg-white">
                             {{-- Header của bảng biến thể --}}
-                            <div class="grid grid-cols-12 gap-2 mb-2 font-bold text-gray-500 text-xs uppercase border-b border-gray-100 pb-2">
-                                <div class="col-span-6">Tên phiên bản</div>
-                                <div class="col-span-5">Giá tiền (VNĐ)</div>
-                                <div class="col-span-1 text-center">Xóa</div>
+                            {{-- Cập nhật cột grid: 4 (Tên) - 4 (Giá) - 3 (SL) - 1 (Xóa) --}}
+                            <div class="grid grid-cols-12 gap-2 mb-2 font-bold text-gray-500 text-xs uppercase border-b border-gray-100 pb-2 text-center">
+                                <div class="col-span-4 text-left">Tên phiên bản</div>
+                                <div class="col-span-4">Giá tiền (VNĐ)</div>
+                                <div class="col-span-3">Số lượng</div>
+                                <div class="col-span-1">Xóa</div>
                             </div>
 
                             <div id="variants-container" class="space-y-3">
@@ -92,16 +94,25 @@
                                     {{-- Input ẩn ID --}}
                                     <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $variant->id }}">
                                     
-                                    <div class="col-span-6">
-                                        <input type="text" name="variants[{{ $index }}][name]" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500 outline-none" value="{{ $variant->name }}" placeholder="VD: Gói 1 năm" required>
+                                    {{-- Cột Tên --}}
+                                    <div class="col-span-4">
+                                        <input type="text" name="variants[{{ $index }}][name]" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500 outline-none" value="{{ $variant->name }}" placeholder="Tên" required>
                                     </div>
-                                    <div class="col-span-5">
-                                        <input type="number" name="variants[{{ $index }}][price]" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500 outline-none" value="{{ $variant->price }}" placeholder="Nhập giá" required>
+                                    
+                                    {{-- Cột Giá --}}
+                                    <div class="col-span-4">
+                                        <input type="number" name="variants[{{ $index }}][price]" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500 outline-none" value="{{ $variant->price }}" placeholder="Giá" required>
                                     </div>
+
+                                    {{-- Cột Số lượng (MỚI) --}}
+                                    <div class="col-span-3">
+                                        <input type="number" name="variants[{{ $index }}][quantity]" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500 outline-none text-center" value="{{ $variant->quantity }}" placeholder="SL">
+                                    </div>
+
+                                    {{-- Cột Xóa --}}
                                     <div class="col-span-1 flex justify-center">
-                                        {{-- Checkbox xóa --}}
                                         <div class="flex items-center justify-center" title="Tick vào đây để xóa dòng này khi Lưu">
-                                            <input type="checkbox" name="variants[{{ $index }}][delete]" value="1" class="w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                                            <input type="checkbox" name="variants[{{ $index }}][delete]" value="1" class="w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500 cursor-pointer">
                                         </div>
                                     </div>
                                 </div>
@@ -219,7 +230,7 @@
         }
     }
 
-    // --- SCRIPT THÊM BIẾN THỂ (Tailwind Version) ---
+    // --- SCRIPT THÊM BIẾN THỂ (ĐÃ CẬP NHẬT THÊM Ô SỐ LƯỢNG) ---
     function addVariant() {
         const container = document.getElementById('variants-container');
         // Tạo index ngẫu nhiên để tránh trùng với index cũ trong DB
@@ -227,12 +238,18 @@
         
         const html = `
             <div class="grid grid-cols-12 gap-2 items-center variant-item bg-blue-50 p-2 rounded-lg border border-blue-100">
-                <div class="col-span-6">
+                <div class="col-span-4">
                     <input type="text" name="variants[${index}][name]" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none" placeholder="Tên (VD: 2 năm)" required>
                 </div>
-                <div class="col-span-5">
+                <div class="col-span-4">
                     <input type="number" name="variants[${index}][price]" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none" placeholder="Giá tiền" required>
                 </div>
+                
+                {{-- MỚI: Cột số lượng cho item thêm bằng JS --}}
+                <div class="col-span-3">
+                    <input type="number" name="variants[${index}][quantity]" class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 outline-none text-center" placeholder="SL" value="0">
+                </div>
+
                 <div class="col-span-1 text-center">
                     <button type="button" class="text-red-500 hover:text-red-700 transition p-1" onclick="this.closest('.variant-item').remove()">
                         <i class="fas fa-times"></i>

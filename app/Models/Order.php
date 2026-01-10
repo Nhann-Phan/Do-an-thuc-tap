@@ -9,14 +9,20 @@ class Order extends Model
 {
     use HasFactory;
     
-    // Cách 1: Cho phép lưu tất cả các cột
+    // Cho phép lưu tất cả các cột (bao gồm cả customer_id vừa thêm)
     protected $guarded = []; 
-    
-    // HOẶC Cách 2: Nếu dùng fillable thì phải có 'total_money' trong này
-    // protected $fillable = ['name', 'phone', 'email', 'address', 'note', 'payment_method', 'status', 'total_money'];
 
+    /**
+     * Mối quan hệ 1: Lấy danh sách sản phẩm trong đơn này
+     * Sử dụng: $order->items
+     */
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 }

@@ -55,6 +55,15 @@
                 <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Xử lý lịch sửa chữa</span>
             </a>
 
+            {{-- 🔥 MỚI: QUẢN LÝ KHÁCH HÀNG (CRM) 🔥 --}}
+            <a href="{{ route('admin.customers.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/customers*') ? 'active' : '' }}">
+                <div class="min-w-[70px] flex justify-center text-lg">
+                    <i class="fas fa-users"></i>
+                </div>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Quản lý Khách hàng</span>
+            </a>
+            {{-- ---------------------------------------- --}}
+
             <a href="{{ route('admin.orders.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/orders*') ? 'active' : '' }}">
                 <div class="min-w-[70px] flex justify-center text-lg">
                     <i class="fas fa-shopping-cart"></i>
@@ -83,14 +92,13 @@
                 <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Quản lý Tin tức</span>
             </a>
 
-            {{-- --- MỤC MỚI: QUẢN LÝ TRANG (PAGES) --- --}}
+            {{-- QUẢN LÝ TRANG (PAGES) --}}
             <a href="{{ route('pages.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/pages*') ? 'active' : '' }}">
                 <div class="min-w-[70px] flex justify-center text-lg">
                     <i class="fas fa-file-alt"></i>
                 </div>
                 <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Thông tin Công ty</span>
             </a>
-            {{-- ------------------------------------- --}}
 
             <a href="{{ route('gallery.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/gallery*') ? 'active' : '' }}">
                 <div class="min-w-[70px] flex justify-center text-lg">
