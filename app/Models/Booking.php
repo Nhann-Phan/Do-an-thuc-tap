@@ -10,7 +10,7 @@ class Booking extends Model
     use HasFactory;
 
     protected $fillable = [
-        'customer_id', // Phải có cái này
+        'customer_id', 
         'customer_name', 
         'phone_number', 
         'address', 

@@ -109,7 +109,7 @@ class ProductController extends Controller
         return view('admin.product_create', compact('categories', 'selectedCategoryId'));
     }
 
-    // --- HÀM LƯU MỚI (ĐÃ CẬP NHẬT: LƯU SỐ LƯỢNG) ---
+    // --- HÀM LƯU MỚI (ĐÃ CẬP NHẬT: LƯU SỐ LƯỢNG + CẬP NHẬT GIÁ GỐC) ---
     public function store(Request $request)
     {
         $request->validate([
@@ -137,7 +137,8 @@ class ProductController extends Controller
         // 1. Tạo sản phẩm chính
         $product = Product::create($data);
 
-        // 2. [CẬP NHẬT] Lưu các biến thể (Variants) KÈM SỐ LƯỢNG
+        // 2. Lưu các biến thể (Variants)
+        $hasVariants = false;
         if ($request->has('variants')) {
             foreach ($request->variants as $variantData) {
                 if (!empty($variantData['name']) && !empty($variantData['price'])) {
@@ -145,16 +146,26 @@ class ProductController extends Controller
                         'product_id' => $product->id, // Lấy ID vừa tạo
                         'name'     => $variantData['name'],
                         'price'    => $variantData['price'],
-                        // 🔥 THÊM DÒNG NÀY: Lưu số lượng, nếu không nhập thì mặc định 0
                         'quantity' => isset($variantData['quantity']) ? (int)$variantData['quantity'] : 0 
                     ]);
+                    $hasVariants = true;
                 }
+            }
+        }
+
+        // 🔥 [LOGIC MỚI] 3. Cập nhật giá Product = Giá biến thể thấp nhất
+        if ($hasVariants) {
+            // Tìm giá thấp nhất trong các biến thể vừa tạo
+            $minPrice = $product->variants()->min('price');
+            
+            if ($minPrice !== null) {
+                $product->update(['price' => $minPrice]);
             }
         }
 
         return redirect()
                 ->route('product.create', ['category_id' => $request->category_id])
-                ->with('success', 'Đã thêm sản phẩm thành công! Mời nhập tiếp sản phẩm tiếp theo.');
+                ->with('success', 'Đã thêm sản phẩm thành công!');
     }
 
     public function edit($id)
@@ -165,7 +176,7 @@ class ProductController extends Controller
         return view('admin.product_edit', compact('product', 'categories'));
     }
 
-    // --- HÀM CẬP NHẬT (ĐÃ CẬP NHẬT: LƯU SỐ LƯỢNG) ---
+    // --- HÀM CẬP NHẬT (ĐÃ CẬP NHẬT: LƯU SỐ LƯỢNG + CẬP NHẬT GIÁ GỐC) ---
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id); 
@@ -194,14 +205,14 @@ class ProductController extends Controller
         $data['is_active'] = $request->has('is_active') ? 1 : 0;
         $data['is_hot'] = $request->has('is_hot') ? 1 : 0;
 
-        // 1. Cập nhật thông tin chính
+        // 1. Cập nhật thông tin chính (bao gồm giá user nhập tạm thời)
         $product->update($data);
 
-        // 2. [CẬP NHẬT] Xử lý cập nhật Biến thể (Variants) KÈM SỐ LƯỢNG
+        // 2. Xử lý cập nhật Biến thể (Thêm/Sửa/Xóa)
         if ($request->has('variants')) {
             foreach ($request->variants as $variantData) {
                 
-                // Trường hợp A: Xóa biến thể (nếu tick chọn xóa)
+                // A. Xóa biến thể
                 if (isset($variantData['delete']) && $variantData['delete'] == 1) {
                     if (isset($variantData['id'])) {
                         ProductVariant::destroy($variantData['id']);
@@ -209,7 +220,7 @@ class ProductController extends Controller
                     continue; // Bỏ qua dòng này
                 }
 
-                // Trường hợp B: Thêm mới hoặc Cập nhật
+                // B. Thêm mới hoặc Cập nhật
                 if (!empty($variantData['name']) && !empty($variantData['price'])) {
                     ProductVariant::updateOrCreate(
                         ['id' => $variantData['id'] ?? null], // Điều kiện tìm
@@ -217,13 +228,22 @@ class ProductController extends Controller
                             'product_id' => $product->id,
                             'name'     => $variantData['name'],
                             'price'    => $variantData['price'],
-                            // 🔥 THÊM DÒNG NÀY: Cập nhật số lượng
                             'quantity' => isset($variantData['quantity']) ? (int)$variantData['quantity'] : 0
                         ]
                     );
                 }
             }
         }
+
+        // 🔥 [LOGIC MỚI] 3. Tính toán lại giá Min sau khi đã Xóa/Sửa/Thêm xong
+        // Gọi database để lấy danh sách biến thể MỚI NHẤT
+        $minPrice = $product->variants()->min('price');
+
+        if ($minPrice !== null) {
+            // Nếu còn biến thể, cập nhật giá Product = giá biến thể thấp nhất
+            $product->update(['price' => $minPrice]);
+        } 
+        // Nếu không còn biến thể nào (minPrice == null), giữ nguyên giá user nhập ở bước 1
 
         return redirect()->route('admin.category.products', $product->category_id)->with('success', 'Cập nhật thành công!');
     }
