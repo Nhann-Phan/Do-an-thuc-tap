@@ -126,7 +126,7 @@
                                         {{-- Nếu số lượng > 1 thì hiện đơn giá nhỏ bên dưới --}}
                                         @if($details['quantity'] > 1)
                                             <span class="block text-[10px] text-gray-400">
-                                                {{ number_format($details['price'], 0, ',', '.') }} x {{ $details['quantity'] }}
+                                                {{ number_format($details['price'], 0, ',', '.') }} x {{ $details['quantity'], 0, ',', '.' }}
                                             </span>
                                         @endif
                                     </div>

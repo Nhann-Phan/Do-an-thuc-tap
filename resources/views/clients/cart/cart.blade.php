@@ -85,7 +85,7 @@
                                             
                                             {{-- Đơn giá --}}
                                             <td class="px-6 py-4 text-center text-sm font-medium text-gray-600 whitespace-nowrap">
-                                                {{ number_format($details['price']) }}đ
+                                                {{ number_format($details['price'], 0, ',', '.') }}đ
                                             </td>
 
                                             {{-- Số lượng --}}
