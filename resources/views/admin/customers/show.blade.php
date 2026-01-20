@@ -152,7 +152,7 @@
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         {{-- Link mẫu, bạn hãy thay bằng route xem chi tiết đơn hàng của bạn --}}
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 font-medium hover:underline">Xem</a>
+                                        <a href="{{ route('admin.orders.show', $order->id) }}" class="text-blue-600 hover:text-blue-900 font-medium hover:underline">Xem</a>
                                     </td>
                                 </tr>
                                 @endforeach

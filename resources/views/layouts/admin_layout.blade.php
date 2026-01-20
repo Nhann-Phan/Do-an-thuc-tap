@@ -48,6 +48,16 @@
 
         {{-- Menu Items --}}
         <nav class="sidebar-menu flex-grow py-2 overflow-y-auto">
+            
+            {{-- QUẢN LÝ KHÁCH HÀNG --}}
+            <a href="{{ route('admin.customers.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/customers*') ? 'active' : '' }}">
+                <div class="min-w-[70px] flex justify-center text-lg">
+                    <i class="fas fa-users"></i>
+                </div>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Quản lý Khách hàng</span>
+            </a>
+
+            {{-- XỬ LÝ LỊCH SỬ CHỮA CHỮA --}}
             <a href="/admin" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden group/item {{ request()->is('admin') ? 'active' : '' }}">
                 <div class="min-w-[70px] flex justify-center text-lg">
                     <i class="fa-solid fa-screwdriver-wrench"></i>
@@ -55,15 +65,7 @@
                 <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Xử lý lịch sửa chữa</span>
             </a>
 
-            {{-- 🔥 MỚI: QUẢN LÝ KHÁCH HÀNG (CRM) 🔥 --}}
-            <a href="{{ route('admin.customers.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/customers*') ? 'active' : '' }}">
-                <div class="min-w-[70px] flex justify-center text-lg">
-                    <i class="fas fa-users"></i>
-                </div>
-                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Quản lý Khách hàng</span>
-            </a>
-            {{-- ---------------------------------------- --}}
-
+            {{-- QUẢN LÝ ĐƠN HÀNG --}}
             <a href="{{ route('admin.orders.index') }}" class="menu-item flex items-center h-[50px] text-slate-400 hover:bg-white/5 hover:text-white border-l-[3px] border-transparent transition-all whitespace-nowrap overflow-hidden {{ request()->is('admin/orders*') ? 'active' : '' }}">
                 <div class="min-w-[70px] flex justify-center text-lg">
                     <i class="fas fa-shopping-cart"></i>
