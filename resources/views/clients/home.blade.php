@@ -172,10 +172,10 @@
                                         <div class="mt-auto pt-2">
                                             <div class="flex items-baseline gap-2 mb-3">
                                                 @if($product->sale_price)
-                                                    <span class="text-red-600 font-bold text-lg">{{ number_format($product->sale_price) }} đ</span>
-                                                    <span class="text-gray-400 text-xs line-through">{{ number_format($product->price) }} đ</span>
+                                                    <span class="text-red-600 font-bold text-lg">{{ number_format($product->sale_price, 0, ',', '.') }} đ</span>
+                                                    <span class="text-gray-400 text-xs line-through">{{ number_format($product->price, 0, ',', '.') }} đ</span>
                                                 @else
-                                                    <span class="text-red-600 font-bold text-lg">{{ number_format($product->price) }} đ</span>
+                                                    <span class="text-red-600 font-bold text-lg">{{ number_format($product->price, 0, ',', '.') }} đ</span>
                                                 @endif
                                             </div>
                                         </div>
