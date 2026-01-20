@@ -161,9 +161,9 @@
                                 @endphp
                                 <span class="text-red-600 font-bold text-base block">
                                     @if($minPrice == $maxPrice)
-                                        {{ number_format($minPrice) }}đ
+                                        {{ number_format($minPrice, 0, ',', '.') }}đ
                                     @else
-                                        {{ number_format($minPrice) }} - {{ number_format($maxPrice) }}đ
+                                        {{ number_format($minPrice, 0, ',', '.') }} - {{ number_format($maxPrice, 0, ',', '.') }}đ
                                     @endif
                                 </span>
                             @else

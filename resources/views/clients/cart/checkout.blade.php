@@ -81,7 +81,7 @@
                 </div>
             </div>
 
-            {{-- CỘT PHẢI: ĐƠN HÀNG (ĐÃ CHỈNH SỬA) --}}
+            {{-- CỘT PHẢI: ĐƠN HÀNG  --}}
             <div class="lg:col-span-5">
                 <div class="bg-white rounded-xl shadow-lg border border-blue-100 p-6 sticky top-24">
                     
@@ -121,12 +121,12 @@
                                     {{-- 3. Giá tiền --}}
                                     <div class="flex-shrink-0 text-right">
                                         <span class="block text-sm font-bold text-gray-800">
-                                            {{ number_format($details['price'] * $details['quantity']) }}đ
+                                            {{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}đ
                                         </span>
                                         {{-- Nếu số lượng > 1 thì hiện đơn giá nhỏ bên dưới --}}
                                         @if($details['quantity'] > 1)
                                             <span class="block text-[10px] text-gray-400">
-                                                {{ number_format($details['price']) }} x {{ $details['quantity'] }}
+                                                {{ number_format($details['price'], 0, ',', '.') }} x {{ $details['quantity'] }}
                                             </span>
                                         @endif
                                     </div>
@@ -139,7 +139,7 @@
                     <div class="border-t border-dashed border-gray-300 pt-4 space-y-2.5">
                         <div class="flex justify-between text-sm text-gray-600">
                             <span>Tạm tính</span>
-                            <span class="font-medium">{{ number_format($total) }}đ</span>
+                            <span class="font-medium">{{ number_format($total, 0, ',', '.') }}đ</span>
                         </div>
                         <div class="flex justify-between text-sm text-gray-600">
                             <span>Phí vận chuyển</span>
@@ -147,7 +147,7 @@
                         </div>
                         <div class="flex justify-between items-center pt-3 border-t border-gray-200 mt-2">
                             <span class="text-base font-bold text-gray-800">Tổng thanh toán</span>
-                            <span class="text-2xl font-extrabold text-red-600">{{ number_format($total) }}đ</span>
+                            <span class="text-2xl font-extrabold text-red-600">{{ number_format($total, 0, ',', '.') }}đ</span>
                         </div>
                     </div>
 

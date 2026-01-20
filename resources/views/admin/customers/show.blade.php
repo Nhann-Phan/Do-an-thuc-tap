@@ -140,7 +140,7 @@
                                 <tr class="bg-white border-b hover:bg-gray-50">
                                     <td class="px-6 py-4 font-medium text-gray-900">#{{ $order->id }}</td>
                                     <td class="px-6 py-4">{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                                    <td class="px-6 py-4 font-bold text-blue-600">{{ number_format($order->total_money) }} đ</td>
+                                    <td class="px-6 py-4 font-bold text-blue-600">{{ number_format($order->total_money, 0, ',', '.') }} đ</td>
                                     <td class="px-6 py-4">
                                         @if($order->status == 'pending')
                                             <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded border border-yellow-200">Chờ xử lý</span>

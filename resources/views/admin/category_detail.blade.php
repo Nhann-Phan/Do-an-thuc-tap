@@ -92,13 +92,13 @@
                                 @endphp
                                 <div class="font-bold text-indigo-600">
                                     @if($minPrice == $maxPrice)
-                                        {{ number_format($minPrice) }}đ
+                                        {{ number_format($minPrice, 0, ',', '.') }}đ
                                     @else
-                                        {{ number_format($minPrice) }} - {{ number_format($maxPrice) }}đ
+                                        {{ number_format($minPrice, 0, ',', '.') }} - {{ number_format($maxPrice, 0, ',', '.') }}đ
                                     @endif
                                 </div>
                             @else
-                                <div class="font-bold text-gray-900">{{ number_format($product->price) }} đ</div>
+                                <div class="font-bold text-gray-900">{{ number_format($product->price, 0, ',', '.') }} đ</div>
                             @endif
                         </td>
 

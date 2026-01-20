@@ -77,7 +77,7 @@
                     </div>
                 </div>
 
-                {{-- 2. Thông tin chi tiết (Chiếm 7 phần) --}}
+                {{-- 2. Thông tin chi tiết --}}
                 <div class="md:col-span-7 flex flex-col h-full">
                     <h1 class="text-lg md:text-xl font-bold text-gray-900 leading-snug mb-3">{{ $product->name }}</h1>
                     
@@ -95,7 +95,7 @@
                         @endphp
 
                         <span id="price-display" class="text-2xl font-bold text-red-600 leading-none">
-                        Đơn giá: {{ number_format($currentPrice) }} ₫
+                            Đơn giá: {{ number_format($currentPrice, 0, ',', '.') }} ₫
                         </span>
                         
                         @if($originalPrice)
@@ -213,7 +213,7 @@
                                             
                                             <div class="mt-auto flex items-center justify-between">
                                                 <span class="text-red-600 font-bold text-base">
-                                                    {{ number_format($related->sale_price ?: $related->price) }} ₫
+                                                    {{ number_format($related->sale_price ?: $related->price, 0, ',', '.') }} ₫
                                                 </span>
                                                 <a href="{{ route('add_to_cart', $related->id) }}" class="w-8 h-8 rounded-full bg-gray-100 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition shadow-sm" title="Thêm vào giỏ">
                                                     <i class="fas fa-plus text-xs"></i>
@@ -252,7 +252,7 @@
                                         {{ $hotItem->name }}
                                     </h5>
                                     <span class="text-red-600 font-bold text-sm">
-                                        {{ number_format($hotItem->sale_price ?: $hotItem->price) }} ₫
+                                        {{ number_format($hotItem->sale_price ?: $hotItem->price, 0, ',', '.') }} ₫
                                     </span>
                                 </div>
                             </a>
@@ -284,7 +284,7 @@
         btn.classList.add('active');
 
         // B. Cập nhật giá hiển thị
-        const formattedPrice = new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
+        const formattedPrice = 'Đơn giá: ' + new Intl.NumberFormat('vi-VN').format(price) + '₫';
         document.getElementById('price-display').innerText = formattedPrice;
         
         // C. Cập nhật tên hiển thị

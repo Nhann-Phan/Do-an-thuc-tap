@@ -24,7 +24,7 @@
                         <thead>
                             <tr class="bg-gray-50 text-gray-700 text-sm font-bold border-b border-gray-200">
                                 <th class="px-6 py-3 whitespace-nowrap">Sản phẩm</th>
-                                <th class="px-6 py-3 whitespace-nowrap text-center">SL</th>
+                                <th class="px-6 py-3 whitespace-nowrap text-center">Số lượng</th>
                                 <th class="px-6 py-3 whitespace-nowrap text-right">Giá</th>
                                 <th class="px-6 py-3 whitespace-nowrap text-right">Thành tiền</th>
                             </tr>
@@ -34,8 +34,8 @@
                             <tr>
                                 <td class="px-6 py-4 font-medium">{{ $item->product_name }}</td>
                                 <td class="px-6 py-4 text-center">{{ $item->quantity }}</td>
-                                <td class="px-6 py-4 text-right">{{ number_format($item->price) }}đ</td>
-                                <td class="px-6 py-4 text-right font-bold">{{ number_format($item->price * $item->quantity) }}đ</td>
+                                <td class="px-6 py-4 text-right">{{ number_format($item->price, 0, ',', '.') }}đ</td>
+                                <td class="px-6 py-4 text-right font-bold">{{ number_format($item->price * $item->quantity, 0, ',', '.') }}đ</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -43,7 +43,7 @@
                             <tr>
                                 <td colspan="3" class="px-6 py-4 text-right font-bold text-gray-700 uppercase">Tổng cộng:</td>
                                 <td class="px-6 py-4 text-right font-bold text-red-600 text-lg">
-                                    {{ number_format($order->total_money) }}đ
+                                    {{ number_format($order->total_money, 0, ',', '.') }}đ
                                 </td>
                             </tr>
                         </tfoot>

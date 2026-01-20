@@ -97,7 +97,7 @@
 
                                             {{-- Thành tiền --}}
                                             <td class="px-6 py-4 text-center text-sm font-bold text-blue-600 whitespace-nowrap">
-                                                {{ number_format($details['price'] * $details['quantity']) }}đ
+                                                {{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}đ
                                             </td>
 
                                             {{-- Xóa --}}
@@ -149,7 +149,7 @@
                     <div class="space-y-3 mb-6 text-sm">
                         <div class="flex justify-between text-gray-600">
                             <span>Tạm tính:</span>
-                            <span class="font-bold">{{ number_format($total) }}đ</span>
+                            <span class="font-bold">{{ number_format($total, 0, ',', '.') }}đ</span>
                         </div>
                         <div class="flex justify-between text-gray-600">
                             <span>Giảm giá:</span>
@@ -157,7 +157,7 @@
                         </div>
                         <div class="flex justify-between items-center pt-4 border-t border-dashed border-gray-200 mt-2">
                             <span class="text-base font-bold text-gray-800">Tổng cộng:</span>
-                            <span class="text-2xl font-extrabold text-red-600">{{ number_format($total) }}đ</span>
+                            <span class="text-2xl font-extrabold text-red-600">{{ number_format($total, 0, ',', '.') }}đ</span>
                         </div>
                         <p class="text-[10px] text-gray-400 text-right italic">(Đã bao gồm VAT nếu có)</p>
                     </div>
