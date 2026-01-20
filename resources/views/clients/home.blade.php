@@ -78,7 +78,7 @@
 
                     {{-- Logo / Branding Box --}}
                     <div class="flex justify-center items-center">
-                        <div class="text-center p-8 rounded-2xl bg-slate-50 border border-slate-100 shadow-inner transform hover:scale-105 transition duration-500 w-full max-w-sm">
+                        <div class="text-center rounded-2xl  transform hover:scale-105 transition duration-500 w-full max-w-sm">
                             <div class="inline-flex items-center justify-center">
                                 @if(!empty($data['image']))
                                     <img src="{{ asset($data['image']) }}" alt="Logo" class="h-20 object-contain" style="height: 50%;">
@@ -281,12 +281,6 @@
                         <p class="text-gray-500 text-sm mb-4 line-clamp-3 flex-grow leading-relaxed">
                             {{ $news->summary }}
                         </p>
-                        
-                        <div class="pt-4 border-t border-gray-100 mt-auto">
-                            <a href="{{ route('client.news.detail', $news->id) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center group/link">
-                                Đọc tiếp <i class="fas fa-arrow-right ml-2 text-xs transform group-hover/link:translate-x-1 transition"></i>
-                            </a>
-                        </div>
                     </div>
                 </article>
                 @endforeach

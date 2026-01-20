@@ -1,6 +1,14 @@
 @extends('layouts.admin_layout')
 
 @section('content')
+// Hide CKEditor warning notifications
+<style>
+    .cke_notification_warning {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+</style>
 <div class="bg-white p-6 rounded-lg shadow-md">
     <div class="flex justify-between items-center mb-6 border-b pb-4">
         <div>

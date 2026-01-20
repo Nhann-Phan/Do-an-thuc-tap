@@ -290,7 +290,7 @@
                         <i class="fa-solid fa-robot"></i>
                     </div>
                     <div>
-                        <span class="font-bold text-sm block">Trợ lý ảo GPM</span>
+                        <span class="font-bold text-sm block">Nhân viên chăm sóc khách hàng</span>
                         <span class="text-[10px] opacity-90 flex items-center"><span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1 animate-pulse"></span> Đang hoạt động</span>
                     </div>
                 </div>

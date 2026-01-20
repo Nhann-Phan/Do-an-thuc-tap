@@ -68,6 +68,7 @@ class ChatbotController extends Controller
                 - Sản phẩm và link sản phẩm: {$contextProduct}
 
                 YÊU CẦU:
+                - Bạn là nhân viên tư vấn. Hãy trả lời ngắn gọn, lịch sự. **Lưu ý: Trả lời bằng văn bản thô (plain text), tuyệt đối không sử dụng định dạng Markdown (như bôi đậm , in nghiêng *, tiêu đề #).
                 - TONE GIỌNG: Lễ phép (Dạ, Vâng, ạ), dùng emoji vui vẻ (😊, ❤️).
                 - CÓ SẢN PHẨM: Báo giá và mời mua.
                 - KHÔNG CÓ: Xin lỗi khéo và mời gọi hotline để được tư vấn chi tiết.
