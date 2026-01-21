@@ -1,7 +1,6 @@
 @extends('layouts.admin_layout')
 
 @section('content')
-// Hide CKEditor warning notifications
 <style>
     .cke_notification_warning {
         display: none !important;

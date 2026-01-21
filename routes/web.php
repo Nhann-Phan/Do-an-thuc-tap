@@ -17,6 +17,7 @@ use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\CompareController;
 
 // Admin Namespace
 use App\Http\Controllers\Admin\PageController; 
@@ -163,3 +164,10 @@ Route::controller(CustomerController::class)
         Route::get('/{id}/edit', 'edit')->name('edit');    // Form sửa
         Route::put('/{id}', 'update')->name('update');     // Xử lý lưu
     });
+
+// Route So sánh sản phẩm
+Route::prefix('compare')->name('compare.')->group(function() {
+    Route::get('/', [CompareController::class, 'index'])->name('index'); // Trang hiển thị
+    Route::post('/add', [CompareController::class, 'add'])->name('add');   // Thêm (AJAX)
+    Route::post('/remove', [CompareController::class, 'remove'])->name('remove'); // Xóa (AJAX)
+});

@@ -284,7 +284,7 @@
         btn.classList.add('active');
 
         // B. Cập nhật giá hiển thị
-        const formattedPrice = 'Đơn giá: ' + new Intl.NumberFormat('vi-VN').format(price) + '₫';
+        const formattedPrice = 'Đơn giá: ' + new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
         document.getElementById('price-display').innerText = formattedPrice;
         
         // C. Cập nhật tên hiển thị

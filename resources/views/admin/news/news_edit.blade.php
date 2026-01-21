@@ -5,7 +5,6 @@
 {{-- Ẩn lỗi bảo mật CKEditor --}}
 <style>
     .cke_notification_warning { display: none !important; }
-    /* Custom Toggle Switch for Tailwind */
     .toggle-checkbox:checked {
         right: 0;
         border-color: #2563eb;
@@ -33,7 +32,7 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                {{-- CỘT TRÁI (Nội dung chính) --}}
+                {{-- CỘT TRÁI --}}
                 <div class="lg:col-span-2 space-y-6">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Tiêu đề tin <span class="text-red-500">*</span></label>

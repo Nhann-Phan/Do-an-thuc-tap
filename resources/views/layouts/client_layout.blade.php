@@ -271,7 +271,7 @@
         </div>
     </footer>
 
-    {{-- --- CHATBOT & BOOKING FLOATING BUTTONS --- --}}
+    {{-- CHATBOT & BOOKING FLOATING BUTTONS --}}
     @if(!request()->is('admin*') && !request()->is('login') && !request()->is('register'))
         
         {{-- Chat Button --}}
@@ -287,10 +287,10 @@
             <div class="bg-blue-700 text-white p-4 flex justify-between items-center shadow-md">
                 <div class="flex items-center">
                     <div class="w-8 h-8 rounded-full bg-white text-blue-700 flex items-center justify-center mr-2 text-sm font-bold border border-blue-200">
-                        <i class="fa-solid fa-robot"></i>
+                        <i class="fa-solid fa-user"></i>
                     </div>
                     <div>
-                        <span class="font-bold text-sm block">Nhân viên chăm sóc khách hàng</span>
+                        <span class="font-bold text-sm block">Nhân viên hỗ trợ</span>
                         <span class="text-[10px] opacity-90 flex items-center"><span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1 animate-pulse"></span> Đang hoạt động</span>
                     </div>
                 </div>
@@ -301,7 +301,7 @@
             <div id="chat-content" class="flex-1 p-4 overflow-y-auto bg-gray-50 text-sm space-y-3">
                 <div class="flex items-start">
                     <div class="w-8 h-8 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center text-blue-600 text-xs mr-2">
-                        <i class="fa-solid fa-robot"></i>
+                        <i class="fa-solid fa-user"></i>
                     </div>
                     <div class="bg-white border border-gray-100 text-gray-700 p-3 rounded-2xl rounded-tl-none shadow-sm text-xs leading-relaxed max-w-[85%]">
                         Chào bạn! 👋<br>GPM Technology có thể giúp gì cho bạn hôm nay?
