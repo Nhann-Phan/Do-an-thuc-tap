@@ -111,7 +111,7 @@
                             
                             {{-- Dropdown Content --}}
                             {{-- Đã thêm rounded-b-xl và overflow-hidden để bo góc dưới --}}
-                            <div class="absolute top-full left-0 w-full invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out z-50 shadow-2xl border-t-4 border-blue-800 bg-white rounded-b-xl overflow-hidden">
+                            <div class="absolute top-full left-0 w-full invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out z-50 shadow-2xl border-blue-800 bg-white rounded-b-xl overflow-hidden">
                                 {{-- Tính toán cột grid --}}
                                 @php
                                     $cats = isset($menuCategories) ? $menuCategories : collect([]);
@@ -121,13 +121,13 @@
                                 
                                 {{-- Dòng tiêu đề danh mục cha (Màu xanh đậm) --}}
                                 <div class="bg-blue-900 text-white">
-                                    {{-- Bỏ container ở đây vì bên ngoài đã căn rồi --}}
                                     <div class="grid text-[13px] font-bold uppercase tracking-wide divide-x divide-blue-800" style="grid-template-columns: repeat({{ $gridCols }}, minmax(0, 1fr));">
                                         @foreach($cats as $parent)
-                                        <div class="py-3 px-2 flex items-center justify-center text-center h-full hover:bg-blue-800 transition">
+                                        <a href="{{ route('frontend.category.show', $parent->id) }}" 
+                                        class="py-3 px-2 flex items-center justify-center text-center h-full hover:bg-blue-800 transition cursor-pointer">
                                             <i class="{{ $parent->icon ?? 'fas fa-folder' }} mr-2 {{ $loop->first ? 'text-yellow-400' : 'text-blue-300' }}"></i> 
                                             <span>{{ $parent->name }}</span>
-                                        </div>
+                                        </a>
                                         @endforeach
                                     </div>
                                 </div>

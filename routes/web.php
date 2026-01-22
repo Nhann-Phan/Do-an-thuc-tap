@@ -31,19 +31,28 @@ use App\Http\Controllers\Admin\CustomerController;
 // --- Trang chủ ---
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// --- Sản phẩm ---
-Route::get('/san-pham', [ProductController::class, 'index'])->name('product.index'); 
-Route::get('/danh-muc/{id}', [ProductController::class, 'showByCategory'])->name('frontend.category.show');
-Route::get('/san-pham/{id}', [ProductController::class, 'show'])->name('product.detail');
+// --- Sản phẩm & Danh mục ---
+Route::controller(ProductController::class)->group(function() {
+    Route::get('/san-pham', 'index')->name('product.index'); 
+    Route::get('/danh-muc/{id}', 'showByCategory')->name('frontend.category.show');
+    Route::get('/san-pham/{id}', 'show')->name('product.detail');
+});
 
-// --- Trang Giới thiệu (Hiển thị ngoài Client) ---
-// Dùng slug cho chuẩn SEO
+// --- So sánh sản phẩm (Client) ---
+Route::controller(CompareController::class)->prefix('compare')->name('compare.')->group(function() {
+    Route::get('/', 'index')->name('index');     // Trang so sánh
+    Route::post('/add', 'add')->name('add');       // Ajax thêm
+    Route::post('/remove', 'remove')->name('remove'); // Ajax xóa
+});
+
+// --- Trang Tĩnh (Giới thiệu, Chính sách...) ---
 Route::get('/gioi-thieu/{slug}', [HomeController::class, 'showPage'])->name('client.page.detail');
 
 // --- Tin tức (News) ---
-// Đã fix lỗi route name và tham số ID
-Route::get('/tin-tuc', [NewsController::class, 'index'])->name('client.news.index');
-Route::get('/tin-tuc/{id}', [NewsController::class, 'detail'])->name('client.news.detail');
+Route::controller(NewsController::class)->prefix('tin-tuc')->name('client.news.')->group(function() {
+    Route::get('/', 'index')->name('index');
+    Route::get('/{id}', 'detail')->name('detail');
+});
 
 // --- Đặt lịch hẹn (Booking) ---
 Route::post('/book-appointment', [BookingController::class, 'store'])
@@ -67,8 +76,10 @@ Route::controller(CartController::class)->group(function () {
 });
 
 // --- THANH TOÁN (Checkout) ---
-Route::get('/thanh-toan', [CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/thanh-toan', [CheckoutController::class, 'process'])->name('checkout.process');
+Route::controller(CheckoutController::class)->prefix('thanh-toan')->name('checkout.')->group(function() {
+    Route::get('/', 'index')->name('index');
+    Route::post('/', 'process')->name('process');
+});
 
 // --- CHATBOT AI ---
 Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])
@@ -83,50 +94,27 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     
     // --- Dashboard ---
     Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard'); 
+    
+    // --- Quản lý Booking ---
     Route::get('/booking/update/{id}/{status}', [AdminController::class, 'updateStatus'])->name('admin.booking.update');
 
-    // --- Quản lý Tin Tức (News) ---
-    Route::controller(NewsController::class)->prefix('news')->name('news.')->group(function () {
-        Route::get('/', 'indexAdmin')->name('index_admin');
-        Route::get('/create', 'create')->name('create');
-        Route::post('/store', 'store')->name('store');
-        Route::get('/{id}/edit', 'edit')->name('edit');
-        Route::put('/{id}', 'update')->name('update');
-        Route::delete('/{id}', 'destroy')->name('destroy');
-    });
+    // --- Quản lý Khách hàng (CRM) - ĐÃ CHUYỂN VÀO ĐÂY ---
+    Route::controller(CustomerController::class)
+        ->prefix('customers')
+        ->name('admin.customers.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/{id}', 'show')->name('show');
+            Route::get('/{id}/edit', 'edit')->name('edit');
+            Route::put('/{id}', 'update')->name('update');
+        });
 
-    // --- Quản lý Trang Giới thiệu (Pages) ---
-    Route::resource('pages', PageController::class);
-    // Route bật tắt menu cho Pages (Nên để trong admin để bảo mật)
-    Route::patch('/pages/{id}/toggle-menu', [PageController::class, 'toggleMenu'])->name('pages.toggle-menu');
-
-    // --- Quản lý Page Sections (Các khối nội dung chi tiết) ---
-    Route::controller(PageSectionController::class)->group(function () {
-        // Danh sách & Thêm mới (Gắn với Page cha)
-        Route::get('pages/{page}/sections', 'index')->name('page_sections.index');
-        Route::post('pages/{page}/sections', 'store')->name('page_sections.store');
-        
-        // Sửa - Cập nhật - Xóa (Thao tác trực tiếp trên Section)
-        Route::get('page-sections/{section}/edit', 'edit')->name('page_sections.edit');
-        Route::put('page-sections/{section}', 'update')->name('page_sections.update');
-        Route::delete('page-sections/{section}', 'destroy')->name('page_sections.destroy');
-    });
-
-    // --- Quản lý Thư viện ảnh ---
-    Route::controller(GalleryController::class)->prefix('gallery')->name('gallery.')->group(function () {
+    // --- Quản lý Đơn hàng ---
+    Route::controller(OrderController::class)->prefix('orders')->name('admin.orders.')->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::post('/', 'store')->name('store');
-        Route::put('/{id}', 'update')->name('update');
-        Route::get('/delete/{id}', 'destroy')->name('delete');
-    });
-
-    // --- Quản lý Danh mục ---
-    Route::controller(CategoryController::class)->group(function () {
-        Route::get('/categories', 'index')->name('categories.index');
-        Route::post('/categories', 'store')->name('categories.store');
-        Route::put('/categories/{id}', 'update')->name('categories.update');
-        Route::delete('/categories/{id}', 'destroy')->name('categories.destroy');
-        Route::get('/category/{id}', 'show')->name('category.show');
+        Route::get('/{id}', 'show')->name('show');
+        Route::post('/{id}/status', 'updateStatus')->name('update_status');
+        Route::delete('/{id}', 'destroy')->name('destroy');
     });
 
     // --- Quản lý Sản phẩm ---
@@ -141,33 +129,42 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::delete('/product/{id}', 'destroy')->name('product.destroy');
     });
 
-    // --- Quản lý Đơn hàng ---
-    Route::controller(OrderController::class)->prefix('orders')->name('admin.orders.')->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::get('/{id}', 'show')->name('show');
-        Route::post('/{id}/status', 'updateStatus')->name('update_status');
+    // --- Quản lý Danh mục ---
+    Route::controller(CategoryController::class)->group(function () {
+        Route::get('/categories', 'index')->name('categories.index');
+        Route::post('/categories', 'store')->name('categories.store');
+        Route::put('/categories/{id}', 'update')->name('categories.update');
+        Route::delete('/categories/{id}', 'destroy')->name('categories.destroy');
+        Route::get('/category/{id}', 'show')->name('category.show');
+    });
+
+    // --- Quản lý Tin Tức ---
+    Route::controller(NewsController::class)->prefix('news')->name('news.')->group(function () {
+        Route::get('/', 'indexAdmin')->name('index_admin');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/store', 'store')->name('store');
+        Route::get('/{id}/edit', 'edit')->name('edit');
+        Route::put('/{id}', 'update')->name('update');
         Route::delete('/{id}', 'destroy')->name('destroy');
     });
-});
 
-// --- Quản lý Khách hàng (CRM) ---
-Route::controller(CustomerController::class)
-    ->prefix('customers')
-    ->name('admin.customers.')
-    ->group(function () {
-        
-        // Danh sách khách hàng
-        Route::get('/', 'index')->name('index');
-        
-        // Chi tiết khách hàng (Xem lịch sử Booking + Order)
-        Route::get('/{id}', 'show')->name('show');
-        Route::get('/{id}/edit', 'edit')->name('edit');    // Form sửa
-        Route::put('/{id}', 'update')->name('update');     // Xử lý lưu
+    // --- Quản lý Trang & Sections ---
+    Route::resource('pages', PageController::class);
+    Route::patch('/pages/{id}/toggle-menu', [PageController::class, 'toggleMenu'])->name('pages.toggle-menu');
+
+    Route::controller(PageSectionController::class)->group(function () {
+        Route::get('pages/{page}/sections', 'index')->name('page_sections.index');
+        Route::post('pages/{page}/sections', 'store')->name('page_sections.store');
+        Route::get('page-sections/{section}/edit', 'edit')->name('page_sections.edit');
+        Route::put('page-sections/{section}', 'update')->name('page_sections.update');
+        Route::delete('page-sections/{section}', 'destroy')->name('page_sections.destroy');
     });
 
-// Route So sánh sản phẩm
-Route::prefix('compare')->name('compare.')->group(function() {
-    Route::get('/', [CompareController::class, 'index'])->name('index'); // Trang hiển thị
-    Route::post('/add', [CompareController::class, 'add'])->name('add');   // Thêm (AJAX)
-    Route::post('/remove', [CompareController::class, 'remove'])->name('remove'); // Xóa (AJAX)
+    // --- Quản lý Thư viện ảnh ---
+    Route::controller(GalleryController::class)->prefix('gallery')->name('gallery.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::put('/{id}', 'update')->name('update');
+        Route::get('/delete/{id}', 'destroy')->name('delete');
+    });
 });
