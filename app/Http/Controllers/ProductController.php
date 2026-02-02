@@ -7,23 +7,17 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProjectImage;
 use App\Models\News;
-use App\Models\ProductVariant; // <--- 1. QUAN TRỌNG: Phải import Model này
+use App\Models\ProductVariant;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
-    // ==========================================
-    // PHẦN 1: FRONTEND (KHÁCH HÀNG)
-    // ==========================================
-
+    // Phần khách hàng
     public function index()
     {
-        // Lấy sản phẩm hiển thị, kèm theo biến thể để tính giá min-max nếu cần
-        $products = Product::where('is_active', 1)->with('variants')->get();
+        $products = Product::where('is_active', 1)->with('variants')->latest()->get();
         $projectImages = ProjectImage::latest()->take(6)->get();
-        
-        // Lấy 5 tin tức mới nhất
         $latestNews = News::where('is_active', 1)->latest()->take(5)->get();
 
         return view('clients.store', compact('products', 'projectImages', 'latestNews'));
@@ -32,12 +26,14 @@ class ProductController extends Controller
     public function showByCategory($id)
     {
         $currentCategory = Category::with('children')->findOrFail($id);
+        
+        // Lấy ID cha và toàn bộ ID con
         $categoryIds = $currentCategory->children->pluck('id')->toArray();
         $categoryIds[] = $currentCategory->id; 
 
         $products = Product::whereIn('category_id', $categoryIds)
                            ->where('is_active', 1)
-                           ->with('variants') // Eager load variants
+                           ->with('variants')
                            ->orderBy('created_at', 'desc')
                            ->get();
 
@@ -47,20 +43,17 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        // Load kèm variants để hiển thị nút chọn giá
         $product = Product::with(['category.parent', 'category.children', 'variants'])->findOrFail($id);
         
+        // Logic sản phẩm liên quan
         $relatedProducts = collect(); 
-
         if ($product->category) {
             $cat = $product->category;
             $ids = [];
             
-            if ($cat->parent_id) {
-                if ($cat->parent) {
-                     $ids = $cat->parent->children->pluck('id')->toArray();
-                     $ids[] = $cat->parent_id; 
-                }
+            if ($cat->parent_id && $cat->parent) {
+                  $ids = $cat->parent->children->pluck('id')->toArray();
+                  $ids[] = $cat->parent_id; 
             } else {
                 $ids = $cat->children->pluck('id')->toArray();
                 $ids[] = $cat->id;
@@ -80,13 +73,10 @@ class ProductController extends Controller
         return view('clients.category.product_detail', compact('product', 'menuCategories', 'relatedProducts'));
     }
 
-    // ==========================================
-    // PHẦN 2: BACKEND ADMIN (QUẢN TRỊ)
-    // ==========================================
+    // Phần quản trị
 
     public function indexAdmin(Request $request)
     {
-        // Load thêm 'variants' để đếm số lượng phiên bản ở trang danh sách
         $query = Product::with(['category', 'variants'])->latest();
         
         if ($request->has('keyword') && $request->keyword != '') {
@@ -109,7 +99,7 @@ class ProductController extends Controller
         return view('admin.product_create', compact('categories', 'selectedCategoryId'));
     }
 
-    // --- HÀM LƯU MỚI (ĐÃ CẬP NHẬT: LƯU SỐ LƯỢNG + CẬP NHẬT GIÁ GỐC) ---
+    // --- HÀM LƯU MỚI (Đã thêm xử lý SPECS) ---
     public function store(Request $request)
     {
         $request->validate([
@@ -119,11 +109,15 @@ class ProductController extends Controller
             'brand' => 'nullable|string|max:255', 
         ]);
 
+        // 1. Chuẩn bị dữ liệu cơ bản
         $data = $request->all();
         $data['slug'] = Str::slug($request->name) . '-' . time();
         $data['price'] = $request->input('price', 0); 
         $data['brand'] = $request->brand;
+        $data['is_active'] = $request->has('is_active') ? 1 : 0;
+        $data['is_hot'] = $request->has('is_hot') ? 1 : 0;
 
+        // 2. Xử lý ảnh
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
@@ -131,19 +125,25 @@ class ProductController extends Controller
             $data['image'] = 'uploads/products/' . $filename;
         }
 
-        $data['is_active'] = $request->has('is_active') ? 1 : 0;
-        $data['is_hot'] = $request->has('is_hot') ? 1 : 0;
+        $specsInput = $request->input('specs');
+        if ($specsInput) {
+            $cleanSpecs = array_filter($specsInput, function($value) {
+                return !is_null($value) && $value !== '';
+            });
+            // Gán vào data (Model sẽ tự động ép kiểu sang JSON nhờ $casts)
+            $data['specs'] = !empty($cleanSpecs) ? $cleanSpecs : null;
+        }
 
-        // 1. Tạo sản phẩm chính
+        // 4. Tạo sản phẩm
         $product = Product::create($data);
 
-        // 2. Lưu các biến thể (Variants)
+        // 5. Lưu các biến thể (Variants)
         $hasVariants = false;
         if ($request->has('variants')) {
             foreach ($request->variants as $variantData) {
                 if (!empty($variantData['name']) && !empty($variantData['price'])) {
                     ProductVariant::create([
-                        'product_id' => $product->id, // Lấy ID vừa tạo
+                        'product_id' => $product->id,
                         'name'     => $variantData['name'],
                         'price'    => $variantData['price'],
                         'quantity' => isset($variantData['quantity']) ? (int)$variantData['quantity'] : 0 
@@ -153,11 +153,9 @@ class ProductController extends Controller
             }
         }
 
-        // 🔥 [LOGIC MỚI] 3. Cập nhật giá Product = Giá biến thể thấp nhất
+        // 6. Cập nhật giá Product = Giá biến thể thấp nhất (Nếu có)
         if ($hasVariants) {
-            // Tìm giá thấp nhất trong các biến thể vừa tạo
             $minPrice = $product->variants()->min('price');
-            
             if ($minPrice !== null) {
                 $product->update(['price' => $minPrice]);
             }
@@ -170,13 +168,12 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        // Load variants để hiển thị trong form sửa
         $product = Product::with('variants')->findOrFail($id);
         $categories = Category::all(); 
         return view('admin.product_edit', compact('product', 'categories'));
     }
 
-    // --- HÀM CẬP NHẬT (ĐÃ CẬP NHẬT: LƯU SỐ LƯỢNG + CẬP NHẬT GIÁ GỐC) ---
+    // --- HÀM CẬP NHẬT (Đã thêm xử lý SPECS) ---
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id); 
@@ -188,10 +185,14 @@ class ProductController extends Controller
             'brand' => 'nullable|string|max:255', 
         ]);
 
+        // 1. Chuẩn bị dữ liệu cập nhật
         $data = $request->all();
         $data['slug'] = Str::slug($request->name) . '-' . $product->id;
         $data['brand'] = $request->brand;
+        $data['is_active'] = $request->has('is_active') ? 1 : 0;
+        $data['is_hot'] = $request->has('is_hot') ? 1 : 0;
 
+        // 2. Xử lý ảnh mới (Xóa ảnh cũ)
         if ($request->hasFile('image')) {
             if ($product->image && File::exists(public_path($product->image))) {
                 File::delete(public_path($product->image));
@@ -202,13 +203,23 @@ class ProductController extends Controller
             $data['image'] = 'uploads/products/' . $filename;
         }
 
-        $data['is_active'] = $request->has('is_active') ? 1 : 0;
-        $data['is_hot'] = $request->has('is_hot') ? 1 : 0;
+        // 3. XỬ LÝ SPECS (THÔNG SỐ KỸ THUẬT) 
+        $specsInput = $request->input('specs');
+        // Nếu user gửi lên specs thì xử lý, nếu không gửi (hoặc xóa hết) thì set null
+        if ($specsInput) {
+            $cleanSpecs = array_filter($specsInput, function($value) {
+                return !is_null($value) && $value !== '';
+            });
+            $data['specs'] = !empty($cleanSpecs) ? $cleanSpecs : null;
+        } else {
+             // Trường hợp user không nhập gì cả
+             $data['specs'] = null; 
+        }
 
-        // 1. Cập nhật thông tin chính (bao gồm giá user nhập tạm thời)
+        // 4. Update thông tin chính
         $product->update($data);
 
-        // 2. Xử lý cập nhật Biến thể (Thêm/Sửa/Xóa)
+        // 5. Xử lý cập nhật Biến thể (Thêm/Sửa/Xóa)
         if ($request->has('variants')) {
             foreach ($request->variants as $variantData) {
                 
@@ -217,13 +228,13 @@ class ProductController extends Controller
                     if (isset($variantData['id'])) {
                         ProductVariant::destroy($variantData['id']);
                     }
-                    continue; // Bỏ qua dòng này
+                    continue; 
                 }
 
                 // B. Thêm mới hoặc Cập nhật
                 if (!empty($variantData['name']) && !empty($variantData['price'])) {
                     ProductVariant::updateOrCreate(
-                        ['id' => $variantData['id'] ?? null], // Điều kiện tìm
+                        ['id' => $variantData['id'] ?? null], 
                         [
                             'product_id' => $product->id,
                             'name'     => $variantData['name'],
@@ -235,15 +246,11 @@ class ProductController extends Controller
             }
         }
 
-        // 🔥 [LOGIC MỚI] 3. Tính toán lại giá Min sau khi đã Xóa/Sửa/Thêm xong
-        // Gọi database để lấy danh sách biến thể MỚI NHẤT
+        // 6. Tính toán lại giá Min
         $minPrice = $product->variants()->min('price');
-
         if ($minPrice !== null) {
-            // Nếu còn biến thể, cập nhật giá Product = giá biến thể thấp nhất
             $product->update(['price' => $minPrice]);
         } 
-        // Nếu không còn biến thể nào (minPrice == null), giữ nguyên giá user nhập ở bước 1
 
         return redirect()->route('admin.category.products', $product->category_id)->with('success', 'Cập nhật thành công!');
     }
@@ -256,7 +263,7 @@ class ProductController extends Controller
             File::delete(public_path($product->image));
         }
         
-        // Variants sẽ tự động xóa nhờ ràng buộc khóa ngoại (cascade) trong migration
+        // Variants sẽ tự động xóa nhờ ràng buộc database (cascade)
         $product->delete();
 
         return redirect()->back()->with('success', 'Đã xóa sản phẩm!');
@@ -269,7 +276,7 @@ class ProductController extends Controller
         $categoryIds[] = $category->id;
 
         $products = Product::whereIn('category_id', $categoryIds)
-                           ->with('variants') // Load thêm variants
+                           ->with('variants')
                            ->latest()
                            ->paginate(10);
         

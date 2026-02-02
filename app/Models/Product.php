@@ -9,22 +9,27 @@ class Product extends Model
 {
     use HasFactory;
 
-    // Khai báo cho phép lưu tất cả các cột
+    // Khai báo cho phép lưu tất cả các cột (Mass Assignment)
     protected $fillable = [
         'name', 
         'slug',
-        'sku',              // Mã sản phẩm
-        'brand',            // Thương hiệu
-        'category_id',      // ID danh mục
-        'price',            // Giá bán
-        'sale_price',       // Giá khuyến mãi
-        'quantity',         // Số lượng
-        'short_description', // Mô tả ngắn
-        'description',      // Bài viết chi tiết
-        'image',            // Ảnh đại diện
-        'gallery',          // Thư viện ảnh
-        'is_active',        // Trạng thái hiển thị
-        'is_hot'            // Sản phẩm HOT
+        'sku',      
+        'brand',       
+        'category_id',   
+        'price',     
+        'sale_price',    
+        'quantity',     
+        'short_description', 
+        'description', 
+        'specs',
+        'image',           
+        'gallery',          
+        'is_active',     
+        'is_hot'            
+    ];
+
+    protected $casts = [
+        'specs' => 'array',
     ];
 
     // Quan hệ với bảng Categories (Danh mục)
@@ -33,7 +38,7 @@ class Product extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    // --- BỔ SUNG: Quan hệ với bảng ProductVariants (Biến thể giá) ---
+    // Quan hệ với bảng ProductVariants (Biến thể giá)
     public function variants()
     {
         return $this->hasMany(ProductVariant::class)->orderBy('created_at', 'asc');
