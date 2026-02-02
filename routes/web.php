@@ -43,6 +43,7 @@ Route::controller(CompareController::class)->prefix('compare')->name('compare.')
     Route::get('/', 'index')->name('index');     // Trang so sánh
     Route::post('/add', 'add')->name('add');       // Ajax thêm
     Route::post('/remove', 'remove')->name('remove'); // Ajax xóa
+    Route::post('/clear', 'clear')->name('clear'); // Ajax xóa toàn bộ
 });
 
 // --- Trang Tĩnh (Giới thiệu, Chính sách...) ---

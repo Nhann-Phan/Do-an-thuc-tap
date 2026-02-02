@@ -2,7 +2,6 @@
 
 @section('content')
 
-{{-- 1. BREADCRUMB (Đường dẫn) --}}
 <nav class="bg-gray-50 border-b border-gray-200 py-4 mb-8">
     <div class="container mx-auto px-4">
         <ol class="flex text-sm text-gray-500 items-center gap-2 overflow-hidden whitespace-nowrap font-medium">
@@ -27,11 +26,9 @@
     </div>
 </nav>
 
-{{-- 2. MAIN CONTENT --}}
 <div class="container mx-auto px-4 pb-16">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         
-        {{-- SIDEBAR: DANH MỤC --}}
         <aside class="hidden lg:block lg:col-span-1">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-24">
                 <div class="bg-gray-50 px-5 py-4 border-b border-gray-200">
@@ -42,40 +39,46 @@
                 
                 <div class="flex flex-col py-2">
                     @foreach($menuCategories as $cat)
-                        <a href="{{ route('frontend.category.show', $cat->id) }}" 
-                           class="px-5 py-3 text-sm font-medium transition flex items-center justify-between group 
-                                  {{ $currentCategory->id == $cat->id ? 'text-blue-600 bg-blue-50/50' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50' }}">
-                            <span class="flex items-center">
-                                <i class="{{ $cat->icon ?? 'fas fa-folder' }} mr-3 text-xs {{ $currentCategory->id == $cat->id ? 'text-blue-500' : 'text-gray-400 group-hover:text-blue-500' }}"></i> 
-                                {{ $cat->name }}
-                            </span>
-                            @if($cat->children && $cat->children->count() > 0)
-                                <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
-                            @endif
-                        </a>
-                        
-                        @if(($currentCategory->id == $cat->id || $currentCategory->parent_id == $cat->id) && $cat->children && $cat->children->count() > 0)
-                            <div class="bg-gray-50/30 border-t border-b border-gray-100 py-1">
-                                @foreach($cat->children as $child)
-                                    <a href="{{ route('frontend.category.show', $child->id) }}" 
-                                       class="pl-12 pr-5 py-2 text-xs transition flex items-center relative
-                                              {{ $currentCategory->id == $child->id ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-blue-600' }}">
-                                        @if($currentCategory->id == $child->id)
-                                            <span class="absolute left-9 w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-                                        @endif
-                                        {{ $child->name }}
-                                    </a>
-                                @endforeach
+                        @php
+                            $isActive = ($currentCategory->id == $cat->id || $currentCategory->parent_id == $cat->id);
+                            $hasChildren = $cat->children && $cat->children->count() > 0;
+                        @endphp
+
+                        <div class="group">
+                            <div class="flex items-center justify-between px-5 py-3 text-sm font-medium transition hover:bg-gray-50 {{ $isActive ? 'bg-blue-50/50 text-blue-600' : 'text-gray-600' }}">
+                                <a href="{{ route('frontend.category.show', $cat->id) }}" class="flex items-center flex-1 hover:text-blue-600">
+                                    <i class="{{ $cat->icon ?? 'fas fa-folder' }} mr-3 text-xs {{ $isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-blue-500' }}"></i> 
+                                    {{ $cat->name }}
+                                </a>
+
+                                @if($hasChildren)
+                                    <button onclick="toggleSubMenu('menu-{{ $cat->id }}', this)" 
+                                            class="p-1 rounded hover:bg-gray-200 text-gray-400 transition-transform duration-200 {{ $isActive ? 'rotate-180 text-blue-500' : '' }}">
+                                        <i class="fas fa-chevron-down text-[10px]"></i>
+                                    </button>
+                                @endif
                             </div>
-                        @endif
+                            
+                            @if($hasChildren)
+                                <div id="menu-{{ $cat->id }}" class="bg-gray-50/30 border-t border-b border-gray-100 py-1 transition-all duration-300 {{ $isActive ? 'block' : 'hidden' }}">
+                                    @foreach($cat->children as $child)
+                                        <a href="{{ route('frontend.category.show', $child->id) }}" 
+                                           class="pl-12 pr-5 py-2 text-xs transition flex items-center relative {{ $currentCategory->id == $child->id ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-blue-600' }}">
+                                            @if($currentCategory->id == $child->id)
+                                                <span class="absolute left-9 w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                            @endif
+                                            {{ $child->name }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
                     @endforeach
                 </div>
             </div>
         </aside>
 
-        {{-- MAIN PRODUCT LIST --}}
         <div class="col-span-1 lg:col-span-3">
-            {{-- Header & Sort --}}
             <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 gap-4">
                 <h1 class="text-2xl font-bold text-gray-900 flex items-center">
                     {{ $currentCategory->name }} 
@@ -100,12 +103,10 @@
                 </div>
             </div>
 
-            {{-- Product Grid --}}
             <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 @forelse($products as $product)
                 <div class="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
                     
-                    {{-- Badges --}}
                     <div class="absolute top-3 left-3 z-10 flex flex-col gap-1">
                         @if($product->is_hot)
                             <span class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm uppercase tracking-wider animate-pulse">HOT</span>
@@ -117,7 +118,6 @@
                         @endif
                     </div>
 
-                    {{-- Image --}}
                     <div class="relative pt-[100%] overflow-hidden bg-white border-b border-gray-50 group-hover:border-gray-100 transition-colors">
                         <a href="{{ route('product.detail', $product->id) }}" class="absolute inset-0 flex items-center justify-center p-6">
                             @if($product->image)
@@ -129,9 +129,11 @@
                             @endif
                         </a>
                         
-                        {{-- Quick Action (Nút Xem & So sánh) --}}
                         <div class="absolute bottom-0 left-0 w-full p-2 translate-y-full group-hover:translate-y-0 transition duration-300 z-30">
-                            <div class="flex">
+                            <div class="flex gap-2">
+                                <a href="{{ route('product.detail', $product->id) }}" class="flex-1 bg-white/90 hover:bg-white text-gray-800 hover:text-blue-600 border border-gray-100 text-center text-xs font-bold py-2 rounded shadow-sm backdrop-blur-sm uppercase tracking-wide transition flex items-center justify-center" title="Xem chi tiết">
+                                    <i class="fas fa-eye mr-1"></i> Xem
+                                </a>
                                 <button type="button" onclick="addToCompare({{ $product->id }})" class="flex-1 bg-blue-600/90 hover:bg-blue-700 text-white text-center text-xs font-bold py-2 rounded shadow-md backdrop-blur-sm uppercase tracking-wide transition flex items-center justify-center" title="Thêm vào so sánh">
                                     <i class="fas fa-exchange-alt mr-1"></i> So sánh
                                 </button>
@@ -139,7 +141,6 @@
                         </div>
                     </div>
 
-                    {{-- Content --}}
                     <div class="p-4 flex flex-col flex-grow">
                         <h3 class="text-sm font-bold text-gray-700 mb-2 line-clamp-2 h-10 group-hover:text-blue-600 transition leading-snug">
                             <a href="{{ route('product.detail', $product->id) }}">{{ $product->name }}</a>
@@ -187,7 +188,6 @@
     </div>
 </div>
 
-{{-- 3. TOAST NOTIFICATION (Thông báo góc phải) --}}
 <div id="toast-notification" class="hidden fixed top-24 right-5 z-[100] max-w-xs w-full bg-white border border-gray-100 rounded-xl shadow-2xl transform transition-all duration-500 ease-in-out translate-x-full opacity-0">
     <div class="flex items-center p-4">
         <div id="toast-icon" class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-green-100 text-green-600"></div>
@@ -201,12 +201,10 @@
     </div>
 </div>
 
-{{-- 4. STICKY COMPARE BAR (Thanh so sánh dưới cùng) --}}
 <div id="compare-sticky-bar" class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-blue-600 shadow-[0_-5px_15px_rgba(0,0,0,0.15)] z-[99] transition-transform duration-300 transform translate-y-full">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
         
         <div class="flex items-center gap-4">
-            {{-- Icon gốc --}}
             <div class="bg-blue-100 text-blue-600 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
                 <i class="fas fa-exchange-alt"></i>
             </div>
@@ -214,15 +212,13 @@
             <div class="flex flex-col">
                 <p class="text-xs text-gray-500 uppercase font-bold mb-1">Danh sách so sánh (<span id="compare-count-display">0</span>)</p>
                 
-                {{-- Container chứa ảnh sản phẩm --}}
                 <div id="compare-items-container" class="flex items-center gap-2">
-                    {{-- JS sẽ render ảnh vào đây --}}
                 </div>
             </div>
         </div>
 
         <div class="flex items-center gap-3">
-            <button onclick="hideCompareBar()" class="text-gray-500 hover:text-red-500 text-sm font-medium px-3 transition">
+            <button onclick="clearAndHideCompareBar()" class="text-gray-500 hover:text-red-500 text-sm font-medium px-3 transition">
                 <i class="fas fa-times"></i> Đóng
             </button>
             <a href="{{ route('compare.index') }}" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-2 px-5 rounded-lg shadow-md transition flex items-center gap-2 transform active:scale-95 text-sm">
@@ -232,9 +228,7 @@
     </div>
 </div>
 
-{{-- 5. JAVASCRIPT XỬ LÝ --}}
 <script>
-    // --- A. Toast Notification Logic ---
     let toastTimeout;
     function showToast(message, type = 'success') {
         const toast = document.getElementById('toast-notification');
@@ -244,7 +238,6 @@
 
         msgEl.innerText = message;
         
-        // Cấu hình màu sắc icon
         if (type === 'success') {
             iconEl.innerHTML = '<i class="fas fa-check"></i>';
             iconEl.className = 'flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-green-100 text-green-600';
@@ -259,7 +252,6 @@
             progressEl.className = 'h-full bg-blue-500 w-full transition-all duration-[5000ms] ease-linear';
         }
 
-        // Hiện Toast
         toast.classList.remove('hidden');
         progressEl.style.width = '100%';
         setTimeout(() => {
@@ -267,15 +259,14 @@
             progressEl.style.width = '0%';
         }, 10);
 
-        // Tự ẩn
         clearTimeout(toastTimeout);
         toastTimeout = setTimeout(hideToast, 5000);
     }
+    
     function hideToast() {
         document.getElementById('toast-notification').classList.add('translate-x-full', 'opacity-0');
     }
 
-    // --- B. AJAX Add To Compare ---
     function addToCompare(productId) {
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         
@@ -287,8 +278,7 @@
         .then(res => res.json())
         .then(data => {
             if(data.status === 'success') {
-                showToast(data.message, 'success');
-                updateCompareBarUI(data.list); // Cập nhật thanh bar
+                updateCompareBarUI(data.list); 
             } else if (data.status === 'warning') {
                 showToast(data.message, 'warning');
             } else {
@@ -298,7 +288,6 @@
         .catch(err => console.error(err));
     }
 
-    // --- C. AJAX Remove From Bar ---
     function removeCompareItem(productId) {
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         
@@ -309,23 +298,19 @@
         })
         .then(res => res.json())
         .then(data => {
-            updateCompareBarUI(data.list); // Cập nhật thanh bar sau khi xóa
-            showToast('Đã xóa sản phẩm khỏi so sánh', 'success');
+            updateCompareBarUI(data.list); 
         })
         .catch(err => console.error(err));
     }
 
-    // --- D. Update UI Sticky Bar ---
     function updateCompareBarUI(products) {
         const bar = document.getElementById('compare-sticky-bar');
         const container = document.getElementById('compare-items-container');
         const countDisplay = document.getElementById('compare-count-display');
 
-        // Cập nhật số lượng
         countDisplay.innerText = products.length;
-
-        // Render ảnh sản phẩm
         container.innerHTML = '';
+        
         if (products.length > 0) {
             products.forEach(p => {
                 const imageUrl = p.image ? `/${p.image}` : 'https://via.placeholder.com/50';
@@ -339,9 +324,9 @@
                 `;
                 container.insertAdjacentHTML('beforeend', itemHtml);
             });
-            bar.classList.remove('translate-y-full'); // Hiện thanh
+            bar.classList.remove('translate-y-full');
         } else {
-            bar.classList.add('translate-y-full'); // Ẩn thanh nếu rỗng
+            bar.classList.add('translate-y-full');
         }
     }
 
@@ -349,18 +334,40 @@
         document.getElementById('compare-sticky-bar').classList.add('translate-y-full');
     }
 
-    // --- E. Load dữ liệu ban đầu khi F5 trang ---
+    function clearAndHideCompareBar() {
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        fetch('{{ route("compare.clear") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': token }
+        })
+        .then(res => res.json())
+        .then(data => {
+            updateCompareBarUI([]); 
+            hideCompareBar();
+        })
+        .catch(err => console.error(err));
+    }
+
+    function toggleSubMenu(menuId, btn) {
+        const menu = document.getElementById(menuId);
+        if (menu.classList.contains('hidden')) {
+            menu.classList.remove('hidden');
+            btn.classList.add('rotate-180', 'text-blue-500');
+        } else {
+            menu.classList.add('hidden');
+            btn.classList.remove('rotate-180', 'text-blue-500');
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         @php
             $currentCompareList = [];
             if(Session::has('compare_products')) {
                 $ids = Session::get('compare_products');
-                // Lấy danh sách sản phẩm từ DB để hiển thị ảnh
                 $currentCompareList = \App\Models\Product::whereIn('id', $ids)->select('id', 'name', 'image')->get();
             }
         @endphp
-        
-        // Truyền dữ liệu từ PHP sang JS
         const initialProducts = @json($currentCompareList);
         updateCompareBarUI(initialProducts);
     });

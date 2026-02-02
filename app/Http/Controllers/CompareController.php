@@ -64,4 +64,14 @@ class CompareController extends Controller
             'list' => $this->getCurrentCompareList()
         ]);
     }
+
+    // Thêm hàm này để xóa toàn bộ session
+    public function clear()
+    {
+        Session::forget('compare_products');
+        return response()->json([
+            'status' => 'success', 
+            'message' => 'Đã xóa toàn bộ danh sách so sánh!'
+        ]);
+    }
 }
