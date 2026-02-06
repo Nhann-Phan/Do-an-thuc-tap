@@ -5,57 +5,54 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        /* Tùy chỉnh CSS cho nội dung bài viết (CKEditor) */
+        /* CSS nội dung bài viết */
+        .product-description { color: #374151; line-height: 1.7; font-size: 15px; }
         .product-description h2 { font-size: 1.5rem; font-weight: 700; margin: 1.5rem 0 1rem; color: #1e3a8a; }
         .product-description h3 { font-size: 1.25rem; font-weight: 600; margin: 1.25rem 0 0.75rem; color: #1f2937; }
-        .product-description p { margin-bottom: 1rem; line-height: 1.7; color: #374151; }
-        .product-description ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .product-description p { margin-bottom: 1rem; }
         .product-description img { border-radius: 0.5rem; margin: 1.5rem auto; max-width: 100%; height: auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        
-        /* Style cho nút biến thể khi Active */
-        .variant-btn.active {
-            border-color: #2563eb;
-            background-color: #eff6ff;
-            color: #1d4ed8;
-            font-weight: 600;
-            box-shadow: 0 0 0 1px #2563eb;
+        .variant-btn.active { border-color: #2563eb; background-color: #eff6ff; color: #1d4ed8; font-weight: 600; box-shadow: 0 0 0 1px #2563eb; }
+
+        /* --- CSS CHO TABS (QUAN TRỌNG) --- */
+        .tab-btn {
+            position: relative;
+            padding: 15px 0;
+            margin-right: 35px;
+            font-size: 1.125rem; /* 18px */
+            font-weight: 700;
+            color: #6b7280; /* Màu xám khi chưa chọn */
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
         }
 
-        /* --- CSS MỚI: BẢNG THÔNG SỐ CHIA CỘT ĐẸP (Giống hình mẫu) --- */
-        .specs-sidebar-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            font-size: 13px; 
-        }
-        
-        .specs-sidebar-table tr { 
-            border-bottom: 1px dashed #e5e7eb; /* Kẻ nét đứt màu xám nhạt */
-        }
-        
-        .specs-sidebar-table tr:last-child { 
-            border-bottom: none; /* Bỏ kẻ dòng cuối */
-        }
-        
-        .specs-sidebar-table td { 
-            padding: 10px 0; /* Khoảng cách thoáng */
-            vertical-align: top; /* Căn chữ lên trên cùng */
-            line-height: 1.4; 
+        .tab-btn:hover { color: #2563eb; }
+
+        /* Trạng thái Active của Tab */
+        .tab-btn.active {
+            color: #2563eb; /* Màu xanh */
+            border-bottom-color: #2563eb;
         }
 
-        /* Cột trái (Tên thông số) - 35% chiều rộng */
-        .specs-sidebar-table td:first-child { 
-            width: 35%; 
-            color: #64748b; /* Màu xám */
-            font-weight: 500;
-            padding-right: 10px; /* Khoảng cách với cột phải */
+        /* Hiệu ứng chuyển tab */
+        .tab-content { display: none; animation: fadeIn 0.4s ease-out; }
+        .tab-content.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Cột phải (Giá trị) - 65% chiều rộng */
-        .specs-sidebar-table td:last-child { 
-            width: 65%;
-            color: #0f172a; /* Màu đen đậm */
-            font-weight: 600; 
-        }
+        /* Bảng thông số trong Tab */
+        .specs-tab-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+        .specs-tab-table tr { border-bottom: 1px solid #e5e7eb; }
+        .specs-tab-table tr:nth-child(even) { background-color: #f9fafb; } /* Màu ngựa vằn */
+        .specs-tab-table td { padding: 14px 16px; vertical-align: top; }
+        .specs-tab-table td:first-child { width: 30%; color: #64748b; font-weight: 500; }
+        .specs-tab-table td:last-child { width: 70%; color: #1e293b; font-weight: 600; }
     </style>
 @endpush
 
@@ -78,22 +75,21 @@
 <div class="container mx-auto px-4 pb-16">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
         
-        {{-- CỘT TRÁI (LỚN): ẢNH + THÔNG TIN + MÔ TẢ --}}
+        {{-- CỘT TRÁI (LỚN): CHỨA TẤT CẢ NỘI DUNG CHÍNH --}}
         <div class="lg:col-span-9">
             
-            {{-- PRODUCT TOP SECTION --}}
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
-                {{-- 1. Ảnh sản phẩm (Chiếm 5 phần) --}}
+            {{-- 1. PHẦN TRÊN: ẢNH & GIÁ (Giữ nguyên) --}}
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12 items-start">
                 <div class="md:col-span-5">
                     <div class="border border-gray-200 rounded-xl p-4 bg-white relative group overflow-hidden shadow-sm">
                         @if($product->sale_price)
-                            <div class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-md z-10">
+                            <div class="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md z-10">
                                 -{{ round((($product->price - $product->sale_price)/$product->price)*100) }}%
                             </div>
                         @endif
                         <div class="aspect-square flex items-center justify-center overflow-hidden bg-white">
                             @if($product->image)
-                                <img src="{{ asset($product->image) }}" class="max-w-full max-h-full object-contain cursor-zoom-in transition duration-500 hover:scale-110" alt="{{ $product->name }}">
+                                <img src="{{ asset($product->image) }}" class="max-w-full max-h-full object-contain cursor-zoom-in transition duration-500 hover:scale-110">
                             @else
                                 <div class="text-gray-300 flex flex-col items-center"><i class="fas fa-image text-5xl mb-2"></i><span class="text-sm">No Image</span></div>
                             @endif
@@ -101,7 +97,6 @@
                     </div>
                 </div>
 
-                {{-- 2. Thông tin chi tiết --}}
                 <div class="md:col-span-7 flex flex-col h-full">
                     <h1 class="text-xl md:text-2xl font-bold text-gray-900 leading-snug mb-3">{{ $product->name }}</h1>
                     
@@ -111,8 +106,7 @@
                         <span class="text-gray-500">Thương hiệu: <span class="text-blue-600 font-bold">{{ $product->brand ?? 'N/A' }}</span></span>
                     </div>
 
-                    {{-- Khu vực giá --}}
-                    <div class="mb-6 bg-gray-50 rounded-xl border border-gray-100 flex items-end gap-3 p-4">
+                    <div class="mb-6 bg-gray-50 rounded-xl border border-gray-100 p-4 flex items-end gap-3">
                         @php
                             $currentPrice = $product->variants->count() > 0 ? $product->variants->first()->price : ($product->sale_price ?? $product->price);
                             $originalPrice = $product->sale_price ? $product->price : null;
@@ -124,7 +118,6 @@
                         @endif
                     </div>
 
-                    {{-- Chọn biến thể --}}
                     @if($product->variants && $product->variants->count() > 0)
                     <div class="mb-6">
                         <h3 class="text-sm font-bold text-gray-800 mb-3 uppercase tracking-wide">
@@ -143,15 +136,13 @@
                     </div>
                     @endif
 
-                    {{-- Thông tin bổ sung --}}
-                    <div class="text-gray-600 text-sm leading-relaxed mb-8 bg-white rounded-lg">
-                        <ul class="space-y-2">
+                    <div class="text-gray-600 text-sm leading-relaxed mb-6 bg-white rounded-lg">
+                        <ul class="space-y-2 mb-4">
                             <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i><span>Tình trạng: <span class="text-green-600 font-medium">Còn hàng</span></span></li>
                             <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i><span>Bảo hành chính hãng</span></li>
                         </ul>
                     </div>
 
-                    {{-- Nút mua hàng --}}
                     <div class="flex gap-4 mt-auto">
                         @php
                             $defaultVariantId = $product->variants->count() > 0 ? $product->variants->first()->id : '';
@@ -168,15 +159,54 @@
                 </div>
             </div>
 
-            {{-- PRODUCT DESCRIPTION SECTION --}}
+            {{-- 🔥 2. HỆ THỐNG TABS: CHI TIẾT SẢN PHẨM | THÔNG SỐ KỸ THUẬT 🔥 --}}
             <div class="mb-16">
-                <div class="border-b border-gray-200 mb-6">
-                    <h2 class="inline-block py-3 px-1 border-b-2 border-blue-600 text-blue-800 font-bold text-lg uppercase tracking-wide">
+                {{-- Tab Headers --}}
+                <div class="flex border-b border-gray-200 mb-6">
+                    <button type="button" class="tab-btn active text-xl font-bold text-gray-800 uppercase pr-[10%]" onclick="openTab(event, 'tab-description')">
                         Chi tiết sản phẩm
-                    </h2>
+                    </button>
+                    @if(!empty($product->specs))
+                    <button type="button" class="tab-btn text-xl font-bold text-gray-800 uppercase" onclick="openTab(event, 'tab-specs')">
+                        Thông số kỹ thuật
+                    </button>
+                    @endif
                 </div>
-                <div class="product-description text-gray-700 leading-7 text-[15px]">
-                    {!! $product->description ?? '<div class="p-8 text-center text-gray-400 bg-gray-50 rounded-lg italic">Đang cập nhật nội dung chi tiết...</div>' !!}
+
+                {{-- Tab Content: Mô tả (Mặc định hiện) --}}
+                <div id="tab-description" class="tab-content active">
+                    <div class="product-description text-gray-700 leading-7 text-[15px]">
+                        {!! $product->description ?? '<div class="p-8 text-center text-gray-400 bg-gray-50 rounded-lg italic">Đang cập nhật nội dung chi tiết...</div>' !!}
+                    </div>
+                </div>
+
+                {{-- Tab Content: Thông số (Mặc định ẩn) --}}
+                <div id="tab-specs" class="tab-content hidden">
+                    @if(!empty($product->specs) && count($product->specs) > 0)
+                        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                            <table class="w-full text-sm text-left">
+                                <tbody>
+                                    @foreach($product->specs as $key => $value)
+                                        <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+                                            <td class="px-6 py-4 font-semibold text-gray-900 bg-gray-50/50 w-1/3 md:w-1/4">
+                                                {{ $key }}
+                                            </td>
+                                            <td class="px-6 py-4 text-gray-600">
+                                                {{ $value }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="flex flex-col items-center justify-center bg-gray-50 border border-dashed border-gray-300 rounded-xl py-12">
+                            <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span class="text-gray-400 font-medium">Chưa có thông số kỹ thuật cho sản phẩm này.</span>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -219,11 +249,9 @@
             @endif
         </div>
 
-        {{-- CỘT PHẢI (NHỎ): SIDEBAR + THÔNG SỐ KỸ THUẬT --}}
+        {{-- CỘT PHẢI (SIDEBAR): CHỈ CÒN SẢN PHẨM NỔI BẬT --}}
         <div class="lg:col-span-3">
-            <div class="sticky top-24 space-y-6"> 
-                
-                {{-- 1. SẢN PHẨM NỔI BẬT --}}
+            <div class="sticky top-24">
                 <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                     <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
                         <h4 class="font-bold text-gray-800 uppercase text-sm border-l-4 border-blue-600 pl-3">Sản phẩm nổi bật</h4>
@@ -244,33 +272,8 @@
                         @endif
                     </div>
                 </div>
-
-                {{-- 2. BẢNG THÔNG SỐ KỸ THUẬT (ĐÃ THÊM CHIA CỘT) --}}
-                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                        <h4 class="font-bold text-gray-800 uppercase text-sm border-l-4 border-red-600 pl-3">Thông số kỹ thuật</h4>
-                    </div>
-                    <div class="p-4">
-                        @if(!empty($product->specs))
-                            <table class="specs-sidebar-table">
-                                <tbody>
-                                    @foreach($product->specs as $key => $value)
-                                        <tr>
-                                            <td>{{ $key }}</td>
-                                            <td>{{ $value }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @else
-                            <div class="text-center text-gray-400 italic py-4 text-sm">Đang cập nhật thông số...</div>
-                        @endif
-                    </div>
-                </div>
-
             </div>
         </div>
-
     </div>
 </div>
 
@@ -288,6 +291,31 @@
         if(nameDisplay) nameDisplay.innerText = name;
         document.getElementById('btn-add-to-cart').href = `${baseUrlAddToCart}?variant_id=${variantId}`;
         document.getElementById('btn-buy-now').href = `${baseUrlBuyNow}?variant_id=${variantId}`;
+    }
+
+    // --- JS XỬ LÝ TABS ---
+    function openTab(evt, tabName) {
+        // 1. Ẩn tất cả nội dung tab
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+
+        // 2. Bỏ class active ở tất cả nút
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // 3. Hiện tab được chọn và thêm class active cho nút
+        document.getElementById(tabName).style.display = "block";
+        setTimeout(() => {
+             document.getElementById(tabName).classList.add("active");
+        }, 10); // Hack nhẹ để animation hoạt động
+        
+        evt.currentTarget.className += " active";
     }
 
     document.addEventListener('DOMContentLoaded', function() {
