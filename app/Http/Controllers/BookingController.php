@@ -73,7 +73,7 @@ class BookingController extends Controller
 
             // B. Tạo Lịch Đặt (Booking)
             Booking::create([
-                'customer_id'       => $customer->id, // 🔥 Liên kết khóa ngoại với bảng customers
+                'customer_id'       => $customer->id,
                 
                 // Vẫn lưu lại thông tin text để làm "Snapshot" lịch sử (tránh việc khách đổi tên/địa chỉ làm sai lệch đơn cũ)
                 'customer_name'     => $request->customer_name,
