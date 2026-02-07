@@ -159,26 +159,31 @@
                 </div>
             </div>
 
-            {{-- 🔥 2. HỆ THỐNG TABS: CHI TIẾT SẢN PHẨM | THÔNG SỐ KỸ THUẬT 🔥 --}}
             <div class="mb-16">
                 {{-- Tab Headers --}}
                 <div class="flex border-b border-gray-200 mb-6">
-                    <button type="button" class="tab-btn active text-xl font-bold text-gray-800 uppercase pr-[10%]" onclick="openTab(event, 'tab-description')">
-                        Chi tiết sản phẩm
+                    <button type="button" class="tab-btn active text-xl font-bold text-gray-700 uppercase mr-[5%] hover-underline-animation hover:text-blue-700" onclick="openTab(event, 'tab-description')">
+                        <i class="fa-regular fa-circle-question"></i> Chi tiết sản phẩm
                     </button>
                     @if(!empty($product->specs))
-                    <button type="button" class="tab-btn text-xl font-bold text-gray-800 uppercase" onclick="openTab(event, 'tab-specs')">
-                        Thông số kỹ thuật
+                    <button type="button" class="tab-btn text-xl font-bold text-gray-700 uppercase hover-underline-animation hover:text-blue-700" onclick="openTab(event, 'tab-specs')">
+                        <i class="fa-solid fa-gear"></i> Thông số kỹ thuật
                     </button>
                     @endif
                 </div>
 
-                {{-- Tab Content: Mô tả (Mặc định hiện) --}}
-                <div id="tab-description" class="tab-content active">
-                    <div class="product-description text-gray-700 leading-7 text-[15px]">
+            {{-- Tab Content: Mô tả --}}
+            <div id="tab-description" class="tab-content active">
+                {{-- Thêm các class: break-words, overflow-hidden --}}
+                <div class="product-description text-gray-700 leading-7 text-[15px] break-words overflow-hidden w-full">
+                    
+                    {{-- Bọc nội dung trong một div riêng để xử lý table tràn --}}
+                    <div class="prose max-w-none"> 
                         {!! $product->description ?? '<div class="p-8 text-center text-gray-400 bg-gray-50 rounded-lg italic">Đang cập nhật nội dung chi tiết...</div>' !!}
                     </div>
+
                 </div>
+            </div>
 
                 {{-- Tab Content: Thông số (Mặc định ẩn) --}}
                 <div id="tab-specs" class="tab-content hidden">
