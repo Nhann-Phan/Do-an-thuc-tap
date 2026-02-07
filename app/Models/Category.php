@@ -9,7 +9,7 @@ class Category extends Model
 {
     use HasFactory;
 
-    // --- SỬA LẠI DÒNG NÀY (Thêm 'slug') ---
+    // --- SỬA LẠI DÒNG NÀY ---
     protected $fillable = ['name', 'slug', 'parent_id', 'icon', 'description'];
 
     // Quan hệ với Sản phẩm

@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class PageSection extends Model
 {
     use HasFactory;
-
-    // --- QUAN TRỌNG: Khai báo các cột được phép lưu ---
     protected $fillable = [
         'page_id', 
         'title', 

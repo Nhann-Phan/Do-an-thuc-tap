@@ -63,7 +63,6 @@ class NewsController extends Controller
         $request->validate([
             'title'   => 'required|max:255',
             'summary' => 'nullable|max:500',
-            // ✅ Thêm dòng này để cho phép nội dung trống lúc tạo mới (giống Page)
             'content' => 'nullable', 
             'image'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ], [
@@ -106,7 +105,7 @@ class NewsController extends Controller
         $request->validate([
             'title'   => 'required|max:255',
             'summary' => 'nullable|max:500',
-            'content' => 'nullable', // ✅ Cho phép cập nhật mà nội dung vẫn trống
+            'content' => 'nullable',
             'image'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 

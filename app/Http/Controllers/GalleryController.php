@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\ProjectImage; // Sử dụng Model ảnh
-use Illuminate\Support\Facades\File; // [QUAN TRỌNG] Thêm dòng này để sửa lỗi gạch đỏ chữ File
+use App\Models\ProjectImage;
+use Illuminate\Support\Facades\File;
 
 class GalleryController extends Controller
 {
@@ -45,7 +45,7 @@ class GalleryController extends Controller
         $image = ProjectImage::find($id);
         
         if ($image) {
-            // Cập nhật mô tả (caption) thay vì 'name'
+            // Cập nhật mô tả caption
             $image->caption = $request->input('caption');
 
             // Nếu người dùng chọn ảnh mới -> Thay thế ảnh cũ
