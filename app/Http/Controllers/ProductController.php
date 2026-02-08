@@ -64,7 +64,7 @@ class ProductController extends Controller
                                       ->where('id', '!=', $id)      
                                       ->with('variants')
                                       ->inRandomOrder()              
-                                      ->take(4)                      
+                                      ->take(7)                      
                                       ->get();
         }
 

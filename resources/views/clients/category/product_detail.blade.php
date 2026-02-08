@@ -76,7 +76,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
         
         {{-- CỘT TRÁI (LỚN): CHỨA TẤT CẢ NỘI DUNG CHÍNH --}}
-        <div class="lg:col-span-9">
+        <div class="lg:col-span-8">
             
             {{-- 1. PHẦN TRÊN: ẢNH & GIÁ (Giữ nguyên) --}}
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12 items-start">
@@ -162,11 +162,11 @@
             <div class="mb-16">
                 {{-- Tab Headers --}}
                 <div class="flex border-b border-gray-200 mb-6">
-                    <button type="button" class="tab-btn active text-xl font-bold text-gray-700 uppercase mr-[5%] hover-underline-animation hover:text-blue-700" onclick="openTab(event, 'tab-description')">
+                    <button type="button" class="tab-btn active text-base font-bold text-gray-700 uppercase mr-[5%] hover-underline-animation hover:text-blue-700" onclick="openTab(event, 'tab-description')">
                         <i class="fa-regular fa-circle-question"></i> Chi tiết sản phẩm
                     </button>
                     @if(!empty($product->specs))
-                    <button type="button" class="tab-btn text-xl font-bold text-gray-700 uppercase hover-underline-animation hover:text-blue-700" onclick="openTab(event, 'tab-specs')">
+                    <button type="button" class="tab-btn text-base font-bold text-gray-700 uppercase hover-underline-animation hover:text-blue-700" onclick="openTab(event, 'tab-specs')">
                         <i class="fa-solid fa-gear"></i> Thông số kỹ thuật
                     </button>
                     @endif
@@ -215,48 +215,57 @@
                 </div>
             </div>
 
-            {{-- RELATED PRODUCTS --}}
-            @if(isset($relatedProducts) && count($relatedProducts) > 0)
-            <div class="select-none"> 
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-gray-800 uppercase border-l-4 border-red-600 pl-3">Sản phẩm tương tự</h3>
+        {{-- RELATED PRODUCTS --}}
+        @if(isset($relatedProducts) && count($relatedProducts) > 0)
+        <div class="mt-12 select-none"> 
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-gray-800 uppercase border-l-4 border-red-600 pl-3">Sản phẩm tương tự</h3>
+                
+                {{-- Thêm nút điều hướng (Tùy chọn, giúp user biết có thể bấm) --}}
+                <div class="flex gap-2">
+                    <button class="swiper-button-prev-custom w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition"><i class="fas fa-chevron-left"></i></button>
+                    <button class="swiper-button-next-custom w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition"><i class="fas fa-chevron-right"></i></button>
                 </div>
-                <div class="relative w-full"> 
-                    <div class="swiper mySwiper w-full overflow-hidden rounded-xl p-1 cursor-grab active:cursor-grabbing"> 
-                        <div class="swiper-wrapper">
-                            @foreach($relatedProducts as $related)
-                            <div class="swiper-slide h-auto">
-                                <div class="bg-white border border-gray-200 rounded-xl hover:shadow-xl hover:border-blue-300 transition-all duration-300 h-full flex flex-col group relative overflow-hidden">
-                                    @if($related->sale_price)
-                                        <span class="absolute top-2 right-2 z-10 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">-{{ round((($related->price - $related->sale_price)/$related->price)*100) }}%</span>
-                                    @endif
-                                    <div class="relative pt-[100%] overflow-hidden bg-white p-6 border-b border-gray-50">
-                                        <a href="{{ route('product.detail', $related->id) }}" class="absolute inset-0 flex items-center justify-center">
-                                            <img src="{{ $related->image ? asset($related->image) : '' }}" class="max-h-full max-w-full object-contain transition duration-500 group-hover:scale-110" onerror="this.src='https://via.placeholder.com/150'">
-                                        </a>
-                                    </div>
-                                    <div class="p-4 flex-grow flex flex-col">
-                                        <h4 class="text-sm font-bold text-gray-700 mb-2 line-clamp-2 hover:text-blue-600 transition h-10">
-                                            <a href="{{ route('product.detail', $related->id) }}">{{ $related->name }}</a>
-                                        </h4>
-                                        <div class="mt-auto flex items-center justify-between">
-                                            <span class="text-red-600 font-bold text-base">{{ number_format($related->sale_price ?: $related->price, 0, ',', '.') }} ₫</span>
-                                            <a href="{{ route('add_to_cart', $related->id) }}" class="w-8 h-8 rounded-full bg-gray-100 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition shadow-sm"><i class="fas fa-plus text-xs"></i></a>
-                                        </div>
+            </div>
+
+            <div class="relative w-full"> 
+                {{-- Thêm padding-bottom để tránh bóng đổ bị cắt --}}
+                <div class="swiper mySwiper w-full overflow-hidden rounded-xl p-2 !pb-4"> 
+                    <div class="swiper-wrapper">
+                        @foreach($relatedProducts as $related)
+                        {{-- Thêm 'h-auto flex' để các thẻ bằng nhau --}}
+                        <div class="swiper-slide h-auto flex">
+                            <div class="w-full bg-white border border-gray-200 rounded-xl hover:shadow-xl hover:border-blue-300 transition-all duration-300 flex flex-col group relative overflow-hidden">
+                                @if($related->sale_price)
+                                    <span class="absolute top-2 right-2 z-10 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">-{{ round((($related->price - $related->sale_price)/$related->price)*100) }}%</span>
+                                @endif
+                                <div class="relative pt-[100%] overflow-hidden bg-white p-6 border-b border-gray-50">
+                                    <a href="{{ route('product.detail', $related->id) }}" class="absolute inset-0 flex items-center justify-center">
+                                        <img src="{{ $related->image ? asset($related->image) : 'https://via.placeholder.com/150' }}" class="max-h-full max-w-full object-contain transition duration-500 group-hover:scale-110" loading="lazy">
+                                    </a>
+                                </div>
+                                <div class="p-4 flex-grow flex flex-col">
+                                    <h4 class="text-sm font-bold text-gray-700 mb-2 line-clamp-2 hover:text-blue-600 transition h-10">
+                                        <a href="{{ route('product.detail', $related->id) }}">{{ $related->name }}</a>
+                                    </h4>
+                                    <div class="mt-auto flex items-center justify-between">
+                                        <span class="text-red-600 font-bold text-base">{{ number_format($related->sale_price ?: $related->price, 0, ',', '.') }} ₫</span>
+                                        <a href="{{ route('add_to_cart', $related->id) }}" class="w-8 h-8 rounded-full bg-gray-100 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition shadow-sm"><i class="fas fa-plus text-xs"></i></a>
                                     </div>
                                 </div>
                             </div>
-                            @endforeach
                         </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
-            @endif
+        </div>
+        @endif
         </div>
 
         {{-- CỘT PHẢI (SIDEBAR): CHỈ CÒN SẢN PHẨM NỔI BẬT --}}
-        <div class="lg:col-span-3">
-            <div class="sticky top-24">
+        <div class="lg:col-span-4">
+            <div class="top-24">
                 <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                     <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
                         <h4 class="font-bold text-gray-800 uppercase text-sm border-l-4 border-blue-600 pl-3">Sản phẩm nổi bật</h4>
@@ -285,53 +294,110 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
+    // --- 1. XỬ LÝ CHỌN PHIÊN BẢN (VARIANTS) ---
     const baseUrlAddToCart = "{{ route('add_to_cart', $product->id) }}";
     const baseUrlBuyNow = "{{ route('buy_now', $product->id) }}";
 
     function selectVariant(btn, variantId, price, name) {
+        // Xóa active cũ
         document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
+        
+        // Active nút mới
         btn.classList.add('active');
+        
+        // Cập nhật giá và tên
         document.getElementById('price-display').innerText = new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
         const nameDisplay = document.getElementById('variant-name-display');
         if(nameDisplay) nameDisplay.innerText = name;
+        
+        // Cập nhật link mua hàng
         document.getElementById('btn-add-to-cart').href = `${baseUrlAddToCart}?variant_id=${variantId}`;
         document.getElementById('btn-buy-now').href = `${baseUrlBuyNow}?variant_id=${variantId}`;
     }
 
-    // --- JS XỬ LÝ TABS ---
+    // --- 2. XỬ LÝ CHUYỂN TABS & ĐƯỜNG LINE CHẠY ---
     function openTab(evt, tabName) {
-        // 1. Ẩn tất cả nội dung tab
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tab-content");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-            tabcontent[i].classList.remove("active");
+        // Ẩn tất cả nội dung
+        var tabContents = document.getElementsByClassName("tab-content");
+        for (var i = 0; i < tabContents.length; i++) {
+            tabContents[i].classList.remove("active");
         }
 
-        // 2. Bỏ class active ở tất cả nút
-        tablinks = document.getElementsByClassName("tab-btn");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        // Bỏ active tất cả các nút
+        var tabLinks = document.getElementsByClassName("tab-btn");
+        for (var i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].classList.remove("active");
         }
 
-        // 3. Hiện tab được chọn và thêm class active cho nút
-        document.getElementById(tabName).style.display = "block";
-        setTimeout(() => {
-             document.getElementById(tabName).classList.add("active");
-        }, 10); // Hack nhẹ để animation hoạt động
-        
-        evt.currentTarget.className += " active";
+        // Hiện nội dung được chọn và active nút
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+
+        // Di chuyển đường line (nếu có HTML #tab-indicator)
+        moveIndicator(evt.currentTarget);
     }
 
+    // Hàm tính toán vị trí đường line (Safe check: chỉ chạy nếu có div id="tab-indicator")
+    function moveIndicator(element) {
+        const indicator = document.getElementById('tab-indicator');
+        if (indicator && element) {
+            indicator.style.width = element.offsetWidth + 'px';
+            indicator.style.left = element.offsetLeft + 'px';
+        }
+    }
+
+    // --- 3. KHỞI TẠO KHI LOAD TRANG ---
     document.addEventListener('DOMContentLoaded', function() {
+        
+        // Cập nhật vị trí đường line tab ban đầu (nếu có)
+        const activeTab = document.querySelector('.tab-btn.active');
+        if(activeTab) moveIndicator(activeTab);
+
+        // Update lại khi resize màn hình
+        window.addEventListener('resize', function() {
+            const currentTab = document.querySelector('.tab-btn.active');
+            if(currentTab) moveIndicator(currentTab);
+        });
+
+        // --- KHỞI TẠO SWIPER SLIDER (ĐÃ FIX LỖI LOOP) ---
         setTimeout(() => {
+            // Lấy tổng số sản phẩm từ PHP để kiểm tra điều kiện Loop
+            const totalSlides = {{ isset($relatedProducts) ? count($relatedProducts) : 0 }};
+            // Chỉ bật Loop nếu số sản phẩm > 5 (số lượng hiển thị max trên Desktop)
+            const enableLoop = totalSlides > 5; 
+
             const swiperEl = document.querySelector('.mySwiper');
             if (swiperEl) {
                 new Swiper('.mySwiper', {
-                    loop: true, observer: true, observeParents: true, grabCursor: true, simulateTouch: true, touchRatio: 1.5, resistance: true, resistanceRatio: 0.65, speed: 800, 
-                    autoplay: { delay: 3000, disableOnInteraction: false },
-                    slidesPerView: 2, spaceBetween: 15, 
-                    breakpoints: { 0: { slidesPerView: 2, spaceBetween: 10 }, 640: { slidesPerView: 2, spaceBetween: 15 }, 768: { slidesPerView: 3, spaceBetween: 15 }, 1024: { slidesPerView: 4, spaceBetween: 20 }, 1280: { slidesPerView: 5, spaceBetween: 20 } }
+                    // Logic Loop thông minh
+                    loop: enableLoop, 
+                    
+                    // Tự động chạy
+                    autoplay: { 
+                        delay: 3000, 
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true // Di chuột vào thì dừng lại
+                    },
+                    
+                    speed: 800,
+                    grabCursor: true, // Con trỏ bàn tay
+                    spaceBetween: 15,
+                    slidesPerView: 2, // Mặc định mobile
+                    
+                    // Responsive
+                    breakpoints: { 
+                        0: { slidesPerView: 2, spaceBetween: 10 }, 
+                        640: { slidesPerView: 2, spaceBetween: 15 }, 
+                        768: { slidesPerView: 3, spaceBetween: 15 }, 
+                        1024: { slidesPerView: 4, spaceBetween: 20 }, 
+                        1280: { slidesPerView: 4, spaceBetween: 20 } 
+                    },
+
+                    // Nút điều hướng (Nếu trong HTML có nút prev/next)
+                    navigation: {
+                        nextEl: ".swiper-button-next-custom",
+                        prevEl: ".swiper-button-prev-custom",
+                    },
                 });
             }
         }, 300);
