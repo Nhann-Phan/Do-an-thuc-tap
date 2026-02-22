@@ -21,6 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',       // Đã thêm: Phân quyền (0: Admin, 1: NV, 2: Khách)
+        'phone',      // Đã thêm: Số điện thoại
+        'address',    // Đã thêm: Địa chỉ
+        'is_active',  // Đã thêm: Trạng thái khóa/mở
     ];
 
     /**

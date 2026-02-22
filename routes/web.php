@@ -18,6 +18,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\CompareController;
+use App\Http\Controllers\AccountController; 
 
 // Admin Namespace
 use App\Http\Controllers\Admin\PageController; 
@@ -40,10 +41,10 @@ Route::controller(ProductController::class)->group(function() {
 
 // --- So sánh sản phẩm (Client) ---
 Route::controller(CompareController::class)->prefix('compare')->name('compare.')->group(function() {
-    Route::get('/', 'index')->name('index');     // Trang so sánh
-    Route::post('/add', 'add')->name('add');       // Ajax thêm
-    Route::post('/remove', 'remove')->name('remove'); // Ajax xóa
-    Route::post('/clear', 'clear')->name('clear'); // Ajax xóa toàn bộ
+    Route::get('/', 'index')->name('index'); 
+    Route::post('/add', 'add')->name('add'); 
+    Route::post('/remove', 'remove')->name('remove'); 
+    Route::post('/clear', 'clear')->name('clear'); 
 });
 
 // --- Trang Tĩnh (Giới thiệu, Chính sách...) ---
@@ -95,11 +96,25 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     
     // --- Dashboard ---
     Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard'); 
+
+    // --- ĐỔI MẬT KHẨU CÁ NHÂN (Đặt ở đây để cả Admin & Nhân viên đều thấy) ---
+    Route::get('/profile/password', [AccountController::class, 'changePasswordForm'])->name('admin.profile.password');
+    Route::post('/profile/password', [AccountController::class, 'updatePassword'])->name('admin.profile.update_password');
+
+    // --- QUẢN LÝ TÀI KHOẢN (Chỉ dành cho Admin) ---
+    Route::prefix('accounts')->name('admin.accounts.')->group(function () {
+        Route::get('/', [AccountController::class, 'index'])->name('index');
+        Route::get('/create', [AccountController::class, 'create'])->name('create');
+        Route::post('/store', [AccountController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [AccountController::class, 'edit'])->name('edit');
+        Route::post('/update/{id}', [AccountController::class, 'update'])->name('update');
+        Route::get('/destroy/{id}', [AccountController::class, 'destroy'])->name('destroy');
+    });
     
     // --- Quản lý Booking ---
     Route::get('/booking/update/{id}/{status}', [AdminController::class, 'updateStatus'])->name('admin.booking.update');
 
-    // --- Quản lý Khách hàng (CRM) - ĐÃ CHUYỂN VÀO ĐÂY ---
+    // --- Quản lý Khách hàng (CRM) ---
     Route::controller(CustomerController::class)
         ->prefix('customers')
         ->name('admin.customers.')
