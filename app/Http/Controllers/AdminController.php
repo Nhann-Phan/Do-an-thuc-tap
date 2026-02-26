@@ -20,7 +20,7 @@ class AdminController extends Controller
         //Đếm số đơn đã hủy
         $cancelled_count = Booking::where('status', 'cancelled')->count();
         //Trả về view kèm số liệu 
-        return view('admin.dashboard', compact('bookings', 'total_bookings', 'pending_count', 'completed_count', 'cancelled_count'));
+        return view('admin.dashboard.dashboard', compact('bookings', 'total_bookings', 'pending_count', 'completed_count', 'cancelled_count'));
     }
 
     //Hàm sử lý trạng thái đơn hàng

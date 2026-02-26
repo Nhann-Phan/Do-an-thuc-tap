@@ -30,13 +30,13 @@ class HomeController extends Controller
         $projectImages = ProjectImage::latest()->take(6)->get(); 
 
         // Trả về View (Lưu ý: tên view phải đúng với file home.blade.php bạn vừa sửa)
-        return view('clients.home', compact('products', 'latestNews', 'projectImages', 'page'));
+        return view('clients.pages.home', compact('products', 'latestNews', 'projectImages', 'page'));
     }
 
     // Hàm hiển thị trang giới thiệu động (Các trang con khác)
     public function showPage($slug)
     {
         $page = Page::where('slug', $slug)->where('is_active', 1)->firstOrFail();
-        return view('clients.page_detail', compact('page'));
+        return view('clients.pages.page_detail', compact('page'));
     }
 }

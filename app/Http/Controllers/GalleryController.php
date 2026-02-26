@@ -12,7 +12,7 @@ class GalleryController extends Controller
     public function index()
     {
         $images = ProjectImage::latest()->get();
-        return view('admin.gallery', compact('images'));
+        return view('admin.gallery.gallery', compact('images'));
     }
 
     // 2. Thêm ảnh mới

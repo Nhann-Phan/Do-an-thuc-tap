@@ -78,7 +78,7 @@
         {{-- CỘT TRÁI (LỚN): CHỨA TẤT CẢ NỘI DUNG CHÍNH --}}
         <div class="lg:col-span-8">
             
-            {{-- 1. PHẦN TRÊN: ẢNH & GIÁ (Giữ nguyên) --}}
+            {{-- 1. PHẦN TRÊN: ẢNH & GIÁ --}}
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12 items-start">
                 <div class="md:col-span-5">
                     <div class="border border-gray-200 rounded-xl p-4 bg-white relative group overflow-hidden shadow-sm">
@@ -172,20 +172,16 @@
                     @endif
                 </div>
 
-            {{-- Tab Content: Mô tả --}}
-            <div id="tab-description" class="tab-content active">
-                {{-- Thêm các class: break-words, overflow-hidden --}}
-                <div class="product-description text-gray-700 leading-7 text-[15px] break-words overflow-hidden w-full">
-                    
-                    {{-- Bọc nội dung trong một div riêng để xử lý table tràn --}}
-                    <div class="prose max-w-none"> 
-                        {!! $product->description ?? '<div class="p-8 text-center text-gray-400 bg-gray-50 rounded-lg italic">Đang cập nhật nội dung chi tiết...</div>' !!}
+                {{-- Tab Content: Mô tả --}}
+                <div id="tab-description" class="tab-content active">
+                    <div class="product-description text-gray-700 leading-7 text-[15px] break-words overflow-hidden w-full">
+                        <div class="prose max-w-none"> 
+                            {!! $product->description ?? '<div class="p-8 text-center text-gray-400 bg-gray-50 rounded-lg italic">Đang cập nhật nội dung chi tiết...</div>' !!}
+                        </div>
                     </div>
-
                 </div>
-            </div>
 
-                {{-- Tab Content: Thông số (Mặc định ẩn) --}}
+                {{-- Tab Content: Thông số (ĐÃ BỎ CLASS HIDDEN) --}}
                 <div id="tab-specs" class="tab-content hidden">
                     @if(!empty($product->specs) && count($product->specs) > 0)
                         <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
@@ -221,7 +217,6 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-gray-800 uppercase border-l-4 border-red-600 pl-3">Sản phẩm tương tự</h3>
                 
-                {{-- Thêm nút điều hướng (Tùy chọn, giúp user biết có thể bấm) --}}
                 <div class="flex gap-2">
                     <button class="swiper-button-prev-custom w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition"><i class="fas fa-chevron-left"></i></button>
                     <button class="swiper-button-next-custom w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-blue-600 hover:text-white transition"><i class="fas fa-chevron-right"></i></button>
@@ -229,11 +224,9 @@
             </div>
 
             <div class="relative w-full"> 
-                {{-- Thêm padding-bottom để tránh bóng đổ bị cắt --}}
                 <div class="swiper mySwiper w-full overflow-hidden rounded-xl p-2 !pb-4"> 
                     <div class="swiper-wrapper">
                         @foreach($relatedProducts as $related)
-                        {{-- Thêm 'h-auto flex' để các thẻ bằng nhau --}}
                         <div class="swiper-slide h-auto flex">
                             <div class="w-full bg-white border border-gray-200 rounded-xl hover:shadow-xl hover:border-blue-300 transition-all duration-300 flex flex-col group relative overflow-hidden">
                                 @if($related->sale_price)
@@ -299,28 +292,24 @@
     const baseUrlBuyNow = "{{ route('buy_now', $product->id) }}";
 
     function selectVariant(btn, variantId, price, name) {
-        // Xóa active cũ
         document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
-        
-        // Active nút mới
         btn.classList.add('active');
         
-        // Cập nhật giá và tên
         document.getElementById('price-display').innerText = new Intl.NumberFormat('vi-VN').format(price) + ' ₫';
         const nameDisplay = document.getElementById('variant-name-display');
         if(nameDisplay) nameDisplay.innerText = name;
         
-        // Cập nhật link mua hàng
         document.getElementById('btn-add-to-cart').href = `${baseUrlAddToCart}?variant_id=${variantId}`;
         document.getElementById('btn-buy-now').href = `${baseUrlBuyNow}?variant_id=${variantId}`;
     }
 
-    // --- 2. XỬ LÝ CHUYỂN TABS & ĐƯỜNG LINE CHẠY ---
+    // --- 2. XỬ LÝ CHUYỂN TABS (ĐÃ CẬP NHẬT) ---
     function openTab(evt, tabName) {
-        // Ẩn tất cả nội dung
+        // Ẩn tất cả nội dung tab
         var tabContents = document.getElementsByClassName("tab-content");
         for (var i = 0; i < tabContents.length; i++) {
             tabContents[i].classList.remove("active");
+            tabContents[i].style.display = "none"; // Ép ẩn bằng style
         }
 
         // Bỏ active tất cả các nút
@@ -329,62 +318,38 @@
             tabLinks[i].classList.remove("active");
         }
 
-        // Hiện nội dung được chọn và active nút
-        document.getElementById(tabName).classList.add("active");
-        evt.currentTarget.classList.add("active");
-
-        // Di chuyển đường line (nếu có HTML #tab-indicator)
-        moveIndicator(evt.currentTarget);
-    }
-
-    // Hàm tính toán vị trí đường line (Safe check: chỉ chạy nếu có div id="tab-indicator")
-    function moveIndicator(element) {
-        const indicator = document.getElementById('tab-indicator');
-        if (indicator && element) {
-            indicator.style.width = element.offsetWidth + 'px';
-            indicator.style.left = element.offsetLeft + 'px';
+        // Hiện nội dung được chọn
+        const selectedTab = document.getElementById(tabName);
+        if (selectedTab) {
+            selectedTab.classList.add("active");
+            selectedTab.style.display = "block"; // Ép hiện bằng style
         }
+        
+        // Active nút bấm hiện tại
+        evt.currentTarget.classList.add("active");
     }
 
     // --- 3. KHỞI TẠO KHI LOAD TRANG ---
     document.addEventListener('DOMContentLoaded', function() {
         
-        // Cập nhật vị trí đường line tab ban đầu (nếu có)
-        const activeTab = document.querySelector('.tab-btn.active');
-        if(activeTab) moveIndicator(activeTab);
-
-        // Update lại khi resize màn hình
-        window.addEventListener('resize', function() {
-            const currentTab = document.querySelector('.tab-btn.active');
-            if(currentTab) moveIndicator(currentTab);
-        });
-
-        // --- KHỞI TẠO SWIPER SLIDER (ĐÃ FIX LỖI LOOP) ---
+        // --- KHỞI TẠO SWIPER SLIDER ---
         setTimeout(() => {
-            // Lấy tổng số sản phẩm từ PHP để kiểm tra điều kiện Loop
             const totalSlides = {{ isset($relatedProducts) ? count($relatedProducts) : 0 }};
-            // Chỉ bật Loop nếu số sản phẩm > 5 (số lượng hiển thị max trên Desktop)
             const enableLoop = totalSlides > 5; 
 
             const swiperEl = document.querySelector('.mySwiper');
             if (swiperEl) {
                 new Swiper('.mySwiper', {
-                    // Logic Loop thông minh
                     loop: enableLoop, 
-                    
-                    // Tự động chạy
                     autoplay: { 
                         delay: 3000, 
                         disableOnInteraction: false,
-                        pauseOnMouseEnter: true // Di chuột vào thì dừng lại
+                        pauseOnMouseEnter: true 
                     },
-                    
                     speed: 800,
-                    grabCursor: true, // Con trỏ bàn tay
+                    grabCursor: true, 
                     spaceBetween: 15,
-                    slidesPerView: 2, // Mặc định mobile
-                    
-                    // Responsive
+                    slidesPerView: 2, 
                     breakpoints: { 
                         0: { slidesPerView: 2, spaceBetween: 10 }, 
                         640: { slidesPerView: 2, spaceBetween: 15 }, 
@@ -392,8 +357,6 @@
                         1024: { slidesPerView: 4, spaceBetween: 20 }, 
                         1280: { slidesPerView: 4, spaceBetween: 20 } 
                     },
-
-                    // Nút điều hướng (Nếu trong HTML có nút prev/next)
                     navigation: {
                         nextEl: ".swiper-button-next-custom",
                         prevEl: ".swiper-button-prev-custom",

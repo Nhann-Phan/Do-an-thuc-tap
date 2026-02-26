@@ -12,7 +12,7 @@ class CompareController extends Controller
     {
         $compareIds = Session::get('compare_products', []);
         $products = Product::whereIn('id', $compareIds)->with('variants')->get();
-        return view('clients.compare', compact('products'));
+        return view('clients.category.compare', compact('products'));
     }
 
     // Hàm lấy danh sách sản phẩm hiện tại trong Session (Dùng chung)
