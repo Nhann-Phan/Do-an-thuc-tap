@@ -85,7 +85,7 @@ class ProductController extends Controller
         }
 
         $products = $query->paginate(10);
-        return view('admin.product_list', compact('products'));
+        return view('admin.products.product_list', compact('products'));
     }
 
     public function create(Request $request, $id = null)
@@ -96,7 +96,7 @@ class ProductController extends Controller
         if (!$selectedCategoryId) $selectedCategoryId = $request->route('category_id');
         if (!$selectedCategoryId) $selectedCategoryId = $request->get('category_id');
 
-        return view('admin.product_create', compact('categories', 'selectedCategoryId'));
+        return view('admin.products.product_create', compact('categories', 'selectedCategoryId'));
     }
 
     // --- HÀM LƯU MỚI (Đã thêm xử lý SPECS) ---
@@ -170,7 +170,7 @@ class ProductController extends Controller
     {
         $product = Product::with('variants')->findOrFail($id);
         $categories = Category::all(); 
-        return view('admin.product_edit', compact('product', 'categories'));
+        return view('admin.products.product_edit', compact('product', 'categories'));
     }
 
     // --- HÀM CẬP NHẬT (Đã thêm xử lý SPECS) ---
@@ -280,6 +280,6 @@ class ProductController extends Controller
                            ->latest()
                            ->paginate(10);
         
-        return view('admin.category_detail', compact('products', 'category'));
+        return view('admin.categories.category_detail', compact('products', 'category'));
     }
 }

@@ -18,7 +18,7 @@ class CategoryController extends Controller
                               ->orderBy('id', 'desc')
                               ->get();
 
-        return view('admin.categories', compact('categories'));
+        return view('admin.categories.categories', compact('categories'));
     }
 
     // 2. Thêm danh mục mới
