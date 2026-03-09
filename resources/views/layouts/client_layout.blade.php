@@ -47,18 +47,41 @@
                 <span><i class="fas fa-envelope mr-1 text-blue-300"></i> contact@gpm.vn</span>
                 <span><i class="fas fa-phone-alt mr-1 text-blue-300"></i> 0902 777 186</span>
             </div>
-            <div class="flex space-x-3">
-                <a href="/login" class="hover:text-blue-300 transition md:border-l md:pl-3 border-blue-700 flex items-center">
-                    <i class="fas fa-user-lock mr-1"></i> Đăng nhập Admin
-                </a>
+            
+            {{-- KHU VỰC ĐĂNG NHẬP / THÔNG TIN USER ĐÃ CẬP NHẬT --}}
+            <div class="flex items-center gap-3">
+                @if(Auth::check())
+                    {{-- ĐÃ ĐĂNG NHẬP --}}
+                    
+                    @if(Auth::user()->role == 0 || Auth::user()->role == 1)
+                        {{-- 1. Nếu là Admin hoặc Nhân viên --}}
+                        <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-300 transition md:border-l md:pl-3 border-blue-700 flex items-center font-bold">
+                            <i class="fas fa-user-shield mr-1 text-yellow-400"></i> {{ Auth::user()->name }}
+                        </a>
+                    @else
+                        {{-- 2. Nếu là Khách hàng --}}
+                        <a href="{{ route('client.profile.index') }}" class="hover:text-blue-300 transition md:border-l md:pl-3 border-blue-700 flex items-center font-bold">
+                            <i class="fas fa-user-circle mr-1 text-blue-300"></i> {{ Auth::user()->name }}
+                        </a>
+                    @endif
+
+                    {{-- Nút Đăng xuất chung cho cả 2 loại User --}}
+                    <span class="text-blue-400 opacity-50">|</span>
+                    <a href="{{ route('logout') }}" class="hover:text-red-300 text-red-200 transition flex items-center">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Đăng xuất
+                    </a>
+                @else
+                    {{-- CHƯA ĐĂNG NHẬP --}}
+                    <a href="{{ route('login') }}" class="hover:text-blue-300 transition md:border-l md:pl-3 border-blue-700 flex items-center">
+                        <i class="fas fa-user-lock mr-1 text-blue-300"></i> Đăng nhập
+                    </a>
+                @endif
             </div>
         </div>
     </div>
 
     {{-- HEADER --}}
-    {{-- HEADER --}}
     <header class="bg-white shadow-sm sticky top-0 z-40">
-        {{-- THÊM class 'relative' VÀO DÒNG DƯỚI ĐÂY --}}
         <div class="container mx-auto px-4 relative">
             <div class="flex justify-between items-center h-20">
                 {{-- Logo --}}
@@ -73,7 +96,6 @@
                 {{-- Desktop Menu --}}
                 <div class="flex items-center space-x-8 ml-auto">
                     <nav class="hidden md:flex space-x-8 font-medium text-sm uppercase text-gray-600 items-center h-full">
-                        {{-- ... --}}
             <a href="/" class="hover:text-blue-700 transition hover-underline-animation py-1">Trang chủ</a>
 
             {{-- MENU GIỚI THIỆU (DROPDOWN ĐỘNG) --}}
@@ -103,23 +125,19 @@
             </div>
 
                         {{-- Mega Menu Sản Phẩm --}}
-                        {{-- Class 'static' ở đây rất quan trọng để nó căn theo container cha --}}
                         <div class="group static h-full flex items-center py-6"> 
                             <a href="#products" class="hover:text-blue-700 transition hover-underline-animation py-1 flex items-center cursor-pointer">
                                 SẢN PHẨM <i class="fas fa-chevron-down ml-1 text-[10px] transition-transform group-hover:rotate-180"></i>
                             </a>
                             
                             {{-- Dropdown Content --}}
-                            {{-- Đã thêm rounded-b-xl và overflow-hidden để bo góc dưới --}}
                             <div class="absolute top-full left-0 w-full invisible opacity-0 translate-y-2 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out z-50 shadow-2xl border-blue-800 bg-white rounded-b-xl overflow-hidden">
-                                {{-- Tính toán cột grid --}}
                                 @php
                                     $cats = isset($menuCategories) ? $menuCategories : collect([]);
                                     $gridCols = $cats->count() > 0 ? $cats->count() : 1;
                                     $gridCols = $gridCols > 6 ? 6 : $gridCols;
                                 @endphp
                                 
-                                {{-- Dòng tiêu đề danh mục cha (Màu xanh đậm) --}}
                                 <div class="bg-blue-900 text-white">
                                     <div class="grid text-[13px] font-bold uppercase tracking-wide divide-x divide-blue-800" style="grid-template-columns: repeat({{ $gridCols }}, minmax(0, 1fr));">
                                         @foreach($cats as $parent)
@@ -132,7 +150,6 @@
                                     </div>
                                 </div>
 
-                                {{-- Danh sách menu con (Màu trắng) --}}
                                 <div class="bg-white text-gray-700 pb-2">
                                     <div class="py-5">
                                         <div class="grid gap-0 divide-x divide-gray-100" style="grid-template-columns: repeat({{ $gridCols }}, minmax(0, 1fr));">
@@ -160,7 +177,6 @@
                         <a href="#footer" class="hover:text-blue-700 transition hover-underline-animation py-1">Liên hệ</a>
                     </nav>
 
-                    {{-- ... Phần giỏ hàng và tìm kiếm giữ nguyên ... --}}
                     <div class="h-6 w-px bg-gray-200 hidden md:block"></div>
                     <a href="{{ route('cart.index') }}" class="relative group flex items-center text-gray-600 hover:text-blue-700 transition">
                         <div class="relative p-2">
@@ -172,14 +188,13 @@
                             @endif
                         </div>
                     </a>
+                    
                     {{-- Search Icon & Dropdown --}}
                     <div class="relative" id="searchContainer">
-                         {{-- ... code search ... --}}
                          <button type="button" onclick="toggleSearchDropdown()" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-blue-800 hover:bg-gray-50 rounded-full transition focus:outline-none">
                             <i class="fas fa-search text-lg"></i>
                         </button>
                         <div id="searchDropdown" class="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-50 invisible opacity-0 scale-95 transform transition-all duration-200 origin-top-right">
-                             {{-- ... code form search ... --}}
                              <div class="absolute -top-2 right-3 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-100"></div>
                              <form action="#" method="GET" class="relative">
                                 <input type="text" name="q" id="searchInput" class="w-full border border-gray-300 text-gray-700 text-sm rounded-lg px-4 py-3 pr-16 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm transition" placeholder="Tìm kiếm sản phẩm...">
@@ -245,7 +260,6 @@
                     <p class="text-xs mb-5 text-gray-500 leading-relaxed">Xin vui lòng để lại địa chỉ email, chúng tôi sẽ cập nhật những tin tức quan trọng của GPM tới quý khách.</p>
                     <form class="space-y-3">
                         <div class="flex gap-2">
-                            {{-- Input style Tailwind hoàn toàn --}}
                             <input type="text" placeholder="Họ và tên" class="w-1/2 text-sm px-4 py-2.5 rounded bg-gray-800 border border-gray-700 text-white focus:bg-gray-700 focus:border-red-600 focus:outline-none transition-all duration-300 placeholder-gray-500">
                             <input type="email" placeholder="Email" class="w-1/2 text-sm px-4 py-2.5 rounded bg-gray-800 border border-gray-700 text-white focus:bg-gray-700 focus:border-red-600 focus:outline-none transition-all duration-300 placeholder-gray-500">
                         </div>
@@ -264,7 +278,6 @@
                 </div>
             </div>
             
-            {{-- Scroll Top Button --}}
             <a href="#" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="hidden md:flex absolute bottom-4 right-6 bg-gray-800 hover:bg-gray-700 text-white w-10 h-10 items-center justify-center rounded shadow-lg transition border border-gray-600 z-30 group">
                 <i class="fas fa-angle-double-up group-hover:-translate-y-1 transition-transform duration-300"></i>
             </a>
@@ -276,7 +289,7 @@
         
         {{-- Chat Button --}}
         <div class="fixed bottom-8 right-6 z-40 print:hidden">
-            <button id="chat-btn" onclick="toggleChat()" class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] flex items-center justify-center w-14 h-14 transition transform hover:scale-110 active:scale-95    ">
+            <button id="chat-btn" onclick="toggleChat()" class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] flex items-center justify-center w-14 h-14 transition transform hover:scale-110 active:scale-95">
                 <i class="fas fa-comment-dots text-2xl"></i>
             </button>
         </div>
@@ -347,12 +360,12 @@
                 @csrf 
                 <div>
                     <label class="block text-gray-700 text-xs font-bold uppercase mb-1">Họ và tên <span class="text-red-500">*</span></label>
-                    <input type="text" name="customer_name" id="input_name" required maxlength="50" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-sm" placeholder="Nguyễn Văn A" onblur="checkName()" oninput="clearError('name')">
+                    <input type="text" name="customer_name" id="input_name" required maxlength="50" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-sm" placeholder="Nguyễn Văn A" onblur="checkName()" oninput="clearError('name')" value="{{ Auth::check() ? Auth::user()->name : '' }}">
                     <p id="error_name" class="text-red-500 text-xs mt-1 hidden font-medium"><i class="fas fa-exclamation-circle mr-1"></i> Tên không hợp lệ.</p>
                 </div>
                 <div>
                     <label class="block text-gray-700 text-xs font-bold uppercase mb-1">Số điện thoại <span class="text-red-500">*</span></label>
-                    <input type="tel" name="phone_number" id="input_phone" required maxlength="10" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-sm" placeholder="09xxxxxxx" onblur="checkPhone()" oninput="clearError('phone')">
+                    <input type="tel" name="phone_number" id="input_phone" required maxlength="10" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-sm" placeholder="09xxxxxxx" onblur="checkPhone()" oninput="clearError('phone')" value="{{ Auth::check() ? Auth::user()->phone : '' }}">
                     <p id="error_phone" class="text-red-500 text-xs mt-1 hidden font-medium"><i class="fas fa-exclamation-circle mr-1"></i> SĐT không hợp lệ.</p>
                 </div>
                 <div>
@@ -393,7 +406,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // 1. CÁC HÀM CHATBOT (TOÀN CỤC)
+        // ... (Khu vực script Chatbot và Validation giữ nguyên) ...
         window.toggleChat = function() {
             const chat = document.getElementById('chat-window');
             if (chat.classList.contains('invisible')) {
@@ -480,14 +493,10 @@
         const chatInput = document.getElementById('chat-input');
         if(chatInput) chatInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') window.sendMessage(); });
 
-
-        // 2. XỬ LÝ CLICK (GLOBAL)
         document.addEventListener('click', function(event) {
-            // Booking
             const bookingModal = document.getElementById('booking-modal');
             if (bookingModal && !bookingModal.classList.contains('invisible') && event.target === bookingModal) toggleBooking();
             
-            // Chatbot
             const chatWindow = document.getElementById('chat-window');
             const chatBtn = document.getElementById('chat-btn');
             
@@ -498,14 +507,11 @@
                 toggleChat();
             }
 
-            // Search
             const searchContainer = document.getElementById('searchContainer');
             const searchDropdown = document.getElementById('searchDropdown');
             if (searchContainer && searchDropdown && !searchContainer.contains(event.target) && !searchDropdown.classList.contains('invisible')) toggleSearchDropdown();
         });
 
-
-        // 3. CÁC HÀM KHÁC
         let ToastMini;
         try { ToastMini = Swal.mixin({ width: 380, padding: '1rem', customClass: { popup: 'small-popup-text' } }); } catch(e){}
 
@@ -516,16 +522,32 @@
             else { dropdown.classList.add('invisible', 'opacity-0', 'scale-95'); dropdown.classList.remove('visible', 'opacity-100', 'scale-100'); }
         };
 
-        // Hàm Validation form (Giữ nguyên logic cũ, chỉ đổi class css nếu cần)
         function showError(fieldId, msgId) { document.getElementById(fieldId).classList.add('border-red-500', 'bg-red-50', 'ring-1', 'ring-red-500'); document.getElementById(fieldId).classList.remove('border-gray-300'); document.getElementById(msgId).classList.remove('hidden'); }
         function clearError(type) { let fieldId, msgId; if (type === 'phone') { fieldId = 'input_phone'; msgId = 'error_phone'; } else if (type === 'date') { fieldId = 'date_picker'; msgId = 'error_date'; } else if (type === 'name') { fieldId = 'input_name'; msgId = 'error_name'; } document.getElementById(fieldId).classList.remove('border-red-500', 'bg-red-50', 'ring-1', 'ring-red-500'); document.getElementById(msgId).classList.add('hidden'); }
         function checkName() { var name = document.getElementById('input_name').value.trim(); if (name === '' || /\d/.test(name)) { showError('input_name', 'error_name'); return false; } return true; }
         function checkPhone() { var phone = document.getElementById('input_phone').value.trim(); if (phone !== '' && !/^(0)[0-9]{9}$/.test(phone)) { showError('input_phone', 'error_phone'); return false; } return true; }
         function checkDate() { var dateVal = document.getElementById('date_picker').value; if (!dateVal) return false; var selectedDate = new Date(dateVal); var today = new Date(); today.setHours(0,0,0,0); if (selectedDate < today) { showError('date_picker', 'error_date'); return false; } return true; }
-        function validateBooking(e) { e.preventDefault(); if (!checkName()) { document.getElementById('input_name').focus(); return false; } if (!checkPhone()) { document.getElementById('input_phone').focus(); return false; } if (!checkDate()) { document.getElementById('date_picker').focus(); return false; } document.getElementById('real_booking_time').value = document.getElementById('date_picker').value + 'T' + document.getElementById('shift_picker').value; document.getElementById('bookingForm').submit(); }
+        function validateBooking(e) { 
+            @if(!Auth::check())
+                e.preventDefault();
+                window.location.href = "{{ route('login') }}";
+                return false;
+            @else
+                e.preventDefault(); 
+                if (!checkName()) { document.getElementById('input_name').focus(); return false; } 
+                if (!checkPhone()) { document.getElementById('input_phone').focus(); return false; } 
+                if (!checkDate()) { document.getElementById('date_picker').focus(); return false; } 
+                document.getElementById('real_booking_time').value = document.getElementById('date_picker').value + 'T' + document.getElementById('shift_picker').value; 
+                document.getElementById('bookingForm').submit(); 
+            @endif
+        }
         function setupBookingTime() { const dateInput = document.getElementById('date_picker'); const now = new Date(); const pad = (n) => n < 10 ? '0' + n : n; dateInput.min = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()); if (!dateInput.value) dateInput.value = dateInput.min; }
         
         window.toggleBooking = function() {
+            @if(!Auth::check())
+                window.location.href = "{{ route('login') }}";
+                return;
+            @endif
             const modal = document.getElementById('booking-modal');
             const box = document.getElementById('booking-box');
             if (modal.classList.contains('invisible')) { modal.classList.remove('invisible', 'opacity-0'); modal.classList.add('visible', 'opacity-100'); box.classList.remove('scale-90'); box.classList.add('scale-100'); setupBookingTime(); } 

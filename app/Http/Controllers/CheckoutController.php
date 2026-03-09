@@ -7,15 +7,48 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Customer;
+use App\Models\Cart;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class CheckoutController extends Controller
 {
+    // ========================================================
+    // 🔥 LÕI ĐỒNG BỘ CHO TRANG THANH TOÁN
+    // ========================================================
+    private function getCartData()
+    {
+        if (Auth::check()) {
+            $dbCarts = Cart::with(['product', 'variant'])->where('user_id', Auth::id())->get();
+            $cart = [];
+            foreach ($dbCarts as $item) {
+                if (!$item->product) continue;
+
+                $price = $item->variant ? $item->variant->price : ($item->product->sale_price ?? $item->product->price);
+                $name = $item->variant ? $item->product->name . ' (' . $item->variant->name . ')' : $item->product->name;
+                $cartKey = $item->product_id . '_' . ($item->variant_id ?? 'default');
+
+                $cart[$cartKey] = [
+                    "product_id" => $item->product_id,
+                    "variant_id" => $item->variant_id,
+                    "name" => $name,
+                    "quantity" => $item->quantity,
+                    "price" => $price,
+                    "image" => $item->product->image
+                ];
+            }
+            // Ép ngược vào Session để các nút Back không bị lỗi
+            session()->put('cart', $cart); 
+            return $cart;
+        }
+        return session()->get('cart', []);
+    }
+
     public function index()
     {
-        $cart = session()->get('cart', []);
+        $cart = $this->getCartData();
+
         if (count($cart) == 0) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng đang trống!');
         }
@@ -24,7 +57,6 @@ class CheckoutController extends Controller
 
     public function process(Request $request)
     {
-        // 1. Validate
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
@@ -32,12 +64,12 @@ class CheckoutController extends Controller
             'payment_method' => 'required'
         ]);
 
-        $cart = session()->get('cart', []);
+        $cart = $this->getCartData();
+
         if (count($cart) == 0) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng rỗng!');
         }
 
-        // 2. Tính tổng tiền
         $total = 0;
         foreach ($cart as $item) {
             $total += $item['price'] * $item['quantity'];
@@ -46,23 +78,11 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
-            // 3. XỬ LÝ KHÁCH HÀNG (Tự động định danh)
-            $customer = Customer::firstOrCreate(
-                ['phone_number' => $request->phone],
-                [
-                    'name' => $request->name,
-                    'address' => $request->address,
-                    'email' => $request->email,
-                    'notes' => 'Khách mua hàng qua Website'
-                ]
-            );
-
-            // 4. TẠO ĐƠN HÀNG
             $order = Order::create([
-                'customer_id' => $customer->id,
+                'customer_id' => Auth::id(),
                 'name' => $request->name,
                 'phone' => $request->phone,
-                'email' => $request->email,
+                'email' => $request->email ?? Auth::user()->email,
                 'address' => $request->address,
                 'note' => $request->note,
                 'total_money' => $total,
@@ -70,52 +90,29 @@ class CheckoutController extends Controller
                 'status' => 'pending',
             ]);
 
-            // 5. XỬ LÝ CHI TIẾT & TRỪ KHO (LOGIC MỚI)
             foreach ($cart as $id => $details) {
-                
-                // $id trong giỏ hàng có thể là "15" (sp thường) hoặc "15_29" (sp có biến thể)
-                
-                // TRƯỜNG HỢP A: SẢN PHẨM CÓ BIẾN THỂ (Có dấu gạch dưới _)
                 if (strpos($id, '_') !== false) {
                     [$productId, $variantId] = explode('_', $id);
-                    
-                    // Tìm biến thể và khóa dòng dữ liệu (lockForUpdate)
                     $variant = ProductVariant::where('id', $variantId)->lockForUpdate()->first();
 
-                    if (!$variant) {
-                        throw new \Exception("Phiên bản '{$details['name']}' không còn tồn tại.");
-                    }
+                    if (!$variant) throw new \Exception("Phiên bản '{$details['name']}' không còn tồn tại.");
+                    if ($variant->quantity < $details['quantity']) throw new \Exception("Sản phẩm '{$details['name']}' chỉ còn {$variant->quantity} cái.");
 
-                    // Check số lượng biến thể
-                    if ($variant->quantity < $details['quantity']) {
-                        throw new \Exception("Sản phẩm '{$details['name']}' chỉ còn {$variant->quantity} cái, không đủ để bán.");
-                    }
-
-                    // Trừ kho biến thể
                     $variant->decrement('quantity', $details['quantity']);
                     
-                    // Lưu vào order_items
                     OrderItem::create([
                         'order_id' => $order->id,
-                        'product_id' => $productId, // Vẫn lưu ID sản phẩm cha
-                        'product_name' => $details['name'] . ' (' . $variant->name . ')', // Lưu tên kèm tên biến thể
+                        'product_id' => $productId,
+                        'product_name' => $details['name'] . ' (' . $variant->name . ')',
                         'price' => $details['price'],
                         'quantity' => $details['quantity'],
                     ]);
                 } 
-                // TRƯỜNG HỢP B: SẢN PHẨM THƯỜNG (Không có biến thể)
                 else {
                     $product = Product::where('id', $id)->lockForUpdate()->first();
 
-                    if (!$product) {
-                        throw new \Exception("Sản phẩm '{$details['name']}' không tồn tại.");
-                    }
-
-                    // Nếu sản phẩm thường mà bạn không quản lý số lượng (ví dụ dịch vụ), 
-                    // thì bỏ qua đoạn if dưới này. Còn nếu có quản lý thì giữ nguyên.
-                    if ($product->quantity < $details['quantity']) {
-                        throw new \Exception("Sản phẩm '{$details['name']}' chỉ còn {$product->quantity} cái.");
-                    }
+                    if (!$product) throw new \Exception("Sản phẩm '{$details['name']}' không tồn tại.");
+                    if ($product->quantity < $details['quantity']) throw new \Exception("Sản phẩm '{$details['name']}' chỉ còn {$product->quantity} cái.");
 
                     $product->decrement('quantity', $details['quantity']);
 
@@ -130,6 +127,11 @@ class CheckoutController extends Controller
             }
 
             DB::commit();
+
+            // 🔥 XÓA RỖNG GIỎ HÀNG SAU KHI ĐẶT THÀNH CÔNG
+            if (Auth::check()) {
+                Cart::where('user_id', Auth::id())->delete();
+            }
             session()->forget('cart');
 
             return redirect()->route('cart.index')->with('success', 'Đặt hàng thành công! Mã đơn: #' . $order->id);
