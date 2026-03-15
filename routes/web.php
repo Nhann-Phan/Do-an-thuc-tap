@@ -19,7 +19,6 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\AccountController; 
-
 // Admin Namespace
 use App\Http\Controllers\Admin\PageController; 
 use App\Http\Controllers\Admin\PageSectionController;
