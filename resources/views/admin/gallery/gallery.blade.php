@@ -10,7 +10,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {{-- CỘT TRÁI: FORM UPLOAD (Sticky) --}}
+        {{-- CỘT TRÁI: FORM UPLOAD --}}
         <div class="lg:col-span-1">
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 sticky top-24 z-10 overflow-hidden">
                 {{-- Card Header --}}

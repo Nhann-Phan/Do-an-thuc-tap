@@ -41,12 +41,13 @@
                     </div>
                     
                     <div class="p-6 space-y-5">
-                        {{-- Các trường input giữ nguyên như cũ vì đã ổn --}}
+                        
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Họ và tên <span class="text-red-500">*</span></label>
                             <input type="text" name="name" required 
                                    class="w-full border border-gray-300 px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-400" 
-                                   placeholder="Nhập họ tên người nhận...">
+                                   placeholder="Nhập họ tên người nhận..."
+                                   value="{{ old('name', Auth::user()->name ?? '') }}">
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -54,13 +55,15 @@
                                 <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Số điện thoại <span class="text-red-500">*</span></label>
                                 <input type="text" name="phone" required 
                                        class="w-full border border-gray-300 px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-400" 
-                                       placeholder="09xxxxxxxxx">
+                                       placeholder="09xxxxxxxxx"
+                                       value="{{ old('phone', Auth::user()->customer->phone_number ?? Auth::user()->phone ?? '') }}">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Email (Tùy chọn)</label>
                                 <input type="email" name="email" 
                                        class="w-full border border-gray-300 px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-400" 
-                                       placeholder="email@example.com">
+                                       placeholder="email@example.com"
+                                       value="{{ old('email', Auth::user()->email ?? '') }}">
                             </div>
                         </div>
 
@@ -68,14 +71,15 @@
                             <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Địa chỉ nhận hàng <span class="text-red-500">*</span></label>
                             <input type="text" name="address" required 
                                    class="w-full border border-gray-300 px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-400" 
-                                   placeholder="Số nhà, tên đường, xã/phường/quận/huyện...">
+                                   placeholder="Số nhà, tên đường, xã/phường/quận/huyện..."
+                                   value="{{ old('address', Auth::user()->customer->address ?? '') }}">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase mb-1.5">Ghi chú đơn hàng</label>
                             <textarea name="note" rows="3" 
                                       class="w-full border border-gray-300 px-4 py-2.5 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition placeholder-gray-400" 
-                                      placeholder="Ví dụ: Giao hàng giờ hành chính..."></textarea>
+                                      placeholder="Ví dụ: Giao hàng giờ hành chính...">{{ old('note') }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -126,7 +130,7 @@
                                         {{-- Nếu số lượng > 1 thì hiện đơn giá nhỏ bên dưới --}}
                                         @if($details['quantity'] > 1)
                                             <span class="block text-[10px] text-gray-400">
-                                                {{ number_format($details['price'], 0, ',', '.') }} x {{ $details['quantity'], 0, ',', '.' }}
+                                                {{ number_format($details['price'], 0, ',', '.') }} x {{ number_format($details['quantity'], 0, ',', '.') }}
                                             </span>
                                         @endif
                                     </div>

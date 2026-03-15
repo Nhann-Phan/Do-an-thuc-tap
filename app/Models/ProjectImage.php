@@ -8,7 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class ProjectImage extends Model
 {
     use HasFactory;
-
-    // Chỉ giữ lại dòng này
     protected $fillable = ['image_path', 'caption'];
 }

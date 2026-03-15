@@ -51,8 +51,8 @@ class ChatbotController extends Controller
             Log::error('Chatbot DB Error: ' . $e->getMessage());
         }
 
-        // 3. GỌI GEMINI (VỚI MODEL CHUẨN 2.5 flash)
-        $modelName = 'gemini-2.5-flash'; // Model chatbot sử dụng (hiện tại) 
+        // 3. GỌI GEMINI model 2.5 flash
+        $modelName = 'gemini-2.5-flash';
         
         $debugLog = []; // Mảng lưu lại lỗi của từng key để soi
 
@@ -84,7 +84,7 @@ class ChatbotController extends Controller
                 ";
 
             try {
-                // QUAN TRỌNG: withoutVerifying() giúp bỏ qua lỗi SSL trên Localhost
+                // Bỏ qua lỗi SSL trên Localhost
                 $response = Http::withoutVerifying()
                     ->withHeaders(['Content-Type' => 'application/json'])
                     ->post($apiUrl, [

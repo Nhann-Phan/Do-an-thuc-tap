@@ -13,14 +13,14 @@
         .product-description img { border-radius: 0.5rem; margin: 1.5rem auto; max-width: 100%; height: auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .variant-btn.active { border-color: #2563eb; background-color: #eff6ff; color: #1d4ed8; font-weight: 600; box-shadow: 0 0 0 1px #2563eb; }
 
-        /* --- CSS CHO TABS (QUAN TRỌNG) --- */
+        /* --- CSS CHO TABS --- */
         .tab-btn {
             position: relative;
             padding: 15px 0;
             margin-right: 35px;
-            font-size: 1.125rem; /* 18px */
+            font-size: 1.125rem;
             font-weight: 700;
-            color: #6b7280; /* Màu xám khi chưa chọn */
+            color: #6b7280;
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -33,7 +33,7 @@
 
         /* Trạng thái Active của Tab */
         .tab-btn.active {
-            color: #2563eb; /* Màu xanh */
+            color: #2563eb;
             border-bottom-color: #2563eb;
         }
 
@@ -322,7 +322,7 @@
         const selectedTab = document.getElementById(tabName);
         if (selectedTab) {
             selectedTab.classList.add("active");
-            selectedTab.style.display = "block"; // Ép hiện bằng style
+            selectedTab.style.display = "block";
         }
         
         // Active nút bấm hiện tại

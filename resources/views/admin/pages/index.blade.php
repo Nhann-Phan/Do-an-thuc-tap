@@ -21,7 +21,6 @@
                 <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
                     <th class="py-3 px-6 text-left">STT</th>
                     <th class="py-3 px-6 text-left">Tiêu đề</th>
-                    {{-- ĐÃ XÓA CỘT 'HIỆN MENU' Ở ĐÂY CHO GỌN --}}
                     <th class="py-3 px-6 text-center">Thứ tự</th>
                     <th class="py-3 px-6 text-center">Trạng thái</th>
                     <th class="py-3 px-6 text-center">Hành động</th>

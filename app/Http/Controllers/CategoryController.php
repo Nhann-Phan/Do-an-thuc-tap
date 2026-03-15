@@ -11,10 +11,9 @@ class CategoryController extends Controller
     // 1. Hiển thị danh mục
     public function index()
     {
-        // QUAN TRỌNG: Chỉ lấy danh mục GỐC (parent_id là null)
-        // Nếu dùng Category::all() sẽ bị lỗi hiện mục con thành ô trống
+        // Chỉ lấy danh mục GỐC (parent_id là null)
         $categories = Category::whereNull('parent_id')
-                              ->with('children') // Lấy kèm con
+                              ->with('children')
                               ->orderBy('id', 'desc')
                               ->get();
 

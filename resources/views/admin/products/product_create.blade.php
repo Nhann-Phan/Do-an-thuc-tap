@@ -69,7 +69,7 @@
                         <textarea name="description" id="description" class="w-full border border-gray-300 rounded-lg">{{ old('description') }}</textarea>
                     </div>
 
-                    {{-- 🔥 KHU VỰC NHẬP THÔNG SỐ KỸ THUẬT (SPECS) 🔥 --}}
+                    {{-- KHU VỰC NHẬP THÔNG SỐ KỸ THUẬT --}}
                     <div class="bg-blue-50/50 p-6 rounded-xl border border-blue-100">
                         <h4 class="text-lg font-bold text-blue-800 mb-4 flex items-center">
                             <i class="fas fa-cogs mr-2"></i> Thông số kỹ thuật
@@ -153,7 +153,6 @@
                         {{-- Danh mục --}}
                         <div class="mb-4">
                             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Danh mục <span class="text-red-500">*</span></label>
-                            {{-- 🔥 Thêm sự kiện onchange để kích hoạt hàm JS --}}
                             <select name="category_id" id="category_select" onchange="toggleSpecsForm()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white" required>
                                 <option value="">-- Chọn danh mục --</option>
                                 @foreach($categories as $cat)

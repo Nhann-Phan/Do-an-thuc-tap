@@ -82,7 +82,6 @@
 <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
 <script>
     CKEDITOR.replace('content_editor', { height: 400 });
-    // Copy function ChangeToSlug from create file here...
     function ChangeToSlug() { /* ... */ } 
 </script>
 @endsection

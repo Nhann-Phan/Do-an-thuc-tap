@@ -23,7 +23,7 @@
     </div>
 </nav>
 
-{{-- 2. NỘI DUNG CHÍNH (CONTENT GỐC TỪ EDITOR) --}}
+{{-- 2. NỘI DUNG CHÍNH --}}
 @if(!empty($page->content) && trim(strip_tags($page->content)) != '')
     
     <div class="container mx-auto px-4 py-12">

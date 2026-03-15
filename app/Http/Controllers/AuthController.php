@@ -42,7 +42,7 @@ class AuthController extends Controller
             }
 
             // ================================================================
-            // 🔥 BẮT ĐẦU ĐỒNG BỘ GIỎ HÀNG TỪ SESSION VÀO DATABASE (KHI LOGIN)
+            // BẮT ĐẦU ĐỒNG BỘ GIỎ HÀNG TỪ SESSION VÀO DATABASE (KHI LOGIN)
             // ================================================================
             $sessionCart = session()->get('cart', []);
             if (count($sessionCart) > 0) {
@@ -120,7 +120,7 @@ class AuthController extends Controller
         Auth::login($user);
 
         // ================================================================
-        // 🔥 BẮT ĐẦU ĐỒNG BỘ GIỎ HÀNG (KHI VỪA ĐĂNG KÝ XONG)
+        // BẮT ĐẦU ĐỒNG BỘ GIỎ HÀNG (KHI VỪA ĐĂNG KÝ XONG)
         // ================================================================
         $sessionCart = session()->get('cart', []);
         if (count($sessionCart) > 0) {

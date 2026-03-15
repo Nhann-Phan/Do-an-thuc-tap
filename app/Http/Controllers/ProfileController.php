@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Order;
 use App\Models\Booking;
 use App\Models\OrderItem;
-use App\Models\Customer; // 🔥 Đừng quên import Customer
+use App\Models\Customer;
 
 class ProfileController extends Controller
 {

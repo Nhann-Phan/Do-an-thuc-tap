@@ -52,7 +52,6 @@
             <div class="flex items-center gap-3">
                 @if(Auth::check())
                     {{-- ĐÃ ĐĂNG NHẬP --}}
-                    
                     @if(Auth::user()->role == 0 || Auth::user()->role == 1)
                         {{-- 1. Nếu là Admin hoặc Nhân viên --}}
                         <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-300 transition md:border-l md:pl-3 border-blue-700 flex items-center font-bold">

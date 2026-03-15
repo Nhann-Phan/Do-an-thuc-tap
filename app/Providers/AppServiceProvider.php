@@ -32,11 +32,8 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // 2. CHỈ chạy các query view composer/share khi KHÔNG PHẢI là Console
-        // Điều này giúp các lệnh php artisan chạy vèo vèo mà không bị treo do DB
         if (!$this->app->runningInConsole()) {
 
-            // --- MENU PAGE (View Composer) ---
-            // View::composer an toàn hơn View::share vì nó chỉ chạy khi View thực sự được render
             View::composer('*', function ($view) {
                 try {
                     $introPages = Page::where('is_active', true)
@@ -51,7 +48,6 @@ class AppServiceProvider extends ServiceProvider
             });
 
             // --- MENU CATEGORY (View Share) ---
-            // Đây là đoạn gây treo nặng nhất. Đã bọc trong runningInConsole nên sẽ an toàn.
             try {
                 if (class_exists(Category::class)) {
                     // Kiểm tra xem bảng categories có tồn tại không (đề phòng lúc mới clone code chưa migrate)

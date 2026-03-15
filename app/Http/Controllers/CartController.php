@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class CartController extends Controller
 {
     // ========================================================
-    // 🔥 LÕI ĐỒNG BỘ: ÉP DATABASE TRỞ LẠI SESSION (CHO GIAO DIỆN HIỂU)
+    // LÕI ĐỒNG BỘ: ÉP DATABASE TRỞ LẠI SESSION (CHO GIAO DIỆN HIỂU)
     // ========================================================
     private function syncDbToSession()
     {
@@ -74,7 +74,7 @@ class CartController extends Controller
                     'quantity' => $quantity
                 ]);
             }
-            $this->syncDbToSession(); // 🔥 Đồng bộ lại Session ngay lập tức
+            $this->syncDbToSession(); // Đồng bộ lại Session ngay lập tức
         } else {
             // CHƯA ĐĂNG NHẬP: Lưu Session
             $cart = session()->get('cart', []);
@@ -122,7 +122,7 @@ class CartController extends Controller
                         ->where('variant_id', $parts[1] === 'default' ? null : $parts[1])
                         ->update(['quantity' => $request->quantity]);
                 }
-                $this->syncDbToSession(); // 🔥 Đồng bộ
+                $this->syncDbToSession();
             } else {
                 $cart = session()->get('cart');
                 $cart[$request->id]["quantity"] = $request->quantity;
@@ -144,7 +144,7 @@ class CartController extends Controller
                         ->where('variant_id', $parts[1] === 'default' ? null : $parts[1])
                         ->delete();
                 }
-                $this->syncDbToSession(); // 🔥 Đồng bộ
+                $this->syncDbToSession();
             } else {
                 $cart = session()->get('cart');
                 if(isset($cart[$request->id])) {

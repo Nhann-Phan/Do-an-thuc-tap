@@ -68,7 +68,7 @@
                         <textarea name="description" id="description" class="w-full border border-gray-300 rounded-lg">{{ old('description', $product->description) }}</textarea>
                     </div>
 
-                    {{-- 🔥 KHU VỰC NHẬP THÔNG SỐ KỸ THUẬT (SPECS) - ĐÃ CẬP NHẬT 🔥 --}}
+                    {{-- KHU VỰC NHẬP THÔNG SỐ KỸ THUẬT (SPECS)--}}
                     <div class="bg-blue-50/50 p-6 rounded-xl border border-blue-100">
                         <h4 class="text-lg font-bold text-blue-800 mb-4 flex items-center">
                             <i class="fas fa-cogs mr-2"></i> Thông số kỹ thuật
@@ -212,7 +212,6 @@
                         {{-- Danh mục --}}
                         <div class="mb-4">
                             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Danh mục <span class="text-red-500">*</span></label>
-                            {{-- 🔥 Thêm onchange để tự động load lại form specs khi đổi danh mục --}}
                             <select name="category_id" id="category_select" onchange="toggleSpecsForm()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none bg-white" required>
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}" {{ $product->category_id == $cat->id ? 'selected' : '' }}>
@@ -312,7 +311,6 @@
 
     function addVariant() {
         const container = document.getElementById('variants-container');
-        // Tạo index ngẫu nhiên để tránh trùng với index cũ trong DB
         const index = 'new_' + new Date().getTime(); 
         
         const html = `
@@ -335,8 +333,6 @@
         `;
         container.insertAdjacentHTML('beforeend', html);
     }
-
-    // 🔥 SCRIPT TỰ ĐỘNG HIỂN THỊ FORM NHẬP LIỆU THEO DANH MỤC 🔥
     function toggleSpecsForm() {
         // Lấy text của option đang chọn
         let select = document.getElementById('category_select');

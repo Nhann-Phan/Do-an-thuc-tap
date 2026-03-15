@@ -55,7 +55,6 @@
                     <th class="px-6 py-3">Tên sản phẩm</th>
                     <th class="px-6 py-3 whitespace-nowrap">Danh mục</th>
                     <th class="px-6 py-3 whitespace-nowrap">Giá bán</th>
-                    {{-- THÊM CỘT KHO HÀNG --}}
                     <th class="px-6 py-3 whitespace-nowrap text-center">Kho hàng</th> 
                     <th class="px-6 py-3 text-center whitespace-nowrap">Trạng thái</th> 
                     <th class="px-6 py-3 text-right whitespace-nowrap">Hành động</th>
@@ -127,7 +126,7 @@
                         @endif
                     </td>
 
-                    {{-- MỚI: KHO HÀNG (Tính tổng quantity của các variants) --}}
+                    {{-- MỚI: KHO HÀNG --}}
                     <td class="px-6 py-4 whitespace-nowrap text-center">
                         @php
                             $totalStock = 0;

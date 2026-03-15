@@ -105,7 +105,6 @@
                         
                         <div class="divide-y divide-gray-100">
                             @forelse($relatedNews as $item)
-                            {{-- QUAN TRỌNG: Dùng $item->slug thay vì $item->id để tránh lỗi 404 --}}
                             <a href="{{ route('client.news.detail', $item->slug) }}" class="flex gap-4 p-5 hover:bg-blue-50/50 transition group items-start">
                                 {{-- Thumbnail nhỏ --}}
                                 <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 relative">

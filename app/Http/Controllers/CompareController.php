@@ -57,7 +57,7 @@ class CompareController extends Controller
             Session::put('compare_products', array_values($compareIds));
         }
 
-        // 🔥 TRẢ VỀ DANH SÁCH MỚI SAU KHI XÓA
+        // TRẢ VỀ DANH SÁCH MỚI SAU KHI XÓA
         return response()->json([
             'status' => 'success', 
             'message' => 'Đã xóa sản phẩm!',
