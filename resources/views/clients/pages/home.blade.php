@@ -21,7 +21,7 @@
                     <p class="text-lg text-gray-200 mb-8 max-w-lg leading-relaxed shadow-black drop-shadow-md">
                         Tối ưu hóa quy trình, nâng cao hiệu suất và bứt phá doanh thu với hệ sinh thái công nghệ toàn diện.
                     </p>
-                    <a href="#products" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-full font-bold uppercase text-sm transition transform hover:scale-105 hover:shadow-lg inline-flex items-center ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900">
+                    <a href="#products" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-full font-bold uppercase text-sm transition transform hover:scale-105 hover:shadow-lg inline-flex items-center ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900">
                         Xem giải pháp <i class="fas fa-arrow-right ml-2"></i>
                     </a>
                 </div>

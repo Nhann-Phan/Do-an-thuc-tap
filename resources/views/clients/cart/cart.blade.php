@@ -118,7 +118,8 @@
                                                 </div>
                                                 <p class="text-gray-800 text-lg font-bold mb-2">Giỏ hàng của bạn đang trống!</p>
                                                 <p class="text-gray-500 text-sm mb-6">Hãy chọn thêm sản phẩm để mua sắm nhé.</p>
-                                                <a href="/" class="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition transform hover:-translate-y-0.5 text-sm uppercase tracking-wide">
+                                                {{-- ĐÃ SỬA: Trỏ về trang sản phẩm thay vì trang chủ --}}
+                                                <a href="{{ route('product.index') }}" class="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition transform hover:-translate-y-0.5 text-sm uppercase tracking-wide">
                                                     Mua sắm ngay
                                                 </a>
                                             </div>
@@ -132,7 +133,8 @@
                 
                 @if(session('cart'))
                     <div class="mt-6">
-                        <a href="/" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition group">
+                        {{-- ĐÃ SỬA: Trỏ về trang sản phẩm --}}
+                        <a href="{{ route('product.index') }}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition group">
                             <i class="fas fa-arrow-left mr-2 transform group-hover:-translate-x-1 transition"></i> Tiếp tục xem sản phẩm
                         </a>
                     </div>
@@ -202,7 +204,7 @@
                 quantity: quantity
             },
             success: function (response) {
-               window.location.reload();
+                window.location.reload();
             }
         });
     });

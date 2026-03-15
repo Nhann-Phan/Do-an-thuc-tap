@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="p-6 bg-white rounded-lg shadow-sm">
-    <h2 class="text-xl font-bold mb-4 text-gray-800">Danh sách Khách hàng (CRM)</h2>
+    <h2 class="text-xl font-bold mb-4 text-gray-800">Danh sách Khách hàng</h2>
     
     <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-gray-500">
@@ -23,7 +23,7 @@
                     </td>
                     <td class="px-6 py-4">
                         <div class="flex flex-col">
-                            <span class="font-bold text-blue-600">{{ $customer->phone_number }}</span>
+                            <span class="font-bold text-blue-600">{{ $customer->phone }}</span>
                             <span>{{ Str::limit($customer->address, 30) }}</span>
                         </div>
                     </td>

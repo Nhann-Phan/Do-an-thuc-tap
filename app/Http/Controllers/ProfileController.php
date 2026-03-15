@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Booking;
+use App\Models\OrderItem;
+use App\Models\Customer; // 🔥 Đừng quên import Customer
 
 class ProfileController extends Controller
 {
@@ -15,7 +17,9 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return view('clients.profile.index', compact('user'));
+        // Lấy thêm thông tin customer nếu có để hiển thị địa chỉ ra view (nếu cần)
+        $customer = Customer::where('user_id', $user->id)->first();
+        return view('clients.profile.index', compact('user', 'customer'));
     }
 
     // 2. Cập nhật thông tin tài khoản
@@ -23,19 +27,24 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-        ], [
-            'name.required' => 'Vui lòng nhập họ tên.',
-        ]);
-
-        User::where('id', $user->id)->update([
+        // 1. Cập nhật Tên (và SĐT nếu muốn đồng bộ) ở bảng users
+        User::where('id', Auth::id())->update([
             'name' => $request->name,
-            'phone' => $request->phone,
+            'phone' => $request->phone, // Nếu bạn muốn lưu số điện thoại trực tiếp trong bảng users
         ]);
 
-        return back()->with('success', 'Cập nhật thông tin cá nhân thành công!');
+        // 2. Cập nhật (hoặc tạo mới) Hồ sơ ở bảng customers
+        Customer::updateOrCreate(
+            ['user_id' => $user->id], // Điều kiện tìm
+            [
+                'name' => $request->name,
+                'email' => $user->email,
+                'phone_number' => $request->phone_number, 
+                'address' => $request->address,
+            ]
+        );
+
+        return back()->with('success', 'Cập nhật thông tin thành công!');
     }
 
     // 3. Xử lý đổi mật khẩu
@@ -53,12 +62,10 @@ class ProfileController extends Controller
 
         $user = Auth::user();
 
-        // Kiểm tra mật khẩu cũ có đúng không
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->with('error', 'Mật khẩu hiện tại không chính xác!');
         }
 
-        // Cập nhật mật khẩu mới
         User::where('id', $user->id)->update([
             'password' => Hash::make($request->new_password)
         ]);
@@ -69,8 +76,12 @@ class ProfileController extends Controller
     // 4. Hiển thị Lịch sử mua hàng
     public function orders()
     {
-        // Lấy danh sách đơn hàng của user đang đăng nhập
-        $orders = Order::where('customer_id', Auth::id())->latest()->paginate(10); 
+        // BƯỚC 1: Tìm ID của Customer thuộc về User này
+        $customer = Customer::where('user_id', Auth::id())->first();
+        $customerId = $customer ? $customer->id : null;
+
+        // BƯỚC 2: Lấy đơn hàng dựa trên customer_id
+        $orders = Order::where('customer_id', $customerId)->latest()->paginate(10); 
         
         return view('clients.profile.orders', compact('orders'));
     }
@@ -78,9 +89,23 @@ class ProfileController extends Controller
     // 5. Hiển thị Lịch sử đặt lịch sửa chữa
     public function bookings()
     {
-        // Theo như cấu trúc bảng bookings của bạn, cột liên kết là 'customer_id'
-        $bookings = Booking::where('customer_id', Auth::id())->latest()->paginate(10);
+        $customer = Customer::where('user_id', Auth::id())->first();
+        $customerId = $customer ? $customer->id : null;
+
+        $bookings = Booking::where('customer_id', $customerId)->latest()->paginate(10);
         
         return view('clients.profile.bookings', compact('bookings'));
+    }
+
+    // 6. Xem chi tiết đơn hàng
+    public function showOrder($id){
+        $customer = Customer::where('user_id', Auth::id())->first();
+        $customerId = $customer ? $customer->id : null;
+
+        // Bắt buộc đơn hàng phải thuộc về customer_id này
+        $order = Order::where('id', $id)->where('customer_id', $customerId)->with('items')->firstOrFail();
+        $orderItems = OrderItem::where('order_id', $order->id)->get();
+        
+        return view('clients.profile.order_detail', compact('order','orderItems'));
     }
 }

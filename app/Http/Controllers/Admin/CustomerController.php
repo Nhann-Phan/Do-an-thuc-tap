@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -11,22 +11,18 @@ class CustomerController extends Controller
     // 1. Danh sách khách hàng
     public function index()
     {
-        // latest('updated_at'): Khách nào mới tương tác (mua/sửa) thì hiện lên đầu
-        // withCount(['bookings', 'orders']): Đếm số lần sửa và số đơn mua để hiện thống kê
-        $customers = Customer::withCount(['bookings', 'orders'])
+        $customers = User::where('role', 2)
+                             -> withCount(['orders', 'bookings'])
                              ->latest('updated_at')
                              ->paginate(10);
 
         return view('admin.customers.index', compact('customers'));
     }
 
-    // 2. Xem chi tiết lịch sử (Sửa chữa + Mua hàng)
+    // 2. Xem chi tiết lịch sử
     public function show($id)
     {
-        // Lấy thông tin khách kèm theo 2 danh sách:
-        // 1. bookings: Sắp xếp theo ngày hẹn giảm dần
-        // 2. orders: Sắp xếp theo ngày đặt (created_at) giảm dần
-        $customer = Customer::with([
+        $customer = User::with([
             'bookings' => function($query) {
                 $query->orderBy('booking_time', 'desc');
             },
@@ -41,23 +37,23 @@ class CustomerController extends Controller
     // 3. Hiển thị form sửa
     public function edit($id)
     {
-        $customer = Customer::findOrFail($id);
+        $customer = User::findOrFail($id);
         return view('admin.customers.edit', compact('customer'));
     }
 
     // 4. Xử lý cập nhật dữ liệu
     public function update(Request $request, $id)
     {
-        $customer = Customer::findOrFail($id);
+        $customer = User::findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
-            // Kiểm tra trùng SĐT nhưng trừ chính khách hàng này ra (. $id)
             'phone_number' => 'required|string|max:20|unique:customers,phone_number,' . $id,
-            'email' => 'nullable|email|max:255',
+            'email' => 'nullable|email|max:255,unique:customers,email,' . $id,
             'address' => 'nullable|string|max:255',
         ], [
             'phone_number.unique' => 'Số điện thoại này đã được sử dụng bởi khách hàng khác.',
+            'email.unique' => 'Email này đã được sử dụng bởi khách hàng khác.',
             'name.required' => 'Vui lòng nhập tên khách hàng.'
         ]);
 
@@ -66,7 +62,8 @@ class CustomerController extends Controller
             'phone_number' => $request->phone_number,
             'email' => $request->email,
             'address' => $request->address,
-            'notes' => $request->notes, // Ghi chú nội bộ về khách (ví dụ: Khách khó tính, khách VIP...)
+            'notes' => $request->notes,
+            'is_active' => $request->has('is_active') ? 1 : 0,
         ]);
 
         return redirect()->route('admin.customers.show', $id)

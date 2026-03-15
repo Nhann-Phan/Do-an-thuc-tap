@@ -81,7 +81,7 @@
                         <div class="text-center py-12">
                             <i class="fas fa-tools text-6xl text-gray-200 mb-4"></i>
                             <p class="text-gray-500 font-medium">Bạn chưa có lịch hẹn sửa chữa nào.</p>
-                            <a href="#" class="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">Đặt lịch ngay</a>
+                            <a href="#" class="hidden inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">Đặt lịch ngay</a>
                         </div>
                     @endif
                 </div>

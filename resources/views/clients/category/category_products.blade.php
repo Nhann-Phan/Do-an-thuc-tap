@@ -12,16 +12,20 @@
             </li>
             <li class="text-gray-300"><i class="fa-solid fa-angle-right"></i></li>
             
-            @if($currentCategory->parent)
-                <li>
-                    <a href="{{ route('frontend.category.show', $currentCategory->parent_id) }}" class="hover:text-blue-600 transition">
-                        {{ $currentCategory->parent->name }}
-                    </a>
-                </li>
-                <li class="text-gray-300"><i class="fa-solid fa-angle-right"></i></li>
-            @endif
-            
-            <li class="text-gray-900 font-bold truncate">{{ $currentCategory->name }}</li>
+            {{-- ĐÃ SỬA: Kiểm tra xem có biến danh mục không --}}
+            @isset($currentCategory)
+                @if($currentCategory->parent)
+                    <li>
+                        <a href="{{ route('frontend.category.show', $currentCategory->parent_id) }}" class="hover:text-blue-600 transition">
+                            {{ $currentCategory->parent->name }}
+                        </a>
+                    </li>
+                    <li class="text-gray-300"><i class="fa-solid fa-angle-right"></i></li>
+                @endif
+                <li class="text-gray-900 font-bold truncate">{{ $currentCategory->name }}</li>
+            @else
+                <li class="text-gray-900 font-bold truncate">Tất cả sản phẩm</li>
+            @endisset
         </ol>
     </div>
 </nav>
@@ -40,7 +44,8 @@
                 <div class="flex flex-col py-2">
                     @foreach($menuCategories as $cat)
                         @php
-                            $isActive = ($currentCategory->id == $cat->id || $currentCategory->parent_id == $cat->id);
+                            // ĐÃ SỬA: Chỉ check active nếu biến tồn tại
+                            $isActive = isset($currentCategory) && ($currentCategory->id == $cat->id || $currentCategory->parent_id == $cat->id);
                             $hasChildren = $cat->children && $cat->children->count() > 0;
                         @endphp
 
@@ -62,9 +67,10 @@
                             @if($hasChildren)
                                 <div id="menu-{{ $cat->id }}" class="bg-gray-50/30 border-t border-b border-gray-100 py-1 transition-all duration-300 {{ $isActive ? 'block' : 'hidden' }}">
                                     @foreach($cat->children as $child)
+                                        {{-- ĐÃ SỬA: Check active cho menu con --}}
                                         <a href="{{ route('frontend.category.show', $child->id) }}" 
-                                           class="pl-12 pr-5 py-2 text-xs transition flex items-center relative {{ $currentCategory->id == $child->id ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-blue-600' }}">
-                                            @if($currentCategory->id == $child->id)
+                                           class="pl-12 pr-5 py-2 text-xs transition flex items-center relative {{ (isset($currentCategory) && $currentCategory->id == $child->id) ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-500 hover:text-blue-600' }}">
+                                            @if(isset($currentCategory) && $currentCategory->id == $child->id)
                                                 <span class="absolute left-9 w-1.5 h-1.5 rounded-full bg-blue-600"></span>
                                             @endif
                                             {{ $child->name }}
@@ -81,7 +87,8 @@
         <div class="col-span-1 lg:col-span-3">
             <div class="flex flex-col sm:flex-row justify-between items-center mb-8 pb-4 border-b border-gray-200 gap-4">
                 <h1 class="text-2xl font-bold text-gray-900 flex items-center">
-                    {{ $currentCategory->name }} 
+                    {{-- ĐÃ SỬA: Đổi tên tiêu đề nếu không có danh mục --}}
+                    {{ isset($currentCategory) ? $currentCategory->name : 'Tất cả sản phẩm' }} 
                     <span class="ml-3 inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                         {{ $products->count() }} sản phẩm
                     </span>

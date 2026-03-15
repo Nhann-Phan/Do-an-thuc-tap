@@ -8,15 +8,13 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Cart;
+use App\Models\Customer; // 🔥 Import Customer Model
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class CheckoutController extends Controller
 {
-    // ========================================================
-    // 🔥 LÕI ĐỒNG BỘ CHO TRANG THANH TOÁN
-    // ========================================================
     private function getCartData()
     {
         if (Auth::check()) {
@@ -38,7 +36,6 @@ class CheckoutController extends Controller
                     "image" => $item->product->image
                 ];
             }
-            // Ép ngược vào Session để các nút Back không bị lỗi
             session()->put('cart', $cart); 
             return $cart;
         }
@@ -75,11 +72,23 @@ class CheckoutController extends Controller
             $total += $item['price'] * $item['quantity'];
         }
 
+        // 1:LƯU/CẬP NHẬT THÔNG TIN VÀO BẢNG CUSTOMERS
+        $customer = Customer::updateOrCreate(
+            ['user_id' => Auth::id()],
+            [
+                'name' => $request->name,
+                'phone_number' => $request->phone,
+                'email' => $request->email ?? Auth::user()->email,
+                'address' => $request->address,
+                'notes' => 'Khách mua hàng qua Web'
+            ]
+        );
         DB::beginTransaction();
 
         try {
+            // 2: TẠO ĐƠN HÀNG VỚI CUSTOMER_ID CHUẨN
             $order = Order::create([
-                'customer_id' => Auth::id(),
+                'customer_id' => $customer->id, // Dùng ID của bảng customers
                 'name' => $request->name,
                 'phone' => $request->phone,
                 'email' => $request->email ?? Auth::user()->email,
@@ -103,7 +112,7 @@ class CheckoutController extends Controller
                     OrderItem::create([
                         'order_id' => $order->id,
                         'product_id' => $productId,
-                        'product_name' => $details['name'] . ' (' . $variant->name . ')',
+                        'product_name' => $details['name'],
                         'price' => $details['price'],
                         'quantity' => $details['quantity'],
                     ]);
@@ -128,7 +137,6 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            // 🔥 XÓA RỖNG GIỎ HÀNG SAU KHI ĐẶT THÀNH CÔNG
             if (Auth::check()) {
                 Cart::where('user_id', Auth::id())->delete();
             }

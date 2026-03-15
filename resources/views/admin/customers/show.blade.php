@@ -17,7 +17,7 @@
                 </div>
                 <div>
                     <label class="text-xs text-gray-500 uppercase">Số điện thoại</label>
-                    <p class="font-bold text-blue-600 text-lg">{{ $customer->phone_number }}</p>
+                    <p class="font-bold text-blue-600 text-lg">{{ $customer->phone }}</p>
                 </div>
                 <div>
                     <label class="text-xs text-gray-500 uppercase">Địa chỉ hiện tại</label>

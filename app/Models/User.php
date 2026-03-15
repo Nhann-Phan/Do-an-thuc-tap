@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -21,10 +22,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',       // Đã thêm: Phân quyền (0: Admin, 1: NV, 2: Khách)
-        'phone',      // Đã thêm: Số điện thoại
-        'address',    // Đã thêm: Địa chỉ
-        'is_active',  // Đã thêm: Trạng thái khóa/mở
+        'role',       //Phân quyền (0: Admin, 1: NV, 2: Khách)
+        'phone',      
+        'address',    
+        'is_active',  
     ];
 
     /**
@@ -48,5 +49,18 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function customer()
+    {
+        return $this->hasOne(Customer::class, 'user_id', 'id');
+    }
+
+    public function orders(){
+        return $this->HasMany(Order::class,'customer_id','id');
+    }
+
+    public function bookings(){
+        return $this->HasMany(Booking::class,'customer_id','id');
     }
 }

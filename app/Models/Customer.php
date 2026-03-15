@@ -10,7 +10,7 @@ class Customer extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'phone_number', 'address', 'email', 'notes'
+        'user_id', 'name', 'phone_number', 'address', 'email', 'notes'
     ];
 
     // Một khách hàng có nhiều lịch đặt
@@ -23,5 +23,10 @@ class Customer extends Model
     public function orders()
     {
         return $this->hasMany(Order::class, 'customer_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

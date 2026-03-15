@@ -55,14 +55,14 @@
                                     <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
                                         <td class="p-4 font-bold text-blue-600">#{{ $order->id }}</td>
                                         <td class="p-4 text-gray-600">{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                                        <td class="p-4 font-bold text-red-600">{{ number_format($order->total_price, 0, ',', '.') }} ₫</td>
+                                        <td class="p-4 font-bold text-red-600">{{ number_format($order->total_money, 0, ',', '.') }} ₫</td>
                                         <td class="p-4">
                                             <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700">
                                                 {{ $order->status }}
                                             </span>
                                         </td>
                                         <td class="p-4 text-center">
-                                            <a href="#" class="text-blue-500 hover:text-blue-700 underline text-xs font-medium">Xem</a>
+                                            <a href="{{ route('client.profile.order_detail', $order->id) }}" class="text-blue-500 hover:text-blue-700 underline text-xs font-bold">Xem chi tiết</a>
                                         </td>
                                     </tr>
                                     @endforeach

@@ -98,6 +98,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/doi-mat-khau', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('update_password');
         Route::get('/don-hang', [App\Http\Controllers\ProfileController::class, 'orders'])->name('orders');
         Route::get('/dat-lich', [App\Http\Controllers\ProfileController::class, 'bookings'])->name('bookings');
+        Route::get('/don-hang/{id}', [App\Http\Controllers\ProfileController::class, 'showOrder'])->name('orders.detail');
     });
 
     // 2. Thanh toán (Ép đăng nhập mới được mua)
