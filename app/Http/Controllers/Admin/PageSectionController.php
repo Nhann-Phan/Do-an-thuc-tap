@@ -82,7 +82,7 @@ class PageSectionController extends Controller
             'title' => $request->title,
             'type' => $request->type,
             'position' => $request->position ?? 0,
-            'data' => $data // Laravel sẽ tự cast mảng này sang JSON nhờ Model
+            'data' => $data
         ]);
 
         return redirect()->back()->with('success', 'Đã thêm khối nội dung thành công!');
