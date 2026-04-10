@@ -56,7 +56,7 @@
             </div>
             
             {{-- Input Password --}}
-            <div class="mb-8">
+            <div class="mb-4">
                 <label class="block text-slate-600 text-sm font-bold mb-2 ml-1">Mật khẩu</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
@@ -66,6 +66,17 @@
                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm text-gray-700 placeholder-gray-400" 
                            placeholder="••••••••" required>
                 </div>
+            </div>
+
+            {{-- Ghi nhớ & Quên mật khẩu --}}
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center">
+                    <input type="checkbox" name="remember" id="remember" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="remember" class="ml-2 text-sm text-slate-600">Ghi nhớ</label>
+                </div>
+                <a href="{{ route('password.request') }}" class="text-sm font-semibold text-blue-600 hover:text-blue-700 transition">
+                    Quên mật khẩu?
+                </a>
             </div>
 
             {{-- Button --}}

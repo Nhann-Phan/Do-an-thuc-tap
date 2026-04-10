@@ -146,13 +146,12 @@
                         </div>
                     </div>
                 </section>
-            @endif {{-- QUAN TRỌNG: Đã thêm thẻ đóng logic IF ở đây --}}
+            @endif
         
         @endforeach
     </div>
 @endif
 
-{{-- CSS Typography giả lập cho nội dung HTML --}}
 <style>
     .prose p { margin-bottom: 1.5em; }
     .prose ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1.5em; }

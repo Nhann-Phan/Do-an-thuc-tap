@@ -45,7 +45,7 @@
                 <i class="fa-regular fa-user"></i>
             </div>
             <span class="text-white font-bold text-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-                ADMIN
+                QUẢN TRỊ
             </span>
         </div>
 

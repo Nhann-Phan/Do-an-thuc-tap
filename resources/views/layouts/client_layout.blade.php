@@ -190,17 +190,21 @@
                     
                     {{-- Search Icon & Dropdown --}}
                     <div class="relative" id="searchContainer">
-                         <button type="button" onclick="toggleSearchDropdown()" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-blue-800 hover:bg-gray-50 rounded-full transition focus:outline-none">
+                        <button type="button" onclick="toggleSearchDropdown()" class="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-blue-800 hover:bg-gray-50 rounded-full transition focus:outline-none">
                             <i class="fas fa-search text-lg"></i>
                         </button>
                         <div id="searchDropdown" class="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-50 invisible opacity-0 scale-95 transform transition-all duration-200 origin-top-right">
-                             <div class="absolute -top-2 right-3 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-100"></div>
-                             <form action="#" method="GET" class="relative">
-                                <input type="text" name="q" id="searchInput" class="w-full border border-gray-300 text-gray-700 text-sm rounded-lg px-4 py-3 pr-16 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm transition" placeholder="Tìm kiếm sản phẩm...">
+                            <div class="absolute -top-2 right-3 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-100"></div>
+                            <form action="{{ route('product.search') }}" method="GET" class="relative">
+                                {{-- Đã thêm autocomplete="off" vào dòng dưới --}}
+                                <input type="text" name="q" id="searchInput" autocomplete="off" class="w-full border border-gray-300 text-gray-700 text-sm rounded-lg px-4 py-3 pr-16 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm transition" placeholder="Tìm kiếm sản phẩm...">
                                 <button type="submit" class="absolute right-1.5 top-1.5 text-white bg-blue-800 hover:bg-blue-700 rounded-md px-3 py-1.5 text-xs font-bold transition shadow-sm mt-0.5">
                                     TÌM KIẾM
                                 </button>
                             </form>
+                            
+                            {{-- Thêm thẻ div này để chứa kết quả Live Search (Mặc định nó tàng hình không ảnh hưởng giao diện) --}}
+                            <div id="liveSearchResults" class="mt-2 hidden max-h-80 overflow-y-auto"></div>
                         </div>
                     </div>
                 </div>
@@ -556,6 +560,78 @@
         @if(session('success')) try { ToastMini.fire({ title: 'THÀNH CÔNG!', text: '{{ session('success') }}', icon: 'success', confirmButtonColor: '#2563eb' }); } catch(e){} @endif
         @if(session('error')) try { ToastMini.fire({ title: 'CÓ LỖI!', text: '{{ session('error') }}', icon: 'error', confirmButtonColor: '#dc2626' }); } catch(e){} @endif
     </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('liveSearchResults');
+        let timeout = null;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeout); // Chống gọi API liên tục khi đang gõ nhanh
+            const query = this.value.trim();
+
+            // Nếu gõ ít hơn 2 chữ thì ẩn đi
+            if(query.length < 2) {
+                searchResults.innerHTML = '';
+                searchResults.classList.add('hidden');
+                return;
+            }
+
+            // Đợi gõ xong 300ms mới gọi server (Tối ưu hiệu năng)
+            timeout = setTimeout(() => {
+                fetch(`/ajax/search?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    searchResults.classList.remove('hidden');
+                    
+                    if(data.length > 0) {
+                        // Vẽ giao diện kết quả
+                        let html = '<ul class="divide-y divide-gray-100 border-t mt-2 pt-2">';
+                        data.forEach(item => {
+                            html += `
+                            <li>
+                                <a href="${item.link}" class="flex items-center p-2 hover:bg-blue-50 rounded-lg transition group">
+                                    <img src="${item.image_url}" 
+                                        onerror="this.onerror=null;this.src='https://placehold.co/150x150?text=No+Image';" 
+                                        class="w-12 h-12 object-contain bg-gray-50 rounded-md border border-gray-100 mr-3">
+                                    <div class="flex-1 overflow-hidden">
+                                        <p class="text-sm font-semibold text-gray-800 truncate group-hover:text-blue-600">${item.name}</p>
+                                        <p class="text-xs text-red-600 font-bold mt-0.5">${item.price_formatted}</p>
+                                    </div>
+                                </a>
+                            </li>`;
+                        });
+                        html += '</ul>';
+                        
+                        // Nút xem tất cả
+                        html += `
+                        <div class="p-2 text-center mt-1 border-t border-gray-100">
+                            <a href="/tim-kiem?q=${encodeURIComponent(query)}" class="text-xs text-blue-600 font-semibold hover:underline">
+                                Xem tất cả kết quả <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>`;
+                        
+                        searchResults.innerHTML = html;
+                    } else {
+                        // Nếu không tìm thấy
+                        searchResults.innerHTML = `
+                        <div class="p-4 text-center border-t mt-2 pt-4">
+                            <p class="text-sm text-gray-500">Không tìm thấy sản phẩm <br> "<span class="font-bold">${query}</span>"</p>
+                        </div>`;
+                    }
+                });
+            }, 300);
+        });
+
+        // Click ra ngoài thì ẩn kết quả đi cho gọn
+        document.addEventListener('click', function(e) {
+            if (!document.getElementById('searchDropdown').contains(e.target)) {
+                searchResults.classList.add('hidden');
+            }
+        });
+    });
+</script>
     
     @stack('scripts')
 </body>

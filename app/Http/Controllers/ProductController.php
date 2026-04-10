@@ -282,4 +282,52 @@ class ProductController extends Controller
         
         return view('admin.categories.category_detail', compact('products', 'category'));
     }
+
+    public function search(Request $request)
+    {
+        // Lấy từ khóa từ ô input có name="q"
+        $keyword = $request->input('q');
+
+        // Nếu khách bấm tìm kiếm mà không gõ gì thì đẩy về trang sản phẩm
+        if (empty($keyword)) {
+            return redirect()->route('product.index');
+        }
+
+        // Tìm sản phẩm có tên chứa từ khóa và đang active
+        $products = \App\Models\Product::where('is_active', 1)
+                    ->where('name', 'LIKE', "%{$keyword}%")
+                    ->paginate(12);
+
+        // Giữ lại tham số ?q=... trên URL khi chuyển trang (pagination)
+        $products->appends(['q' => $keyword]);
+
+        // Trả về view kèm theo dữ liệu (Mày có thể dùng chung view với trang danh sách sản phẩm)
+        return view('clients.category.search', compact('products', 'keyword'));
+    }
+
+    public function searchAjax(Request $request)
+    {
+        $keyword = $request->q;
+        
+        if(empty($keyword)) {
+            return response()->json([]);
+        }
+
+        // Tìm tối đa 5 sản phẩm khớp tên
+        $products = \App\Models\Product::where('is_active', 1)
+                    ->where('name', 'LIKE', "%{$keyword}%")
+                    ->select('id', 'name', 'image', 'price') // Chỉ lấy mấy cột cần thiết cho nhẹ
+                    ->limit(5)
+                    ->get();
+
+        // Định dạng lại ảnh và link để JS dễ dùng
+        foreach($products as $p) {
+            // Sửa lại chỗ này cho giống trang chi tiết (nơi mà ảnh đang hiện được)
+            $p->image_url = $p->image ? asset($p->image) : 'https://placehold.co/150x150?text=No+Image';
+            $p->link = route('product.detail', $p->id);
+            $p->price_formatted = number_format($p->price, 0, ',', '.') . 'đ';
+        }
+
+        return response()->json($products);
+    }
 }
