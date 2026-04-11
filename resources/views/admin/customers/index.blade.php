@@ -5,7 +5,7 @@
     
     {{-- PHẦN HEADER & THANH TÌM KIẾM --}}
     <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-        <h2 class="text-xl font-bold text-gray-800">Danh sách Khách hàng</h2>
+        <h2 class="text-2xl font-bold text-gray-800 m-0">Danh sách Khách hàng</h2>
 
         <form action="{{ route('admin.customers.index') }}" method="GET" class="w-full md:w-auto flex gap-2">
             <div class="relative w-full md:w-80">

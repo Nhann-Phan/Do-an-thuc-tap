@@ -7,8 +7,8 @@
     
     {{-- PHẦN HEADER & THANH TÌM KIẾM --}}
     <div class="px-6 py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between bg-gray-50/50 gap-4">
-        <h5 class="font-bold text-blue-600 text-lg flex items-center">
-            <i class="fas fa-shopping-cart mr-2"></i> Quản Lý Đơn Hàng
+        <h5 class="text-2xl font-bold text-gray-800 m-0">
+            Quản Lý Đơn Hàng
         </h5>
 
         {{-- Form Tìm kiếm --}}

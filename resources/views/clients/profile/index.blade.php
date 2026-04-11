@@ -63,8 +63,8 @@
                         <form action="{{ route('client.profile.update_info') }}" method="POST" class="space-y-4">
                             @csrf
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Email đăng nhập (Không thể đổi)</label>
-                                <input type="email" value="{{ $customer ? $customer->email : '' }}" disabled class="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email đăng nhập</label>
+                                <input type="email" value="{{ $user ? $user->email : '' }}" disabled class="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Họ và Tên</label>

@@ -1,7 +1,7 @@
 @extends('layouts.admin_layout')
 
 @section('content')
-<div class="bg-white p-6 rounded-lg shadow-md">
+<div class="bg-white rounded-lg shadow-md">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Quản lý Trang Giới Thiệu</h2>
         <a href="{{ route('pages.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center transition shadow-sm">
