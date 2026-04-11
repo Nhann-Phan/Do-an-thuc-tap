@@ -9,14 +9,29 @@ use Illuminate\Http\Request;
 class CustomerController extends Controller
 {
     // 1. Danh sách khách hàng
-    public function index()
+    public function index(Request $request)
     {
-        $customers = User::where('role', 2)
-                             -> withCount(['orders', 'bookings'])
-                             ->latest('updated_at')
-                             ->paginate(10);
+        // Lấy từ khóa tìm kiếm từ form
+        $search = $request->input('search');
 
-        return view('admin.customers.index', compact('customers'));
+        $customers = User::where('role', 2)
+            ->withCount(['orders', 'bookings'])
+            // Nếu có từ khóa tìm kiếm thì mới chạy khối lệnh này
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('phone', 'LIKE', "%{$search}%")
+                      ->orWhere('email', 'LIKE', "%{$search}%");
+                });
+            })
+            ->latest('updated_at')
+            ->paginate(10);
+
+        // Quan trọng: Giữ lại từ khóa tìm kiếm trên URL khi bấm sang trang 2, trang 3
+        $customers->appends(['search' => $search]);
+
+        // Trả thêm biến $search ra view để hiển thị lại chữ đã gõ vào ô input
+        return view('admin.customers.index', compact('customers', 'search'));
     }
 
     // 2. Xem chi tiết lịch sử

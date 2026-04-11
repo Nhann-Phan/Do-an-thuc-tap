@@ -9,44 +9,63 @@
         <p class="text-sm text-gray-500 mt-1">Danh sách tất cả sản phẩm hiện có trong hệ thống</p>
     </div>
     
-    {{-- Sửa link này trỏ về trang tạo mới (nếu bạn muốn chọn danh mục trước thì giữ nguyên link cũ) --}}
-    <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition flex items-center transform active:scale-95 text-sm uppercase">
+    <a href="{{ route('product.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg shadow-sm shadow-blue-500/30 transition flex items-center transform active:scale-95 text-sm uppercase">
         <i class="fas fa-plus mr-2"></i> Thêm sản phẩm mới
     </a>
 </div>
 
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     
-    {{-- TOOLBAR (FILTER & SEARCH) --}}
-    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
-        
-        {{-- Filter Label --}}
-        <div class="flex items-center text-gray-700 font-medium text-sm">
-            <i class="fas fa-filter text-blue-500 mr-2"></i>
-            @if(isset($category))
-                <span>Lọc theo: <span class="text-blue-600 font-bold ml-1">{{ $category->name }}</span></span>
-                <a href="{{ route('product.index_admin') }}" class="ml-3 text-xs bg-white border border-gray-300 hover:bg-gray-100 text-gray-600 px-2 py-1 rounded transition flex items-center shadow-sm">
-                    <i class="fas fa-times mr-1"></i> Bỏ lọc
-                </a>
-            @else
-                <span>Tất cả sản phẩm</span>
-            @endif
-        </div>
-
-        {{-- Search Form --}}
-        <div class="w-full md:w-1/3">
-            <form action="{{ route('product.index_admin') }}" method="GET" class="relative group">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-gray-400 group-focus-within:text-blue-500 transition"></i>
+    {{-- TOOLBAR (FILTER DANH MỤC & SEARCH) --}}
+    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+        <form action="{{ route('product.index_admin') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-center justify-between">
+            
+            {{-- Dropdown lọc danh mục --}}
+            <div class="w-full md:w-64 relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-500 pointer-events-none">
+                    <i class="fas fa-filter text-sm"></i>
+                </span>
+                <select name="category_id" onchange="this.form.submit()" class="block w-full pl-9 pr-10 py-2.5 text-sm font-medium border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white appearance-none cursor-pointer text-gray-700 hover:border-blue-400 transition">
+                    <option value="">Tất cả danh mục</option>
+                    @if(isset($categories))
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
+                                {{ $cat->name }}
+                            </option>
+                        @endforeach
+                    @endif
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                    <i class="fas fa-chevron-down text-xs"></i>
                 </div>
-                <input type="text" name="keyword" value="{{ request('keyword') }}" 
-                       class="w-full border border-gray-300 pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm bg-white" 
-                       placeholder="Tìm kiếm tên sản phẩm...">
-            </form>
-        </div>
+            </div>
+
+            {{-- Ô Tìm kiếm chữ --}}
+            <div class="flex gap-2 w-full md:w-auto">
+                <div class="relative w-full md:w-80">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 pointer-events-none">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" name="keyword" value="{{ request('keyword') }}" 
+                        class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition" 
+                        placeholder="Tìm kiếm tên sản phẩm, mã ID...">
+                </div>
+                
+                <button type="submit" class="bg-blue-600 hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm whitespace-nowrap">
+                    Tìm
+                </button>
+                
+                {{-- Nút xóa lọc (Chỉ hiện khi đang tìm kiếm hoặc lọc danh mục) --}}
+                @if((request()->has('keyword') && request('keyword') != '') || (request()->has('category_id') && request('category_id') != ''))
+                    <a href="{{ route('product.index_admin') }}" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2.5 rounded-lg text-sm font-semibold transition flex items-center justify-center border border-red-100" title="Xóa bộ lọc">
+                        <i class="fas fa-times"></i>
+                    </a>
+                @endif
+            </div>
+        </form>
     </div>
     
-    {{-- TABLE --}}
+    {{-- TABLE (Giữ nguyên logic cực xịn của mày) --}}
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
@@ -126,7 +145,7 @@
                         @endif
                     </td>
 
-                    {{-- MỚI: KHO HÀNG --}}
+                    {{-- Kho hàng --}}
                     <td class="px-6 py-4 whitespace-nowrap text-center">
                         @php
                             $totalStock = 0;
@@ -181,10 +200,10 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                    <td colspan="8" class="px-6 py-16 text-center text-gray-500">
                         <div class="flex flex-col items-center justify-center">
                             <i class="fas fa-box-open text-4xl text-gray-300 mb-3"></i>
-                            <p>Không tìm thấy sản phẩm nào.</p>
+                            <p>Không tìm thấy sản phẩm nào khớp với bộ lọc.</p>
                         </div>
                     </td>
                 </tr>

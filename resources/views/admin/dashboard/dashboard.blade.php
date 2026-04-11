@@ -12,7 +12,7 @@
         <div class="bg-white rounded-lg shadow-sm border-l-4 border-blue-600 p-4 h-full">
             <div class="flex flex-col h-full justify-between">
                 <h6 class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-2">Tổng đặt lịch</h6>
-                <h2 class="text-2xl font-bold text-blue-600">{{ $total_bookings ?? 0 }}</h2>
+                <h2 class="text-2xl font-bold text-blue-600">{{ number_format($total_bookings ?? 0) }}</h2>
             </div>
         </div>
 
@@ -20,7 +20,7 @@
         <div class="bg-white rounded-lg shadow-sm border-l-4 border-yellow-400 p-4 h-full">
             <div class="flex flex-col h-full justify-between">
                 <h6 class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-2">Đang chờ xử lý</h6>
-                <h2 class="text-2xl font-bold text-yellow-500">{{ $pending_count ?? 0 }}</h2>
+                <h2 class="text-2xl font-bold text-yellow-500">{{ number_format($pending_count ?? 0) }}</h2>
             </div>
         </div>
 
@@ -28,7 +28,7 @@
         <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-600 p-4 h-full">
             <div class="flex flex-col h-full justify-between">
                 <h6 class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-2">Đã hoàn thành</h6>
-                <h2 class="text-2xl font-bold text-green-600">{{ $completed_count ?? 0 }}</h2>
+                <h2 class="text-2xl font-bold text-green-600">{{ number_format($completed_count ?? 0) }}</h2>
             </div>
         </div>
 
@@ -36,7 +36,7 @@
         <div class="bg-white rounded-lg shadow-sm border-l-4 border-red-600 p-4 h-full">
             <div class="flex flex-col h-full justify-between">
                 <h6 class="text-gray-500 text-xs uppercase font-bold tracking-wider mb-2">Đã hủy</h6>
-                <h2 class="text-2xl font-bold text-red-600">{{ $cancelled_count ?? 0 }}</h2>
+                <h2 class="text-2xl font-bold text-red-600">{{ number_format($cancelled_count ?? 0) }}</h2>
             </div>
         </div>
     </div>
@@ -44,9 +44,31 @@
     {{-- BẢNG DỮ LIỆU (TABLE) --}}
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         
-        {{-- Table Header --}}
-        <div class="bg-white px-6 py-4 border-b border-gray-200 flex items-center font-bold text-gray-700">
-            <i class="fas fa-calendar-alt mr-2 text-blue-600"></i> Đơn đặt lịch mới nhất
+        {{-- Table Header & Thanh Tìm Kiếm --}}
+        <div class="bg-white px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+            <div class="font-bold text-gray-700 flex items-center">
+                <i class="fas fa-calendar-alt mr-2 text-blue-600"></i> Đơn đặt lịch mới nhất
+            </div>
+
+            {{-- Form Tìm kiếm thu gọn --}}
+            <form action="{{ url()->current() }}" method="GET" class="flex gap-2">
+                <div class="relative w-full sm:w-64">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 pointer-events-none">
+                        <i class="fas fa-search text-xs"></i>
+                    </span>
+                    <input type="text" name="search" value="{{ $search ?? '' }}" 
+                        class="block w-full pl-8 pr-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500 transition" 
+                        placeholder="Tìm SĐT, tên khách...">
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold transition shadow-sm">
+                    Tìm
+                </button>
+                @if(!empty($search))
+                    <a href="{{ url()->current() }}" class="bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 px-2.5 py-1.5 rounded-lg transition flex items-center justify-center border border-red-100" title="Xóa tìm kiếm">
+                        <i class="fas fa-times text-sm"></i>
+                    </a>
+                @endif
+            </form>
         </div>
 
         {{-- Table Content --}}
@@ -62,73 +84,82 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-sm text-gray-700">
-                    @if(isset($bookings) && count($bookings) > 0)
-                        @foreach($bookings as $booking)
-                        <tr class="hover:bg-gray-50 transition duration-150 group">
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-gray-900">{{ $booking->customer_name }}</div>
-                                <div class="text-xs text-gray-500 mt-0.5">{{ $booking->phone_number }}</div>
-                            </td>
-                            <td class="px-6 py-4 max-w-xs truncate text-gray-600" title="{{ $booking->issue_description }}">
-                                {{ $booking->issue_description }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                                {{ \Carbon\Carbon::parse($booking->booking_time)->format('d/m/Y H:i') }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @if($booking->status == 'pending') 
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
-                                        Chờ xử lý
-                                    </span>
-                                @elseif($booking->status == 'completed') 
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                        Hoàn thành
-                                    </span>
-                                @else 
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
-                                        Đã hủy
-                                    </span> 
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    @if($booking->status == 'pending')
-                                        <a href="{{ url('/admin/booking/update/'.$booking->id.'/completed') }}" 
-                                           class="p-1.5 text-white bg-green-600 hover:bg-green-700 rounded transition shadow-sm" 
-                                           title="Đã làm xong"
-                                           onclick="return confirm('Xác nhận đã xử lý xong yêu cầu này?')">
-                                            <i class="fas fa-check text-xs px-0.5"></i>
-                                        </a>
+                    @forelse($bookings as $booking)
+                    <tr class="hover:bg-gray-50 transition duration-150 group">
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-gray-900">{{ $booking->customer_name }}</div>
+                            <div class="text-xs text-gray-500 mt-0.5">{{ $booking->phone_number }}</div>
+                        </td>
+                        <td class="px-6 py-4 max-w-xs truncate text-gray-600" title="{{ $booking->issue_description }}">
+                            {{ $booking->issue_description }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-500">
+                            {{ \Carbon\Carbon::parse($booking->booking_time)->format('d/m/Y H:i') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($booking->status == 'pending') 
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                    Chờ xử lý
+                                </span>
+                            @elseif($booking->status == 'completed') 
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                    Hoàn thành
+                                </span>
+                            @else 
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                                    Đã hủy
+                                </span> 
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                @if($booking->status == 'pending')
+                                    <a href="{{ url('/admin/booking/update/'.$booking->id.'/completed') }}" 
+                                       class="p-1.5 text-white bg-green-600 hover:bg-green-700 rounded transition shadow-sm" 
+                                       title="Đã làm xong"
+                                       onclick="return confirm('Xác nhận đã xử lý xong yêu cầu này?')">
+                                        <i class="fas fa-check text-xs px-0.5"></i>
+                                    </a>
 
-                                        <a href="{{ url('/admin/booking/update/'.$booking->id.'/cancelled') }}" 
-                                           class="p-1.5 text-white bg-red-600 hover:bg-red-700 rounded transition shadow-sm" 
-                                           title="Hủy bỏ"
-                                           onclick="return confirm('Bạn có chắc chắn muốn hủy đơn này?')">
-                                            <i class="fas fa-times text-xs px-0.5"></i>
-                                        </a>
+                                    <a href="{{ url('/admin/booking/update/'.$booking->id.'/cancelled') }}" 
+                                       class="p-1.5 text-white bg-red-600 hover:bg-red-700 rounded transition shadow-sm" 
+                                       title="Hủy bỏ"
+                                       onclick="return confirm('Bạn có chắc chắn muốn hủy đơn này?')">
+                                        <i class="fas fa-times text-xs px-0.5"></i>
+                                    </a>
+                                @else
+                                    @if($booking->status == 'completed')
+                                        <span class="text-xs text-gray-400 italic">Đã liên hệ hỗ trợ</span>
                                     @else
-                                        @if($booking->status == 'completed')
-                                            <span class="text-xs text-gray-400 italic">Đã liên hệ hỗ trợ</span>
-                                        @else
-                                            <span class="text-xs text-gray-400 italic">Đơn đã hủy</span>
-                                        @endif
+                                        <span class="text-xs text-gray-400 italic">Đơn đã hủy</span>
                                     @endif
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="5" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center justify-center text-gray-400">
-                                    <i class="fas fa-inbox text-4xl mb-3 opacity-30"></i>
-                                    <span class="text-sm italic">Chưa có dữ liệu đặt lịch nào.</span>
-                                </div>
-                            </td>
-                        </tr>
-                    @endif
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center justify-center text-gray-400">
+                                <i class="fas fa-inbox text-4xl mb-3 opacity-30"></i>
+                                <span class="text-sm italic">
+                                    @if(!empty($search))
+                                        Không tìm thấy lịch đặt nào khớp với "{{ $search }}"
+                                    @else
+                                        Chưa có dữ liệu đặt lịch nào.
+                                    @endif
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
+        </div>
+        
+        {{-- THÊM PHÂN TRANG VÀO ĐÂY ĐỂ ĐỒNG BỘ VỚI CONTROLLER --}}
+        <div class="px-6 py-3 border-t border-gray-100 bg-gray-50 flex justify-center">
+            {{ $bookings->links('pagination::tailwind') }}
         </div>
     </div>
 

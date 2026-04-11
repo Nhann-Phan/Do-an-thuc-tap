@@ -5,10 +5,34 @@
 {{-- HEADER CARD --}}
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     
-    <div class="px-6 py-4 border-b border-gray-100 flex items-center bg-gray-50/50">
+    {{-- PHẦN HEADER & THANH TÌM KIẾM --}}
+    <div class="px-6 py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between bg-gray-50/50 gap-4">
         <h5 class="font-bold text-blue-600 text-lg flex items-center">
             <i class="fas fa-shopping-cart mr-2"></i> Quản Lý Đơn Hàng
         </h5>
+
+        {{-- Form Tìm kiếm --}}
+        <form action="{{ route('admin.orders.index') }}" method="GET" class="w-full md:w-auto flex gap-2">
+            <div class="relative w-full md:w-72">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" name="search" value="{{ $search ?? '' }}" 
+                    class="block w-full pl-10 pr-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" 
+                    placeholder="Tìm mã đơn, tên, SĐT...">
+            </div>
+            
+            <button type="submit" class="inline-flex items-center px-4 py-1.5 bg-blue-600 rounded-lg font-semibold text-xs text-white uppercase hover:bg-blue-700 transition">
+                Tìm
+            </button>
+            
+            {{-- Nút xóa lọc (Chỉ hiện khi có tìm kiếm) --}}
+            @if(!empty($search))
+                <a href="{{ route('admin.orders.index') }}" class="inline-flex items-center px-3 py-1.5 bg-gray-200 rounded-lg text-gray-600 hover:bg-gray-300 transition" title="Xóa bộ lọc">
+                    <i class="fas fa-times"></i>
+                </a>
+            @endif
+        </form>
     </div>
 
     <div class="p-0">
@@ -84,8 +108,15 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center text-gray-400 italic">
-                            Chưa có đơn hàng nào.
+                        <td colspan="6" class="px-6 py-16 text-center">
+                            <div class="text-gray-300 mb-3"><i class="fas fa-receipt text-5xl"></i></div>
+                            <div class="text-gray-400 italic text-base">
+                                @if(!empty($search))
+                                    Không tìm thấy đơn hàng nào khớp với từ khóa "<span class="font-bold text-gray-600">{{ $search }}</span>"
+                                @else
+                                    Chưa có đơn hàng nào.
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @endforelse
@@ -94,10 +125,9 @@
         </div>
 
         {{-- Pagination --}}
-        <div class="px-6 py-4 border-t border-gray-100 flex justify-center">
-            {{-- Nếu chưa config pagination tailwind, dùng tạm style cơ bản --}}
+        <div class="px-6 py-4 border-t border-gray-100 flex justify-center bg-white">
             <div class="flex space-x-1">
-                {{ $orders->onEachSide(1)->links('pagination::tailwind') }} 
+                {{ $orders->appends(['search' => $search ?? ''])->links('pagination::tailwind') }} 
             </div>
         </div>
     </div>

@@ -77,15 +77,31 @@ class ProductController extends Controller
 
     public function indexAdmin(Request $request)
     {
+        // 1. Lấy danh sách danh mục để đổ vào thẻ <select>
+        $categories = Category::all(); 
+
+        // 2. Khởi tạo query
         $query = Product::with(['category', 'variants'])->latest();
         
+        // 3. Lọc theo từ khóa (Tên hoặc ID)
         if ($request->has('keyword') && $request->keyword != '') {
             $keyword = $request->keyword;
-            $query->where('name', 'like', "%{$keyword}%");
+            $query->where(function($q) use ($keyword) {
+                $q->where('name', 'like', "%{$keyword}%")
+                  ->orWhere('id', $keyword); // Tao cho tìm theo ID luôn cho tiện
+            });
         }
 
+        // 4. Lọc theo Danh mục
+        if ($request->has('category_id') && $request->category_id != '') {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // 5. Phân trang và giữ lại tham số trên URL khi sang trang 2, 3
         $products = $query->paginate(10);
-        return view('admin.products.product_list', compact('products'));
+        $products->appends($request->all());
+
+        return view('admin.products.product_list', compact('products', 'categories'));
     }
 
     public function create(Request $request, $id = null)

@@ -7,20 +7,38 @@ use App\Models\Booking;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Lấy tất cả dữ liệu đặt lịch từ database - Sắp xếp theo thời gian tạo mới nhất
-        $bookings = Booking::orderBy('created_at', 'desc')->get();
-        // Tính toán số liệu thống kê
+        // Nhận từ khóa tìm kiếm
+        $search = $request->input('search');
+
+        // 1. Tối ưu danh sách: Bắt buộc dùng paginate(10)
+        $bookings = Booking::when($search, function ($query, $search) {
+                return $query->where('id', 'LIKE', "%{$search}%")
+                    ->orWhere('customer_name', 'LIKE', "%{$search}%") 
+                    ->orWhere('phone_number', 'LIKE', "%{$search}%");
+            })
+            ->latest() // Sắp xếp theo thời gian tạo mới nhất
+            ->paginate(10); 
+            
+        // Giữ nguyên tham số search khi chuyển trang
+        $bookings->appends(['search' => $search]);
+
+        // 2. Tính toán số liệu thống kê
         $total_bookings = Booking::count();
-        //Đếm số đơn đơn chờ xác nhận
         $pending_count = Booking::where('status', 'pending')->count();
-        //Đếm số đơn đã hoàn thành
         $completed_count = Booking::where('status', 'completed')->count();
-        //Đếm số đơn đã hủy
         $cancelled_count = Booking::where('status', 'cancelled')->count();
-        //Trả về view kèm số liệu 
-        return view('admin.dashboard.dashboard', compact('bookings', 'total_bookings', 'pending_count', 'completed_count', 'cancelled_count'));
+
+        // 3. Trả về view
+        return view('admin.dashboard.dashboard', compact(
+            'bookings', 
+            'total_bookings', 
+            'pending_count', 
+            'completed_count', 
+            'cancelled_count',
+            'search'
+        ));
     }
 
     //Hàm sử lý trạng thái đơn hàng

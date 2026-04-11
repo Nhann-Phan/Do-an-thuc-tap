@@ -10,11 +10,31 @@ use Illuminate\Support\Facades\Auth;
 class AccountController extends Controller
 {
     // 1. Hiển thị danh sách tài khoản
-    public function index()
+    public function index(Request $request)
     {
-        // Đổi auth()->id() thành Auth::id()
-        $users = User::where('id', '!=', Auth::id())->latest()->paginate(10);
-        return view('admin.accounts.index', compact('users'));
+        $search = $request->input('search');
+        $role = $request->input('role');
+
+        $users = User::where('id', '!=', Auth::id()) // Ẩn tài khoản đang đăng nhập
+            // Lọc theo từ khóa (Tên, Email, SĐT)
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('email', 'LIKE', "%{$search}%")
+                      ->orWhere('phone', 'LIKE', "%{$search}%");
+                });
+            })
+            // Lọc theo quyền hạn
+            ->when($role, function ($query, $role) {
+                return $query->where('role', $role);
+            })
+            ->latest()
+            ->paginate(10);
+
+        // Giữ tham số trên URL khi qua trang khác
+        $users->appends(['search' => $search, 'role' => $role]);
+
+        return view('admin.accounts.index', compact('users', 'search', 'role'));
     }
 
     // 2. Hiển thị form thêm mới
