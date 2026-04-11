@@ -19,10 +19,25 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Họ và Tên *</label>
                 <input type="text" name="name" value="{{ old('name') }}" required class="w-full px-4 py-2 border rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
             </div>
+            
+            {{-- NÂNG CẤP Ô EMAIL: CÓ NÚT GỬI OTP --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                <input type="email" name="email" value="{{ old('email') }}" required class="w-full px-4 py-2 border rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <div class="flex gap-2">
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" required class="w-full px-4 py-2 border rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <button type="button" id="btn-send-otp" class="whitespace-nowrap px-4 py-2 bg-gray-800 text-white rounded-xl hover:bg-gray-900 text-sm font-semibold transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        Gửi mã
+                    </button>
+                </div>
+                <p id="otp-message" class="text-xs font-medium mt-1 hidden"></p>
             </div>
+
+            {{-- Ô NHẬP MÃ OTP (Mặc định ẩn, gửi mail xong mới hiện) --}}
+            <div id="otp-group" class="hidden">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Mã xác nhận (OTP) *</label>
+                <input type="text" name="otp" maxlength="6" class="w-full px-4 py-2 border border-blue-300 bg-blue-50 rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Nhập 6 số gửi về email...">
+            </div>
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
                 <input type="text" name="phone" value="{{ old('phone') }}" class="w-full px-4 py-2 border rounded-xl outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -42,4 +57,70 @@
         </div>
     </div>
 </div>
+
+{{-- SCRIPT XỬ LÝ NÚT GỬI MÃ OTP BẰNG AJAX --}}
+<script>
+    document.getElementById('btn-send-otp').addEventListener('click', function() {
+        let emailInput = document.getElementById('email');
+        let email = emailInput.value;
+        let btn = this;
+        let msg = document.getElementById('otp-message');
+        let otpGroup = document.getElementById('otp-group');
+
+        // Kiểm tra xem đã nhập email chưa
+        if(!email) {
+            alert('Vui lòng nhập email trước!');
+            emailInput.focus();
+            return;
+        }
+
+        // Vô hiệu hóa nút để tránh khách bấm liên tục spam mail
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
+
+        // Gọi API lên Route send.otp
+        fetch('{{ route("send.otp") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ email: email })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                // Hiện ô nhập OTP và báo màu xanh lá
+                otpGroup.classList.remove('hidden');
+                msg.classList.remove('hidden');
+                msg.className = 'text-xs font-medium mt-1 text-green-600';
+                msg.innerText = data.message;
+                
+                // Đếm ngược 60s
+                let timeLeft = 60;
+                let timer = setInterval(() => {
+                    btn.innerText = `Chờ (${timeLeft}s)`;
+                    timeLeft--;
+                    if(timeLeft < 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.innerText = 'Gửi lại mã';
+                    }
+                }, 1000);
+            } else {
+                // Lỗi (VD: Email bị trùng, nhập sai định dạng) báo màu đỏ
+                btn.disabled = false;
+                btn.innerText = 'Gửi mã';
+                msg.classList.remove('hidden');
+                msg.className = 'text-xs font-medium mt-1 text-red-600';
+                msg.innerText = data.message || 'Lỗi: Email không hợp lệ hoặc đã tồn tại!';
+            }
+        })
+        .catch(error => {
+            btn.disabled = false;
+            btn.innerText = 'Gửi mã';
+            alert('Có lỗi xảy ra, vui lòng kiểm tra lại kết nối!');
+        });
+    });
+</script>
 @endsection

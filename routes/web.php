@@ -15,7 +15,8 @@ use App\Http\Controllers\{
     ChatbotController,
     AuthController,
     ForgotPasswordController,
-    ProfileController
+    ProfileController,
+    MailController
 };
 
 // Admin Controllers
@@ -31,6 +32,8 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\OrderController;
 
+
+Route::post('/send-register-otp', [AuthController::class, 'sendOtp'])->name('send.otp');
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES

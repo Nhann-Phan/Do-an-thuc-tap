@@ -7,9 +7,32 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Cart;
+use Illuminate\Support\Facades\Cache; // Required for OTP caching
+use Illuminate\Support\Facades\Mail;  // Required for sending Mail
+use App\Mail\RegisterOtpMail;         // Required to use the Mailable
 
 class AuthController extends Controller
 {
+    // 0. Gửi mã OTP (AJAX gọi vào đây)
+    public function sendOtp(Request $request)
+    {
+        // Kiểm tra xem user có nhập email chưa, và email có bị trùng trong DB không
+        $request->validate([
+            'email' => 'required|email|unique:users,email'
+        ]);
+
+        // 1. Tạo mã 6 số ngẫu nhiên
+        $otp = rand(100000, 999999);
+        
+        // 2. Lưu vào Cache 5 phút (khóa theo email)
+        Cache::put('otp_' . $request->email, $otp, now()->addMinutes(5));
+
+        // 3. Nhét OTP vào Bức Thư và Gửi đi
+        Mail::to($request->email)->send(new RegisterOtpMail($otp));
+
+        return response()->json(['success' => true, 'message' => 'Đã gửi mã OTP thành công!']);
+    }
+
     // 1. Hiển thị form đăng nhập
     public function showLogin() 
     {
@@ -99,6 +122,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:6|confirmed', 
+            'otp' => 'required' 
         ], [
             'name.required' => 'Vui lòng nhập họ tên.',
             'email.required' => 'Vui lòng nhập email.',
@@ -106,8 +130,17 @@ class AuthController extends Controller
             'password.required' => 'Vui lòng nhập mật khẩu.',
             'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
             'password.min' => 'Mật khẩu phải từ 6 ký tự trở lên.',
+            'otp.required' => 'Vui lòng nhập mã xác nhận (OTP).'
         ]);
 
+        // KIỂM TRA OTP TỪ CACHE
+        $cachedOtp = Cache::get('otp_' . $request->email);
+        
+        if (!$cachedOtp || $cachedOtp != $request->otp) {
+            return back()->withErrors(['otp' => 'Mã xác nhận (OTP) không đúng hoặc đã hết hạn!'])->withInput();
+        }
+
+        // Tạo User
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -117,6 +150,9 @@ class AuthController extends Controller
             'is_active' => 1,
         ]);
 
+        // Xóa OTP khỏi Cache sau khi đăng ký thành công
+        Cache::forget('otp_' . $request->email);
+
         Auth::login($user);
 
         // ================================================================
@@ -125,7 +161,6 @@ class AuthController extends Controller
         $sessionCart = session()->get('cart', []);
         if (count($sessionCart) > 0) {
             foreach ($sessionCart as $item) {
-                // Khách mới tạo tài khoản chắc chắn chưa có giỏ hàng trong DB, nên chỉ cần Create
                 Cart::create([
                     'user_id' => Auth::id(),
                     'product_id' => $item['product_id'],
