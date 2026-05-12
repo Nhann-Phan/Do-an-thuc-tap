@@ -62,7 +62,7 @@
                                             </span>
                                         </td>
                                         <td class="p-4 text-center">
-                                            <a href="{{ route('client.profile.order_detail', $order->id) }}" class="text-blue-500 hover:text-blue-700 underline text-xs font-bold">Xem chi tiết</a>
+                                            <a href="{{ route('client.profile.orders.detail', $order->id) }}" class="text-blue-500 hover:text-blue-700 underline text-xs font-bold">Xem chi tiết</a>
                                         </td>
                                     </tr>
                                     @endforeach

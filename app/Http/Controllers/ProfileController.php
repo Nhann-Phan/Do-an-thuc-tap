@@ -22,29 +22,43 @@ class ProfileController extends Controller
         return view('clients.profile.index', compact('user', 'customer'));
     }
 
-    // 2. Cập nhật thông tin tài khoản
+// 2. Cập nhật thông tin tài khoản (Dành riêng cho Client)
     public function updateInfo(Request $request)
     {
         $user = Auth::user();
 
-        // 1. Cập nhật Tên (và SĐT nếu muốn đồng bộ) ở bảng users
-        User::where('id', Auth::id())->update([
-            'name' => $request->name,
-            'phone' => $request->phone, // Nếu bạn muốn lưu số điện thoại trực tiếp trong bảng users
+        // 1. Gom số điện thoại lại
+        $phoneNumber = $request->phone ?? $request->phone_number;
+
+        // Bắt lỗi rỗng ngay từ vòng gửi xe
+        if (empty($phoneNumber)) {
+            return back()->with('error', 'Vui lòng nhập số điện thoại, không được bỏ trống!');
+        }
+
+        // 2. Validate dữ liệu
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'nullable|string|max:255',
         ]);
 
-        // 2. Cập nhật (hoặc tạo mới) Hồ sơ ở bảng customers
+        // 3. CẬP NHẬT BẢNG USERS
+        User::where('id', $user->id)->update([
+            'name' => $request->name,
+            'phone' => $phoneNumber, // Truyền biến đã gom ở trên vào
+        ]);
+
+        // 4. CẬP NHẬT BẢNG CUSTOMERS
         Customer::updateOrCreate(
-            ['user_id' => $user->id], // Điều kiện tìm
+            ['user_id' => $user->id], 
             [
                 'name' => $request->name,
-                'email' => $user->email,
-                'phone_number' => $request->phone_number, 
+                'email' => $user->email, 
+                'phone_number' => $phoneNumber, // Ép số điện thoại vào đúng cột phone_number
                 'address' => $request->address,
             ]
         );
 
-        return back()->with('success', 'Cập nhật thông tin thành công!');
+        return back()->with('success', 'Cập nhật thông tin hồ sơ thành công!');
     }
 
     // 3. Xử lý đổi mật khẩu

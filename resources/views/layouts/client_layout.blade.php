@@ -363,17 +363,17 @@
                 @csrf 
                 <div>
                     <label class="block text-gray-700 text-xs font-bold uppercase mb-1">Họ và tên <span class="text-red-500">*</span></label>
-                    <input type="text" name="customer_name" id="input_name" required maxlength="50" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-sm" placeholder="Nguyễn Văn A" onblur="checkName()" oninput="clearError('name')" value="{{ Auth::check() ? Auth::user()->name : '' }}">
+                    <input type="text" name="customer_name" id="input_name" required maxlength="50" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-sm" placeholder="Nguyễn Văn A" onblur="checkName()" oninput="clearError('name')" value="{{ Auth::check() ? Auth::user()->customer->name : '' }}">
                     <p id="error_name" class="text-red-500 text-xs mt-1 hidden font-medium"><i class="fas fa-exclamation-circle mr-1"></i> Tên không hợp lệ.</p>
                 </div>
                 <div>
                     <label class="block text-gray-700 text-xs font-bold uppercase mb-1">Số điện thoại <span class="text-red-500">*</span></label>
-                    <input type="tel" name="phone_number" id="input_phone" required maxlength="10" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-sm" placeholder="09xxxxxxx" onblur="checkPhone()" oninput="clearError('phone')" value="{{ Auth::check() ? Auth::user()->phone : '' }}">
+                    <input type="tel" name="phone_number" id="input_phone" required maxlength="10" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-sm" placeholder="09xxxxxxx" onblur="checkPhone()" oninput="clearError('phone')" value="{{ Auth::check() ? Auth::user()->customer->phone_number : '' }}">
                     <p id="error_phone" class="text-red-500 text-xs mt-1 hidden font-medium"><i class="fas fa-exclamation-circle mr-1"></i> SĐT không hợp lệ.</p>
                 </div>
                 <div>
                     <label class="block text-gray-700 text-xs font-bold uppercase mb-1">Địa chỉ <span class="text-red-500">*</span></label>
-                    <input type="text" name="address" id="input_address" required class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-sm" placeholder="Ví dụ: Số 12, đường Lý Thái Tổ...">
+                    <input type="text" name="address" id="input_address" required class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition text-sm" placeholder="Ví dụ: Số 12, đường Lý Thái Tổ..." value="{{ Auth::check() ? Auth::user()->customer->address : '' }}">
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">

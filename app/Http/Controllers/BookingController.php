@@ -25,8 +25,11 @@ class BookingController extends Controller
         ]);
 
         try {
-            // 1. Chống Spam (Dựa theo ID Khách hàng hoặc SĐT)
-            $pendingCount = Booking::where('customer_id', Auth::id())
+            // Lấy ID của Customer tương ứng với User đang đăng nhập
+            $customerId = Auth::user()->customer->id;
+
+            // 1. Chống Spam (Dựa theo ID của bảng Customer)
+            $pendingCount = Booking::where('customer_id', $customerId)
                                    ->where('status', 'pending')
                                    ->count();
             
@@ -35,7 +38,7 @@ class BookingController extends Controller
             }
 
             // 2. Chống Trùng Lịch
-            $isDuplicate = Booking::where('customer_id', Auth::id())
+            $isDuplicate = Booking::where('customer_id', $customerId)
                                   ->where('booking_time', $request->booking_time)
                                   ->exists();
 
@@ -43,9 +46,9 @@ class BookingController extends Controller
                 return redirect()->back()->with('error', 'Bạn đã đặt lịch vào khung giờ này rồi!');
             }
 
-            // 3. TẠO LỊCH ĐẶT (Lưu trực tiếp ID Khách hàng đang đăng nhập)
+            // 3. TẠO LỊCH ĐẶT (Lưu chính xác Customer ID)
             Booking::create([
-                'customer_id'       => Auth::id(),
+                'customer_id'       => $customerId, // ĐÃ SỬA CHỖ NÀY
                 'customer_name'     => $request->customer_name,
                 'phone_number'      => $request->phone_number,
                 'address'           => $request->address,
