@@ -42,7 +42,7 @@ class PageController extends Controller
 
         $data = $request->all();
 
-        // 2. Tự động tạo Slug nếu người dùng không nhập
+        // 2. Tự động tạo Slug
         if (empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title']);
         }

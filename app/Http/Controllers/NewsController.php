@@ -41,7 +41,7 @@ class NewsController extends Controller
     }
 
     // ==========================================
-    // PHẦN 2: ADMIN (QUẢN TRỊ VIÊN)
+    // PHẦN 2: ADMIN
     // ==========================================
 
     // 1. DANH SÁCH TIN TỨC
